@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-abstract class AcColors {
+abstract final class AcColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
 
@@ -20,7 +20,7 @@ abstract class AcColors {
   static const Color dangerLight = Color(0xFFFCBABA);
 }
 
-abstract class AcSizes {
+abstract final class AcSizes {
   // border radius
   static const double br = 20.0;
   static const double brInput = 10.0;
