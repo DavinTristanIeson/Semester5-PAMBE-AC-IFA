@@ -13,7 +13,7 @@ abstract final class AcColors {
   static const Color primary = Color(0xFFF8C238);
   static const Color secondary = Color(0xFF725E54);
   static const Color subtle = Color(0xFFC3BAAA);
-  static const Color surface = Color(0xFFFFF5D0);
+  static const Color card = Color(0xFFFFF5D0);
   static const Color background = Color(0xFF524948);
 
   static const Color danger = Color(0xFFF47070);
