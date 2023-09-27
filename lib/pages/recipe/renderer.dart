@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/components/function/future_caller.dart';
+import 'package:pambe_ac_ifa/models/recipe.dart';
 
 class RecipeStepRenderer extends StatefulWidget {
   final Stream<dynamic> stream;
@@ -15,8 +16,7 @@ class RecipeStepRenderer extends StatefulWidget {
 
 class _RecipeStepRendererState extends State<RecipeStepRenderer> {
   late final StreamSubscription _subscribe;
-  // TODO: Recipe step type
-  List<dynamic> steps = [];
+  List<RecipeStep> steps = [];
   @override
   void initState() {
     super.initState();

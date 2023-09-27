@@ -53,18 +53,73 @@ class _AcTextInputState extends State<AcTextInput> {
         error: widget.error,
         required: widget.required,
         child: TextField(
-          decoration: InputDecoration(
-            enabledBorder: createInputBorder(Colors.black),
-            disabledBorder:
-                createInputBorder(Theme.of(context).colorScheme.tertiary),
-            errorBorder: createInputBorder(Theme.of(context).colorScheme.error),
-            focusedBorder:
-                createInputBorder(Theme.of(context).colorScheme.primary),
-            fillColor: AcColors.white,
-            filled: true,
-          ),
+          decoration: AcInputBorderFactory(context, AcInputBorderType.outline)
+              .decorate(InputDecoration(
+                  fillColor: AcColors.white,
+                  filled: true,
+                  hintText: widget.placeholder,
+                  hintStyle: AcTypography.placeholder)),
           controller: _controller,
           onChanged: widget.onChanged,
         ));
   }
+}
+
+enum AcInputBorderType {
+  outline,
+  underline,
+}
+
+class AcInputBorderFactory {
+  BuildContext context;
+  AcInputBorderType type;
+  AcInputBorderFactory(this.context, this.type);
+
+  OutlineInputBorder createOutlineInputBorder(Color color) {
+    return OutlineInputBorder(
+        borderRadius: const BorderRadius.all(Radius.circular(AcSizes.brInput)),
+        borderSide: BorderSide(
+          color: color,
+          width: AcSizes.xs,
+        ));
+  }
+
+  UnderlineInputBorder createUnderlineInputBorder(Color color) {
+    return UnderlineInputBorder(
+        borderSide: BorderSide(
+      color: color,
+      width: AcSizes.xs,
+    ));
+  }
+
+  InputDecoration decorate(InputDecoration? decoration) {
+    if (decoration == null) {
+      return InputDecoration(
+        enabledBorder: enabledBorder,
+        errorBorder: errorBorder,
+        disabledBorder: disabledBorder,
+        focusedBorder: focusedBorder,
+      );
+    }
+    return decoration.copyWith(
+      enabledBorder: enabledBorder,
+      errorBorder: errorBorder,
+      disabledBorder: disabledBorder,
+      focusedBorder: focusedBorder,
+    );
+  }
+
+  InputBorder createInputBorder(Color color) {
+    return type == AcInputBorderType.outline
+        ? createOutlineInputBorder(color)
+        : createUnderlineInputBorder(color);
+  }
+
+  InputBorder get enabledBorder => createInputBorder(Colors.black);
+  InputBorder get disabledBorder =>
+      createInputBorder(Theme.of(context).colorScheme.tertiary);
+  InputBorder get errorBorder =>
+      createInputBorder(Theme.of(context).colorScheme.error);
+  InputBorder get focusedBorder =>
+      createInputBorder(Theme.of(context).colorScheme.primary);
 }

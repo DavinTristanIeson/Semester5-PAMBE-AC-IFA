@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 abstract final class AcColors {
@@ -32,7 +33,13 @@ abstract final class AcSizes {
   static const double xl = 32.0;
   static const double xxl = 64.0;
 
+  static const double space = 16.0;
+
   static const double fontRegular = 12.0;
   static const double fontEmphasis = 14.0;
   static const double fontBig = 18.0;
+}
+
+abstract final class AcTypography {
+  static const TextStyle placeholder = TextStyle(color: Colors.black38);
 }

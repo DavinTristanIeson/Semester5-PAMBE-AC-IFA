@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:pambe_ac_ifa/components/field/text_input.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:pambe_ac_ifa/components/app/app_bar.dart';
+import 'package:pambe_ac_ifa/pages/editor/title.dart';
 import 'package:reactive_forms/reactive_forms.dart';
+import 'package:pambe_ac_ifa/common/validation.dart';
 
 class RecipeEditorPage extends StatefulWidget {
   const RecipeEditorPage({super.key});
@@ -16,30 +19,44 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
   void initState() {
     super.initState();
     form = FormGroup({
-      'name': FormControl<String>(value: "Davin", validators: [
-        Validators.maxLength(8),
+      'title': FormControl<String>(validators: [
+        Validators.minLength(5),
+        AcValidators.acceptedChars,
+      ]),
+      'description': FormControl<String>(validators: [
+        Validators.required,
+      ]),
+      'thumbnail': FormControl<XFile?>(validators: [
+        Validators.required,
       ]),
     });
   }
 
+  void save() {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: OnlyReturnAppBar(
+        actions: [
+          IconButton(
+              onPressed: () {},
+              color: Theme.of(context).colorScheme.tertiary,
+              icon: const Icon(Icons.more_vert)),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: save,
+        child: const Icon(Icons.save),
+      ),
       body: ReactiveForm(
         formGroup: form,
-        child: ReactiveValueListenableBuilder<String>(
-            formControlName: "name",
-            builder: (context, control, child) {
-              return AcTextInput(
-                  value: control.value ?? '',
-                  onChanged: (String? value) {
-                    control.value = value ?? '';
-                    print(value);
-                  },
-                  label: "Name",
-                  required: true);
-            }),
+        child: const Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            RecipeDetailsEditor(),
+          ],
+        ),
       ),
     );
   }

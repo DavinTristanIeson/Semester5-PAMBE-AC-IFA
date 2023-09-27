@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/pages/editor/main.dart';
 import 'package:pambe_ac_ifa/providers/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
-import 'package:reactive_forms/reactive_forms.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
           onError: AcColors.black,
           onTertiary: AcColors.white,
         ),
+        splashColor: AcColors.card.withAlpha(50),
         useMaterial3: true,
         fontFamily: "Roboto",
         appBarTheme: const AppBarTheme(
@@ -51,18 +52,6 @@ class MyApp extends StatelessWidget {
     ];
   }
 
-  ReactiveFormConfig configureReactiveForm({required Widget child}) {
-    return ReactiveFormConfig(
-      validationMessages: {
-        ValidationMessage.required: (error) => "Field must not be empty",
-        ValidationMessage.equals: (error) => "Field should be equal to $error",
-        ValidationMessage.maxLength: (error) =>
-            "Field has a maximum length of $error"
-      },
-      child: child,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -70,7 +59,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: createTheme(),
-        home: configureReactiveForm(child: const RecipeEditorPage()),
+        home: const AcReactiveFormConfig(child: RecipeEditorPage()),
       ),
     );
   }
