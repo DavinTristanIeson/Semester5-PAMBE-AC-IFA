@@ -2,29 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/field/field_wrapper.dart';
 
-class AcTextInput extends StatefulWidget {
-  final String value;
-  final void Function(String?) onChanged;
-  final String label;
-  final String? error;
-  final bool required;
-  final String? placeholder;
-  const AcTextInput(
-      {super.key,
-      required this.value,
-      required this.onChanged,
-      required this.label,
-      this.error,
-      this.placeholder,
-      this.required = false});
+class TextFieldValueProvider extends StatefulWidget {
+  final String? value;
+  final Widget Function(BuildContext context, TextEditingController controller)
+      builder;
+  const TextFieldValueProvider(
+      {super.key, required this.builder, required this.value});
 
   @override
-  State<AcTextInput> createState() => _AcTextInputState();
+  State<TextFieldValueProvider> createState() => _TextFieldValueProviderState();
 }
 
-class _AcTextInputState extends State<AcTextInput> {
+class _TextFieldValueProviderState extends State<TextFieldValueProvider> {
   late final TextEditingController _controller;
-
   @override
   void initState() {
     super.initState();
@@ -37,89 +27,72 @@ class _AcTextInputState extends State<AcTextInput> {
     _controller.dispose();
   }
 
-  OutlineInputBorder createInputBorder(Color color) {
-    return OutlineInputBorder(
-        borderRadius: const BorderRadius.all(Radius.circular(AcSizes.brInput)),
-        borderSide: BorderSide(
-          color: color,
-          width: AcSizes.xs,
-        ));
+  @override
+  Widget build(BuildContext context) {
+    return widget.builder(context, _controller);
   }
+}
+
+class BoxTextInput extends StatelessWidget {
+  final String? placeholder;
+  final String? value;
+  final void Function(String?) onChanged;
+  final bool multiline;
+  const BoxTextInput(
+      {super.key,
+      required this.placeholder,
+      required this.value,
+      required this.onChanged,
+      this.multiline = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFieldValueProvider(
+      value: value,
+      builder: (context, controller) => TextField(
+        decoration: AcInputBorderFactory(context, AcInputBorderType.outline)
+            .decorate(InputDecoration(
+                fillColor: AcColors.white,
+                filled: true,
+                hintText: placeholder,
+                hintStyle: AcTypography.placeholder)),
+        controller: controller,
+        maxLines: multiline ? null : 1,
+        minLines: multiline ? 4 : null,
+        onChanged: onChanged,
+      ),
+    );
+  }
+}
+
+class AcTextInput extends StatelessWidget {
+  final String label;
+  final String? error;
+  final bool required;
+  final String? placeholder;
+  final String? value;
+  final bool multiline;
+  final void Function(String?) onChanged;
+  const AcTextInput(
+      {super.key,
+      required this.value,
+      required this.onChanged,
+      required this.label,
+      this.error,
+      this.placeholder,
+      this.multiline = true,
+      this.required = false});
 
   @override
   Widget build(BuildContext context) {
     return AcFieldWrapper(
-        label: widget.label,
-        error: widget.error,
-        required: widget.required,
-        child: TextField(
-          decoration: AcInputBorderFactory(context, AcInputBorderType.outline)
-              .decorate(InputDecoration(
-                  fillColor: AcColors.white,
-                  filled: true,
-                  hintText: widget.placeholder,
-                  hintStyle: AcTypography.placeholder)),
-          controller: _controller,
-          onChanged: widget.onChanged,
+        label: label,
+        error: error,
+        required: required,
+        child: BoxTextInput(
+          value: value,
+          placeholder: placeholder,
+          onChanged: onChanged,
         ));
   }
-}
-
-enum AcInputBorderType {
-  outline,
-  underline,
-}
-
-class AcInputBorderFactory {
-  BuildContext context;
-  AcInputBorderType type;
-  AcInputBorderFactory(this.context, this.type);
-
-  OutlineInputBorder createOutlineInputBorder(Color color) {
-    return OutlineInputBorder(
-        borderRadius: const BorderRadius.all(Radius.circular(AcSizes.brInput)),
-        borderSide: BorderSide(
-          color: color,
-          width: AcSizes.xs,
-        ));
-  }
-
-  UnderlineInputBorder createUnderlineInputBorder(Color color) {
-    return UnderlineInputBorder(
-        borderSide: BorderSide(
-      color: color,
-      width: AcSizes.xs,
-    ));
-  }
-
-  InputDecoration decorate(InputDecoration? decoration) {
-    if (decoration == null) {
-      return InputDecoration(
-        enabledBorder: enabledBorder,
-        errorBorder: errorBorder,
-        disabledBorder: disabledBorder,
-        focusedBorder: focusedBorder,
-      );
-    }
-    return decoration.copyWith(
-      enabledBorder: enabledBorder,
-      errorBorder: errorBorder,
-      disabledBorder: disabledBorder,
-      focusedBorder: focusedBorder,
-    );
-  }
-
-  InputBorder createInputBorder(Color color) {
-    return type == AcInputBorderType.outline
-        ? createOutlineInputBorder(color)
-        : createUnderlineInputBorder(color);
-  }
-
-  InputBorder get enabledBorder => createInputBorder(Colors.black);
-  InputBorder get disabledBorder =>
-      createInputBorder(Theme.of(context).colorScheme.tertiary);
-  InputBorder get errorBorder =>
-      createInputBorder(Theme.of(context).colorScheme.error);
-  InputBorder get focusedBorder =>
-      createInputBorder(Theme.of(context).colorScheme.primary);
 }

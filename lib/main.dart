@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pambe_ac_ifa/common/collection.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/pages/editor/main.dart';
@@ -31,9 +32,15 @@ class MyApp extends StatelessWidget {
           onError: AcColors.black,
           onTertiary: AcColors.white,
         ),
-        splashColor: AcColors.card.withAlpha(50),
+        splashColor: AcColors.splashColor,
         useMaterial3: true,
         fontFamily: "Roboto",
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          splashColor: AcColors.splashColor,
+          hoverColor: AcColors.hoverColor,
+          focusColor: AcColors.hoverColor,
+        ),
+        elevatedButtonTheme: buildElevatedButtonTheme(),
         appBarTheme: const AppBarTheme(
           backgroundColor: AcColors.secondary,
           foregroundColor: AcColors.primary,
@@ -44,6 +51,28 @@ class MyApp extends StatelessWidget {
               color: AcColors.primary,
               fontSize: AcSizes.fontBig),
         ));
+  }
+
+  ElevatedButtonThemeData buildElevatedButtonTheme() {
+    return ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+                backgroundColor: AcColors.primary,
+                foregroundColor: AcColors.background,
+                textStyle: AcTypography.buttonPrimary)
+            .copyWith(overlayColor: MaterialStateProperty.resolveWith((states) {
+      if (states.containsAny([
+        MaterialState.hovered,
+        MaterialState.focused,
+        MaterialState.selected
+      ])) {
+        return AcColors.hoverColor;
+      } else if (states
+          .containsAny([MaterialState.pressed, MaterialState.dragged])) {
+        return AcColors.splashColor;
+      } else {
+        return null;
+      }
+    })));
   }
 
   List<SingleChildWidget> buildProviders() {

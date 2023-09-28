@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 abstract final class AcColors {
   static const Color white = Color(0xFFFFFFFF);
@@ -19,12 +18,16 @@ abstract final class AcColors {
 
   static const Color danger = Color(0xFFF47070);
   static const Color dangerLight = Color(0xFFFCBABA);
+
+  static const Color splashColor = Color(0x88FFF5D0);
+  static const Color hoverColor = Color(0x44FFF5D0);
 }
 
 abstract final class AcSizes {
   // border radius
-  static const double br = 20.0;
-  static const double brInput = 10.0;
+  static const Radius br = Radius.circular(20.0);
+  static const Radius brInput = Radius.circular(10.0);
+  static const Radius brCircle = Radius.circular(10000.0);
 
   static const double xs = 2.0;
   static const double sm = 4.0;
@@ -42,4 +45,9 @@ abstract final class AcSizes {
 
 abstract final class AcTypography {
   static const TextStyle placeholder = TextStyle(color: Colors.black38);
+  static const TextStyle buttonPrimary = TextStyle(
+    fontSize: AcSizes.fontEmphasis,
+    fontWeight: FontWeight.bold,
+    fontFamily: "Roboto",
+  );
 }

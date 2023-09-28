@@ -17,8 +17,7 @@ class AcFieldWrapper extends StatelessWidget {
     return Container(
         decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(AcSizes.brInput))),
+            borderRadius: const BorderRadius.vertical(top: AcSizes.brInput)),
         padding: const EdgeInsets.symmetric(
             horizontal: AcSizes.md + AcSizes.sm, vertical: AcSizes.md),
         child: Text.rich(TextSpan(children: [
@@ -31,7 +30,7 @@ class AcFieldWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Radius inputRadius = Radius.circular(AcSizes.brInput);
+    const Radius inputRadius = AcSizes.brInput;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -67,4 +66,63 @@ class AcFieldWrapper extends StatelessWidget {
       ],
     );
   }
+}
+
+enum AcInputBorderType {
+  outline,
+  underline,
+}
+
+class AcInputBorderFactory {
+  BuildContext context;
+  AcInputBorderType type;
+  AcInputBorderFactory(this.context, this.type);
+
+  OutlineInputBorder createOutlineInputBorder(Color color) {
+    return OutlineInputBorder(
+        borderRadius: const BorderRadius.all(AcSizes.brInput),
+        borderSide: BorderSide(
+          color: color,
+          width: AcSizes.xs,
+        ));
+  }
+
+  UnderlineInputBorder createUnderlineInputBorder(Color color) {
+    return UnderlineInputBorder(
+        borderSide: BorderSide(
+      color: color,
+      width: AcSizes.xs,
+    ));
+  }
+
+  InputDecoration decorate(InputDecoration? decoration) {
+    if (decoration == null) {
+      return InputDecoration(
+        enabledBorder: enabledBorder,
+        errorBorder: errorBorder,
+        disabledBorder: disabledBorder,
+        focusedBorder: focusedBorder,
+      );
+    }
+    return decoration.copyWith(
+      enabledBorder: enabledBorder,
+      errorBorder: errorBorder,
+      disabledBorder: disabledBorder,
+      focusedBorder: focusedBorder,
+    );
+  }
+
+  InputBorder createInputBorder(Color color) {
+    return type == AcInputBorderType.outline
+        ? createOutlineInputBorder(color)
+        : createUnderlineInputBorder(color);
+  }
+
+  InputBorder get enabledBorder => createInputBorder(Colors.black);
+  InputBorder get disabledBorder =>
+      createInputBorder(Theme.of(context).colorScheme.tertiary);
+  InputBorder get errorBorder =>
+      createInputBorder(Theme.of(context).colorScheme.error);
+  InputBorder get focusedBorder =>
+      createInputBorder(Theme.of(context).colorScheme.primary);
 }

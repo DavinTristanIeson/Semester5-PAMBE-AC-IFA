@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/touchable.dart';
+import 'package:pambe_ac_ifa/components/field/field_wrapper.dart';
 import 'package:pambe_ac_ifa/components/field/text_input.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
@@ -45,12 +46,11 @@ class _TitleEditorImageChooser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Radius rad = Radius.circular(AcSizes.brInput);
     return Container(
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(
-          topLeft: rad,
-          topRight: rad,
+          topLeft: AcSizes.brInput,
+          topRight: AcSizes.brInput,
         ),
         gradient: LinearGradient(colors: [
           Theme.of(context).colorScheme.tertiary,
@@ -69,7 +69,9 @@ class _TitleEditorImageChooser extends StatelessWidget {
 class _TitleEditorTitleField extends StatefulWidget {
   final String? value;
   final void Function(String?) onChanged;
-  const _TitleEditorTitleField({required this.value, required this.onChanged});
+  final String? error;
+  const _TitleEditorTitleField(
+      {required this.value, required this.onChanged, this.error});
 
   @override
   State<_TitleEditorTitleField> createState() => _TitleEditorTitleFieldState();
@@ -92,14 +94,13 @@ class _TitleEditorTitleFieldState extends State<_TitleEditorTitleField> {
 
   @override
   Widget build(BuildContext context) {
-    const Radius rad = Radius.circular(AcSizes.brInput);
     var factory = AcInputBorderFactory(context, AcInputBorderType.underline);
     return Container(
       decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.primary,
           borderRadius: const BorderRadius.only(
-            bottomLeft: rad,
-            bottomRight: rad,
+            bottomLeft: AcSizes.brInput,
+            bottomRight: AcSizes.brInput,
           )),
       padding: const EdgeInsets.all(AcSizes.md),
       child: TextField(
@@ -109,6 +110,7 @@ class _TitleEditorTitleFieldState extends State<_TitleEditorTitleField> {
                 borderSide:
                     BorderSide(color: Colors.black, width: AcSizes.xs + 0.5)),
             hintText: "Title",
+            error: widget.error != null ? Text(widget.error!) : null,
             hintStyle: AcTypography.placeholder),
         controller: _control,
         onChanged: widget.onChanged,
@@ -154,6 +156,8 @@ class RecipeDetailsEditor extends StatelessWidget {
           builder: (context, control, child) {
             return _TitleEditorTitleField(
                 value: control.value,
+                error: ReactiveFormConfig.of(context)!
+                    .translateAny(control.errors),
                 onChanged: (value) {
                   control.value = value;
                 });
