@@ -58,7 +58,8 @@ class _TitleEditorImageChooser extends StatelessWidget {
               const Color.fromRGBO(0, 0, 0, 0.1), 0.2)!,
         ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
       ),
-      constraints: const BoxConstraints(maxHeight: 300.0),
+      constraints:
+          BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 3),
       child: OverInkwell(
           onTap: () => pickImage(context),
           child: image == null ? buildNoImage(context) : buildImage(context)),
@@ -135,6 +136,7 @@ class RecipeDetailsEditor extends StatelessWidget {
               },
               label: "Description",
               placeholder: "Describe your recipe!",
+              multiline: true,
               required: true);
         });
   }
@@ -170,7 +172,6 @@ class RecipeDetailsEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        constraints: const BoxConstraints(maxWidth: 1024.0),
         padding: const EdgeInsets.all(AcSizes.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,

@@ -2,6 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+/// Builder that supports calling a future function more than once.
+///
+/// Use call() with the input to trigger the function again.
+///
+/// call() will be null when the future is loading.
 class FutureFunctionCaller<TOutput, TInput> extends StatefulWidget {
   final Future<TOutput> Function(TInput)? process;
   final Widget Function(BuildContext context, AsyncSnapshot snapshot,
@@ -38,6 +43,9 @@ class _FutureFunctionCallerState<TOutput, TInput>
   }
 }
 
+/// Same as FutureFunctionCaller, but receives no input (Dart Generics don't support void functions)
+///
+/// Since call() is a void function, and will be null when the future is loading, you can directly pass it to buttons/touchables and expect it to be disabled.
 class FutureProcedureCaller<TOutput> extends StatefulWidget {
   final Future<TOutput> Function()? process;
   final Widget Function(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
+import 'package:pambe_ac_ifa/components/field/form_array.dart';
 import 'package:pambe_ac_ifa/pages/editor/step.dart';
 import 'package:pambe_ac_ifa/pages/editor/title.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -83,14 +84,17 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
             key: ValueKey(formArray.controls[i - 1].hashCode),
             formGroup: formArray.controls[i - 1] as FormGroup,
             child: RecipeStepEditor(
-                index: i - 1,
-                onDelete: () {
-                  setState(() {
-                    formArray.removeAt(i - 1);
-                  });
-                }),
+              index: i - 1,
+            ),
           );
         });
+  }
+
+  void handleMutate(bool Function(FormArray formArray) fn) {
+    bool shouldRerender = fn(form.controls["steps"] as FormArray);
+    if (shouldRerender) {
+      setState(() {});
+    }
   }
 
   @override
@@ -110,20 +114,8 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
         ),
         body: ReactiveForm(
           formGroup: form,
-          child: buildScroll(context),
+          child: FormArrayController(
+              mutate: handleMutate, child: buildScroll(context)),
         ));
   }
 }
-
-// ListView(
-//           children: const [
-//             RecipeDetailsEditor(),
-//             ReactiveFormArray<RecipeStepFormType>(
-//               formArrayName: "steps",
-//               builder: (context, formArray, child) {
-//                 final controls = formArray.controls.map()
-//             RecipeStepEditor(),
-
-//               })
-//           ],
-//         ),

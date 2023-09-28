@@ -93,6 +93,7 @@ class AcTextInput extends StatelessWidget {
           value: value,
           placeholder: placeholder,
           onChanged: onChanged,
+          multiline: multiline,
         ));
   }
 }

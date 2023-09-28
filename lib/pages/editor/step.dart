@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/components/field/form_array.dart';
 import 'package:pambe_ac_ifa/components/field/text_input.dart';
 import 'package:pambe_ac_ifa/pages/editor/components/step_number.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -10,6 +11,13 @@ enum RecipeStepEditorVariant {
   regular,
   tip,
   warning,
+}
+
+enum _RecipeStepEditorAction {
+  addImage,
+  addTimer,
+  toTip,
+  toWarning,
 }
 
 class RecipeStepFormType {
@@ -35,33 +43,110 @@ class _StepEditor extends StatelessWidget {
   final int index;
   final String? value;
   final void Function(String?) onChanged;
-  final void Function() onDelete;
   final String? error;
   const _StepEditor(
       {required this.index,
       required this.value,
       required this.onChanged,
-      this.error,
-      required this.onDelete});
+      this.error});
+
+  Widget iconWithText(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, color: AcColors.black),
+        const SizedBox(
+          width: AcSizes.space,
+        ),
+        Text(text),
+      ],
+    );
+  }
 
   Widget buildTopActions() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        IconButton(onPressed: () {}, icon: const Icon(Icons.more_horiz)),
+        PopupMenuButton<_RecipeStepEditorAction>(
+          icon: const Icon(Icons.more_horiz, color: AcColors.black),
+          color: AcColors.white,
+          onSelected: (_RecipeStepEditorAction action) {
+            switch (action) {
+              case _RecipeStepEditorAction.addImage:
+              // TODO: Handle this case.
+              case _RecipeStepEditorAction.addTimer:
+              // TODO: Handle this case.
+              case _RecipeStepEditorAction.toTip:
+              // TODO: Handle this case.
+              case _RecipeStepEditorAction.toWarning:
+              // TODO: Handle this case.
+            }
+          },
+          itemBuilder: (BuildContext context) {
+            return <PopupMenuEntry<_RecipeStepEditorAction>>[
+              PopupMenuItem(
+                  value: _RecipeStepEditorAction.addImage,
+                  child: iconWithText(Icons.add_photo_alternate, "Add Image")),
+              PopupMenuItem(
+                  value: _RecipeStepEditorAction.addTimer,
+                  child: iconWithText(Icons.timer, "Add Timer")),
+              const PopupMenuDivider(),
+              PopupMenuItem(
+                  value: _RecipeStepEditorAction.toTip,
+                  child: iconWithText(Icons.error_outline, "Change to Tip")),
+              PopupMenuItem(
+                  value: _RecipeStepEditorAction.toWarning,
+                  child:
+                      iconWithText(Icons.warning_amber, "Change to Warning")),
+            ];
+          },
+        ),
       ],
     );
   }
 
+  void shiftFormItemUp(FormArrayController controller) {
+    controller.mutate((formArray) {
+      if (index == 0) return false;
+      dynamic control = formArray.controls[index];
+      formArray.removeAt(index);
+      formArray.insert(index - 1, control);
+      return true;
+    });
+  }
+
+  void shiftFormItemDown(FormArrayController controller) {
+    controller.mutate((formArray) {
+      if (index == formArray.controls.length - 1) return false;
+      dynamic control = formArray.controls[index];
+      formArray.removeAt(index);
+      formArray.insert(index + 1, control);
+      return true;
+    });
+  }
+
+  void removeFormItem(FormArrayController controller) {
+    controller.mutate((formArray) {
+      formArray.removeAt(index);
+      return true;
+    });
+  }
+
   Widget buildBottomActions(BuildContext context) {
+    final controller = FormArrayController.of(context);
+    final formArray = controller.formArray;
     return Row(
       children: [
-        IconButton(onPressed: () {}, icon: const Icon(Icons.keyboard_arrow_up)),
         IconButton(
-            onPressed: () {}, icon: const Icon(Icons.keyboard_arrow_down)),
+            onPressed: index == 0 ? null : () => shiftFormItemUp(controller),
+            icon: const Icon(Icons.keyboard_arrow_up)),
+        IconButton(
+            onPressed: index == formArray.controls.length - 1
+                ? null
+                : () => shiftFormItemDown(controller),
+            icon: const Icon(Icons.keyboard_arrow_down)),
         const Spacer(),
         IconButton(
-            onPressed: onDelete,
+            onPressed: () => removeFormItem(controller),
             color: AcColors.danger,
             icon: const Icon(Icons.delete)),
       ],
@@ -91,9 +176,13 @@ class _StepEditor extends StatelessWidget {
                 multiline: true,
                 onChanged: onChanged),
             if (error != null)
-              Text(error!,
-                  style: const TextStyle(
-                      color: AcColors.danger, fontWeight: FontWeight.bold)),
+              Padding(
+                padding:
+                    const EdgeInsets.only(left: AcSizes.lg, top: AcSizes.sm),
+                child: Text(error!,
+                    style: const TextStyle(
+                        color: AcColors.danger, fontWeight: FontWeight.bold)),
+              ),
             buildBottomActions(context),
           ],
         ));
@@ -102,9 +191,7 @@ class _StepEditor extends StatelessWidget {
 
 class RecipeStepEditor extends StatelessWidget {
   final int index;
-  final void Function() onDelete;
-  const RecipeStepEditor(
-      {super.key, required this.index, required this.onDelete});
+  const RecipeStepEditor({super.key, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +215,6 @@ class RecipeStepEditor extends StatelessWidget {
                       value: control.value,
                       error: ReactiveFormConfig.of(context)
                           ?.translateAny(control.errors),
-                      onDelete: onDelete,
                       onChanged: (value) {
                         control.value = value;
                       });
