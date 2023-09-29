@@ -50,4 +50,13 @@ abstract final class AcTypography {
     fontWeight: FontWeight.bold,
     fontFamily: "Roboto",
   );
+  static const TextStyle header = TextStyle(
+    fontSize: AcSizes.fontBig,
+    fontWeight: FontWeight.bold,
+  );
+}
+
+abstract final class AcShadows {
+  static const BoxShadow regular = BoxShadow(
+      color: Color(0x55000000), offset: Offset(0, 2), spreadRadius: 2);
 }

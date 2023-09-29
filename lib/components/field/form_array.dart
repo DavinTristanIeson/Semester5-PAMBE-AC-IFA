@@ -33,3 +33,23 @@ class FormArrayController extends InheritedWidget {
     return context.dependOnInheritedWidgetOfExactType<FormArrayController>()!;
   }
 }
+
+/// Is the input enabled or not, and what's the value?
+class InputToggle<T> {
+  T? value;
+  late bool toggle;
+  InputToggle(this.toggle, this.value);
+  InputToggle.on(this.value) {
+    toggle = true;
+  }
+  InputToggle.off() {
+    toggle = false;
+  }
+  InputToggle<T> toggled() {
+    return InputToggle(!toggle, value);
+  }
+
+  InputToggle<T> withValue(T? value) {
+    return InputToggle(toggle, value);
+  }
+}

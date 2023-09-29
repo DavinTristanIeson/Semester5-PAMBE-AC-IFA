@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pambe_ac_ifa/common/collection.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/pages/editor/main.dart';
