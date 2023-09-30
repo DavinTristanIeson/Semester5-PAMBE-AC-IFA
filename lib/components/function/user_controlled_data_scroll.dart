@@ -17,7 +17,7 @@ import 'package:flutter/widgets.dart';
 /// The ``next`` function will be null when the stream is closed.
 class UserControlledDataScroll<T> extends StatefulWidget {
   final Iterator<T> data;
-  final FutureOr<bool> Function(StreamSink sink, Iterator<T> iterator)? next;
+  final FutureOr<bool> Function(StreamSink<T> sink, Iterator<T> iterator)? next;
   final Widget Function(
           BuildContext context, Stream<T> stream, Future<void> Function()? next)
       builder;
@@ -51,19 +51,19 @@ class _UserControlledDataScrollState<T>
   Future<void> next() async {
     if (widget.next != null) {
       bool hasNext = await widget.next!(_loop.sink, widget.data);
-      setState(() {
-        if (!hasNext && !_loop.isClosed) {
+      if (!hasNext && !_loop.isClosed) {
+        setState(() {
           _loop.close();
-        }
-      });
+        });
+      }
     } else {
-      setState(() {
-        if (widget.data.moveNext()) {
-          _loop.sink.add(widget.data.current);
-        } else if (!_loop.isClosed) {
+      if (widget.data.moveNext()) {
+        _loop.sink.add(widget.data.current);
+      } else if (!_loop.isClosed) {
+        setState(() {
           _loop.close();
-        }
-      });
+        });
+      }
     }
   }
 

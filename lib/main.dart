@@ -3,6 +3,7 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/pages/editor/main.dart';
+import 'package:pambe_ac_ifa/pages/recipe/main.dart';
 import 'package:pambe_ac_ifa/providers/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';

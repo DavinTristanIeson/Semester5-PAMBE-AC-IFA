@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/field/form_array.dart';
-import 'package:pambe_ac_ifa/pages/editor/step.dart';
+import 'package:pambe_ac_ifa/pages/editor/step_editor.dart';
 import 'package:pambe_ac_ifa/pages/editor/title.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
@@ -42,7 +42,11 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
     });
   }
 
-  void save() {}
+  void save() {
+    print(form.value);
+  }
+
+  void publish() {}
 
   Widget buildAddStepButton() {
     return Padding(
@@ -102,15 +106,21 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
     return Scaffold(
         appBar: OnlyReturnAppBar(
           actions: [
-            IconButton(
-                onPressed: () {},
-                color: Theme.of(context).colorScheme.tertiary,
-                icon: const Icon(Icons.more_vert)),
+            Tooltip(
+              message: "Publish Recipe",
+              child: IconButton(
+                  onPressed: publish,
+                  color: Theme.of(context).colorScheme.tertiary,
+                  icon: const Icon(Icons.upload)),
+            ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: save,
-          child: const Icon(Icons.save),
+        floatingActionButton: Tooltip(
+          message: "Save",
+          child: FloatingActionButton(
+            onPressed: save,
+            child: const Icon(Icons.save),
+          ),
         ),
         body: ReactiveForm(
           formGroup: form,

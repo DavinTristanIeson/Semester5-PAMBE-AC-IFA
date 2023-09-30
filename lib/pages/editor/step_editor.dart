@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/field/form_array.dart';
 import 'package:pambe_ac_ifa/components/field/image_picker.dart';
 import 'package:pambe_ac_ifa/components/field/text_input.dart';
+import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
-import 'package:pambe_ac_ifa/pages/editor/components/step_number.dart';
+import 'package:pambe_ac_ifa/pages/editor/components/step.dart';
 import 'package:pambe_ac_ifa/pages/editor/components/timer.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
@@ -236,48 +238,55 @@ class _RecipeStepEditorFieldWrapper extends StatelessWidget {
     final formArray = controller.formArray;
     return Row(
       children: [
-        IconButton(
-            onPressed: index == 0 ? null : () => shiftFormItemUp(controller),
-            icon: const Icon(Icons.keyboard_arrow_up)),
-        IconButton(
-            onPressed: index == formArray.controls.length - 1
-                ? null
-                : () => shiftFormItemDown(controller),
-            icon: const Icon(Icons.keyboard_arrow_down)),
+        Tooltip(
+          message: "Move step up",
+          child: IconButton(
+              onPressed: index == 0 ? null : () => shiftFormItemUp(controller),
+              icon: const Icon(Icons.keyboard_arrow_up)),
+        ),
+        Tooltip(
+          message: "Move step down",
+          child: IconButton(
+              onPressed: index == formArray.controls.length - 1
+                  ? null
+                  : () => shiftFormItemDown(controller),
+              icon: const Icon(Icons.keyboard_arrow_down)),
+        ),
         const Spacer(),
-        IconButton(
-            onPressed: () => removeFormItem(controller),
-            color: AcColors.danger,
-            icon: const Icon(Icons.delete)),
+        Tooltip(
+          message: "Delete step",
+          child: IconButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return SimpleConfirmationDialog.delete(
+                          onConfirm: () {
+                            removeFormItem(controller);
+                          },
+                          title: Either.right("Delete Step?"),
+                          message: Either.right(
+                              "Are you sure you want to delete this step?"),
+                          context: context);
+                    });
+              },
+              color: AcColors.danger,
+              icon: const Icon(Icons.delete)),
+        ),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final form = ReactiveForm.of(context, listen: true) as FormGroup;
-    final variantControl =
-        form.controls["variant"] as FormControl<RecipeStepVariant>;
-    return Container(
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(AcSizes.brInput),
-          color: variantControl.value?.backgroundColor ??
-              RecipeStepVariant.regular.backgroundColor,
-        ),
-        padding: const EdgeInsets.only(
-          left: AcSizes.md,
-          top: AcSizes.md,
-          right: AcSizes.md,
-          bottom: AcSizes.lg,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const _RecipeStepEditorMenuButton(),
-            const _RecipeStepEditorInternal(),
-            buildBottomActions(context),
-          ],
-        ));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _RecipeStepEditorMenuButton(),
+        const _RecipeStepEditorInternal(),
+        buildBottomActions(context),
+      ],
+    );
   }
 }
 
@@ -287,33 +296,20 @@ class RecipeStepEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-          top: AcSizes.lg,
-          right: AcSizes.lg,
-          bottom: AcSizes.lg,
-          left: AcSizes.lg - StepNumber.defaultDiameter / 4),
-      child: Stack(
-        children: [
-          Container(
+    return ReactiveValueListenableBuilder<RecipeStepVariant>(
+        formControlName: "variant",
+        builder: (context, control, child) {
+          return RecipeStepWrapper(
+            index: index + 1,
+            variant: control.value ?? RecipeStepVariant.regular,
             padding: const EdgeInsets.only(
-                top: StepNumber.defaultDiameter / 2,
-                left: StepNumber.defaultDiameter / 4),
+              left: AcSizes.lg,
+              top: AcSizes.sm,
+              right: AcSizes.lg,
+              bottom: AcSizes.sm,
+            ),
             child: _RecipeStepEditorFieldWrapper(index: index),
-          ),
-          Positioned(
-              top: 0,
-              left: 0,
-              child: ReactiveValueListenableBuilder<RecipeStepVariant>(
-                  formControlName: "variant",
-                  builder: (context, control, child) {
-                    return StepNumber(
-                      number: index + 1,
-                      variant: control.value ?? RecipeStepVariant.regular,
-                    );
-                  })),
-        ],
-      ),
-    );
+          );
+        });
   }
 }
