@@ -55,10 +55,7 @@ class AcFieldWrapper extends StatelessWidget {
                       left: AcSizes.md + AcSizes.sm,
                       right: AcSizes.md + AcSizes.sm,
                       top: AcSizes.sm),
-                  child: Text(error!,
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                          fontWeight: FontWeight.bold)),
+                  child: Text(error!, style: AcTypography.errorRegular),
                 )
             ],
           ),

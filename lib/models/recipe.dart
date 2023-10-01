@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/components/display/image.dart';
+
+import 'user.dart';
 
 enum RecipeStepVariant {
   regular,
@@ -24,41 +27,49 @@ enum RecipeStepVariant {
   }
 }
 
-class RecipeStep {
+class RecipeStep with SupportsLocalAndOnlineImages {
+  String? id;
   String content;
   RecipeStepVariant type;
-  String? imagePath;
+  // Location of file stored on local device
+  @override
+  String? localImage;
+  // URL of file stored online
+  @override
+  String? onlineImage;
   Duration? timer;
+
   RecipeStep(
     this.content, {
     this.type = RecipeStepVariant.regular,
-    this.imagePath,
+    this.localImage,
     this.timer,
   });
-  File? get image {
-    if (imagePath == null) {
-      return null;
-    }
-    return File(imagePath!);
-  }
 }
 
-class Recipe {
+class Recipe with SupportsLocalAndOnlineImages {
+  String? id;
   String title;
   String description;
-  String? imagePath;
+
+  @override
+  String? localImage;
+  @override
+  String? onlineImage;
   List<RecipeStep> steps;
+  User creator;
 
   Recipe({
     required this.title,
     required this.description,
-    this.imagePath,
+    this.localImage,
+    required this.creator,
     required this.steps,
   });
   File? get image {
-    if (imagePath == null) {
+    if (localImage == null) {
       return null;
     }
-    return File(imagePath!);
+    return File(localImage!);
   }
 }

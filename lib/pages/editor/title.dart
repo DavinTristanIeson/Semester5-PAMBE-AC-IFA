@@ -51,7 +51,9 @@ class _TitleEditorTitleFieldState extends State<_TitleEditorTitleField> {
                 borderSide:
                     BorderSide(color: Colors.black, width: AcSizes.xs + 0.5)),
             hintText: "Title",
-            error: widget.error != null ? Text(widget.error!) : null,
+            error: widget.error != null
+                ? Text(widget.error!, style: AcTypography.errorRegular)
+                : null,
             hintStyle: AcTypography.placeholder),
         controller: _control,
         onChanged: widget.onChanged,

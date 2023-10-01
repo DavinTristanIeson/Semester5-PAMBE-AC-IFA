@@ -12,12 +12,12 @@ class Either<TLeft, TRight> {
     return this._right;
   }
 
-  TLeft leftOr(TLeft defaultValue) {
-    return this._left == null ? defaultValue : this._left!;
+  TLeft leftOr(TLeft Function(TRight right) defaultValue) {
+    return _left == null ? defaultValue(_right as TRight) : _left!;
   }
 
-  TRight rightOr(TRight defaultValue) {
-    return this._right == null ? defaultValue : this._right!;
+  TRight rightOr(TRight Function(TLeft left) defaultValue) {
+    return _right == null ? defaultValue(_left as TLeft) : _right!;
   }
 
   bool get hasLeft {

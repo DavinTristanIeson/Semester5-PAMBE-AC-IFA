@@ -28,7 +28,7 @@ class StepNumber extends StatelessWidget {
       child: Center(
           child: switch (variant) {
         RecipeStepVariant.regular =>
-          Text(number.toString(), style: AcTypography.header),
+          Text(number.toString(), style: AcTypography.displayMedium),
         RecipeStepVariant.tip => const Icon(
             Icons.error_outline,
             color: Colors.black,
@@ -45,12 +45,14 @@ class RecipeStepWrapper extends StatelessWidget {
   final RecipeStepVariant variant;
   final Widget child;
   final EdgeInsets? padding;
+  final BorderRadius? borderRadius;
   const RecipeStepWrapper(
       {super.key,
       required this.index,
       required this.variant,
       required this.child,
-      this.padding});
+      this.padding,
+      this.borderRadius});
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +71,8 @@ class RecipeStepWrapper extends StatelessWidget {
             child: Container(
                 decoration: BoxDecoration(
                   boxShadow: const [AcDecoration.shadowRegular],
-                  borderRadius: const BorderRadius.all(AcSizes.brInput),
+                  borderRadius:
+                      borderRadius ?? const BorderRadius.all(AcSizes.brInput),
                   color: variant.backgroundColor,
                 ),
                 padding: padding ??

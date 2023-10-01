@@ -38,27 +38,64 @@ abstract final class AcSizes {
   static const double xl = 32.0;
   static const double xxl = 64.0;
 
-  static const double space = 16.0;
+  static const double space = 12.0;
 
+  static const double fontSmall = 12.0;
   static const double fontRegular = 14.0;
   static const double fontEmphasis = 16.0;
-  static const double fontBig = 20.0;
-  static const double fontLarge = 28.0;
+  static const double fontLarge = 20.0;
+  static const double fontExtraLarge = 28.0;
 
   static const double iconBig = 28.0;
+  static const double avatarRadius = 32.0;
 }
 
 abstract final class AcTypography {
-  static const TextStyle placeholder = TextStyle(color: Colors.black38);
-  static const TextStyle buttonPrimary = TextStyle(
+  // Don't use these for now, just use Theme.of(context).textTheme
+  static const TextStyle bodyMedium = TextStyle(
+    fontSize: AcSizes.fontRegular,
+    fontWeight: FontWeight.w400,
+  );
+  static TextStyle bodySmall = bodyMedium.copyWith(fontSize: AcSizes.fontSmall);
+  static TextStyle bodyLarge = bodyMedium.copyWith(fontSize: AcSizes.fontLarge);
+
+  static const TextStyle labelMedium = TextStyle(
+    fontSize: AcSizes.fontRegular,
+    fontWeight: FontWeight.w500,
+  );
+  static TextStyle largeSmall =
+      labelMedium.copyWith(fontSize: AcSizes.fontSmall);
+  static TextStyle labelLarge =
+      labelMedium.copyWith(fontSize: AcSizes.fontEmphasis);
+
+  static const TextStyle titleMedium = TextStyle(
     fontSize: AcSizes.fontEmphasis,
     fontWeight: FontWeight.bold,
-    fontFamily: "Roboto",
   );
-  static const TextStyle header = TextStyle(
-    fontSize: AcSizes.fontBig,
+  static TextStyle titleSmall =
+      labelMedium.copyWith(fontSize: AcSizes.fontRegular);
+  static TextStyle titleLarge =
+      labelMedium.copyWith(fontSize: AcSizes.fontLarge);
+
+  static const TextStyle displayMedium = TextStyle(
+    fontSize: AcSizes.fontLarge,
     fontWeight: FontWeight.bold,
   );
+  static TextStyle displaySmall =
+      displayMedium.copyWith(fontSize: AcSizes.fontEmphasis);
+  static TextStyle displayLarge =
+      displayMedium.copyWith(fontSize: AcSizes.fontExtraLarge);
+
+  // You can use the ones under here
+  static const TextStyle placeholder =
+      TextStyle(color: Colors.black38, fontSize: AcSizes.fontRegular);
+
+  static const TextStyle importantDescription = TextStyle(
+    fontSize: AcSizes.fontEmphasis,
+    fontWeight: FontWeight.w600,
+  );
+  static const TextStyle errorRegular =
+      TextStyle(color: AcColors.danger, fontWeight: FontWeight.bold);
 }
 
 abstract final class AcDecoration {

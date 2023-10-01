@@ -29,7 +29,7 @@ class ImagePickerField extends StatelessWidget {
           Text("Choose Image",
               style: TextStyle(
                 color: Theme.of(context).colorScheme.secondary,
-                fontSize: AcSizes.fontBig,
+                fontSize: AcSizes.fontLarge,
               )),
           Icon(Icons.add_photo_alternate,
               size: 36.0, color: Theme.of(context).colorScheme.secondary)

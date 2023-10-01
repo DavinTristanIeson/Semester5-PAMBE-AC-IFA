@@ -16,8 +16,8 @@ class _DigitCard extends StatelessWidget {
         decoration: const BoxDecoration(
             color: AcColors.white,
             borderRadius: BorderRadius.all(Radius.circular(AcSizes.sm))),
-        child:
-            Center(child: Text(value.toString(), style: AcTypography.header)));
+        child: Center(
+            child: Text(value.toString(), style: AcTypography.displayMedium)));
   }
 }
 
@@ -92,7 +92,7 @@ class TimerField extends StatelessWidget {
   Widget build(BuildContext context) {
     const Padding separator = Padding(
       padding: EdgeInsets.symmetric(horizontal: AcSizes.md),
-      child: Text(":", style: AcTypography.header),
+      child: Text(":", style: AcTypography.displayMedium),
     );
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

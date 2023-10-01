@@ -13,12 +13,13 @@ class SimpleConfirmationDialog extends StatelessWidget {
   late final Widget positiveText;
   late final Widget negativeText;
 
-  static Widget _buildTitle(Either<Widget, String>? title, String defaultText) {
+  static Widget _buildTitle(
+      BuildContext context, Either<Widget, String>? title, String defaultText) {
     return title != null && title.left != null
         ? title.left!
         : Text(
             title?.right ?? defaultText,
-            style: AcTypography.header,
+            style: Theme.of(context).textTheme.displayMedium,
           );
   }
 
@@ -46,7 +47,7 @@ class SimpleConfirmationDialog extends StatelessWidget {
   }
 
   static Widget _buildMessage(Either<Widget, String> message) {
-    return message.leftOr(Text(message.right!));
+    return message.leftOr((right) => Text(right));
   }
 
   SimpleConfirmationDialog(
@@ -58,7 +59,7 @@ class SimpleConfirmationDialog extends StatelessWidget {
       Either<Widget, String>? title,
       Either<Widget, String>? positiveText,
       Either<Widget, String>? negativeText}) {
-    this.title = _buildTitle(title, "Confirmation");
+    this.title = _buildTitle(context, title, "Confirmation");
     this.message = _buildMessage(message);
     this.positiveText = _buildPositiveText(
         positiveText, "Confirm", Theme.of(context).colorScheme.primary);
@@ -73,7 +74,7 @@ class SimpleConfirmationDialog extends StatelessWidget {
       Either<Widget, String>? title,
       Either<Widget, String>? positiveText,
       Either<Widget, String>? negativeText}) {
-    this.title = _buildTitle(title, "Confirm Deletion");
+    this.title = _buildTitle(context, title, "Confirm Deletion");
     this.message = _buildMessage(message);
     this.positiveText = _buildPositiveText(
         positiveText, "Delete", Theme.of(context).colorScheme.error);

@@ -10,31 +10,19 @@ class RecipeStepComponent extends StatelessWidget {
   const RecipeStepComponent(
       {super.key, required this.step, required this.number});
 
-  Widget buildImage(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(AcSizes.brInput),
-        gradient: LinearGradient(colors: [
-          Theme.of(context).colorScheme.tertiary,
-          Color.lerp(Theme.of(context).colorScheme.tertiary,
-              const Color.fromRGBO(0, 0, 0, 0.1), 0.2)!,
-        ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
-      ),
-      constraints:
-          BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 3),
-      child: Image.file(step.image!, fit: BoxFit.contain),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return RecipeStepWrapper(
         index: number,
         variant: step.type,
+        borderRadius: const BorderRadius.all(AcSizes.br),
         padding: const EdgeInsets.all(0.0),
         child: Column(
           children: [
-            if (step.imagePath != null) buildImage(context),
+            if (step.localImage != null)
+              step.buildImage(
+                  borderRadius: const BorderRadius.only(
+                      topLeft: AcSizes.br, topRight: AcSizes.br)),
             Padding(
               padding: const EdgeInsets.only(
                 left: AcSizes.xl,

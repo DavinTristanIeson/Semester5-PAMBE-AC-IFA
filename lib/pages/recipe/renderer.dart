@@ -72,7 +72,7 @@ class _RecipeStepRendererState extends State<RecipeStepRenderer> {
                       child: Text("Click anywhere to continue",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: AcSizes.fontBig,
+                              fontSize: AcSizes.fontLarge,
                               color: AcColors.hoverColor,
                               fontWeight: FontWeight.w400))),
               ],

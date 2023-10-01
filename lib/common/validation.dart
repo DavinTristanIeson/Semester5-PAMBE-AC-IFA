@@ -12,7 +12,9 @@ class AcReactiveFormConfig extends StatelessWidget {
         ValidationMessage.required: (error) => "Field must not be empty",
         ValidationMessage.equals: (error) => "Field should be equal to $error",
         ValidationMessage.maxLength: (error) =>
-            "Field has a maximum length of ${(error as Map<String, Object>)["requiredLength"]}",
+            "Field has a maximum length of ${(error as Map<String, Object>)["requiredLength"]} characters",
+        ValidationMessage.minLength: (error) =>
+            "Field has a minimum length of ${(error as Map<String, Object>)["requiredLength"]} characters",
         AcValidationMessage.acceptedChars: (error) =>
             "Field only accepts spaces, numbers, and alphabetic characters",
       },
