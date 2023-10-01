@@ -21,6 +21,8 @@ abstract final class AcColors {
 
   static const Color splashColor = Color(0x88FFF5D0);
   static const Color hoverColor = Color(0x44FFF5D0);
+
+  static const Color shadowColor = Color(0x55000000);
 }
 
 abstract final class AcSizes {
@@ -38,9 +40,12 @@ abstract final class AcSizes {
 
   static const double space = 16.0;
 
-  static const double fontRegular = 12.0;
-  static const double fontEmphasis = 14.0;
-  static const double fontBig = 18.0;
+  static const double fontRegular = 14.0;
+  static const double fontEmphasis = 16.0;
+  static const double fontBig = 20.0;
+  static const double fontLarge = 28.0;
+
+  static const double iconBig = 28.0;
 }
 
 abstract final class AcTypography {
@@ -56,7 +61,7 @@ abstract final class AcTypography {
   );
 }
 
-abstract final class AcShadows {
-  static const BoxShadow regular = BoxShadow(
-      color: Color(0x55000000), offset: Offset(0, 2), spreadRadius: 2);
+abstract final class AcDecoration {
+  static const BoxShadow shadowRegular = BoxShadow(
+      color: AcColors.shadowColor, offset: Offset(0, 2), spreadRadius: 2);
 }

@@ -42,9 +42,7 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
     });
   }
 
-  void save() {
-    print(form.value);
-  }
+  void save() {}
 
   void publish() {}
 

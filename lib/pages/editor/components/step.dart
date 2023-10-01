@@ -68,6 +68,7 @@ class RecipeStepWrapper extends StatelessWidget {
                 left: StepNumber.defaultDiameter / 4),
             child: Container(
                 decoration: BoxDecoration(
+                  boxShadow: const [AcDecoration.shadowRegular],
                   borderRadius: const BorderRadius.all(AcSizes.brInput),
                   color: variant.backgroundColor,
                 ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
-import 'package:pambe_ac_ifa/pages/editor/main.dart';
 import 'package:pambe_ac_ifa/pages/recipe/main.dart';
 import 'package:pambe_ac_ifa/providers/auth.dart';
 import 'package:provider/provider.dart';
@@ -89,7 +88,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: createTheme(),
-        home: const AcReactiveFormConfig(child: RecipeEditorPage()),
+        home: const AcReactiveFormConfig(child: RecipePage()),
       ),
     );
   }

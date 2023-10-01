@@ -36,13 +36,15 @@ class RecipePage extends StatelessWidget {
         appBar: const OnlyReturnAppBar(),
         body: UserControlledDataScroll(
           data: [
+            RecipeStep("Start Tip", type: RecipeStepVariant.tip),
             RecipeStep("Step 1"),
-            RecipeStep("Step 2"),
+            RecipeStep("Step 2\nDescription\nDescription 2", imagePath: "Test"),
             RecipeStep("Tip", type: RecipeStepVariant.tip),
             RecipeStep("Step 3"),
-            RecipeStep("Step 4"),
+            RecipeStep("Step 4", timer: const Duration(seconds: 5)),
             RecipeStep("Warning", type: RecipeStepVariant.warning),
-            RecipeStep("Step 5"),
+            RecipeStep("Step 5",
+                imagePath: "Test", timer: const Duration(seconds: 5)),
           ].iterator,
           next: recipeStepScrollLogic,
           builder: (context, stream, next) {
