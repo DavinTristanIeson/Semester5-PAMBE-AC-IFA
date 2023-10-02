@@ -61,7 +61,7 @@ class RecipeStepWrapper extends StatelessWidget {
           top: AcSizes.lg,
           right: AcSizes.lg,
           bottom: AcSizes.lg,
-          left: AcSizes.lg - StepNumber.defaultDiameter / 4),
+          left: StepNumber.defaultDiameter / 4),
       child: Stack(
         children: [
           Container(

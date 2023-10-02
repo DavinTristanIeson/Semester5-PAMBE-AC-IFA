@@ -23,6 +23,7 @@ abstract final class AcColors {
   static const Color hoverColor = Color(0x44FFF5D0);
 
   static const Color shadowColor = Color(0x55000000);
+  static const Color smallShadowColor = Color(0x33000000);
 }
 
 abstract final class AcSizes {
@@ -101,4 +102,6 @@ abstract final class AcTypography {
 abstract final class AcDecoration {
   static const BoxShadow shadowRegular = BoxShadow(
       color: AcColors.shadowColor, offset: Offset(0, 2), spreadRadius: 2);
+  static const BoxShadow shadowSmall = BoxShadow(
+      color: AcColors.smallShadowColor, offset: Offset(0, 1), spreadRadius: 1);
 }

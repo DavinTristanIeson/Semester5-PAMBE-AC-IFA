@@ -35,8 +35,7 @@ class AcImageContainer extends StatelessWidget {
   const AcImageContainer(
       {super.key, this.child, this.borderRadius, this.constraints});
 
-  static const BorderRadius defaultBorderRadius =
-      BorderRadius.all(AcSizes.brInput);
+  static const BorderRadius defaultBorderRadius = BorderRadius.all(AcSizes.br);
 
   static Widget clipImage(Widget image, {BorderRadius? borderRadius}) {
     return ClipRRect(

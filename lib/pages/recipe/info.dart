@@ -5,10 +5,15 @@ import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
+import 'package:pambe_ac_ifa/models/review.dart';
+import 'package:pambe_ac_ifa/pages/recipe/components/review.dart';
+import 'package:pambe_ac_ifa/pages/recipe/viewer.dart';
 
 class RecipeInfoPage extends StatelessWidget {
   final Recipe recipe;
-  const RecipeInfoPage({super.key, required this.recipe});
+  final List<Review> reviews;
+  const RecipeInfoPage(
+      {super.key, required this.recipe, required this.reviews});
 
   Widget buildTitle(BuildContext context) {
     // info required to position user avatar
@@ -78,28 +83,45 @@ class RecipeInfoPage extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: const OnlyReturnAppBar(),
-        body: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: AcSizes.space),
-          children: [
-            buildTitle(context),
-            const SizedBox(height: AcSizes.space),
-            buildDescription(context),
-            const SizedBox(height: AcSizes.space),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                NoticeComponent(
-                    child: Either.right(
-                        "This tutorial has ${recipe.steps.length} steps"),
-                    type: NoticeType.tip)
-              ],
-            )
-          ],
-        ));
+  Widget buildReviewList() {
+    return ListView(
+      scrollDirection: Axis.horizontal,
+      children: reviews
+          .take(5)
+          .map<Widget>((e) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AcSizes.md),
+                child: ReviewCard(
+                    rating: e.rating,
+                    reviewer: e.reviewer,
+                    reviewedAt: e.reviewedAt,
+                    content: Either.right(e.content)),
+              ))
+          .toList(),
+    );
+  }
+
+  Row buildSeeReviewsButton(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // To make sure the text is centered
+        const SizedBox(width: AcSizes.lg + AcSizes.sm),
+        Text(
+          "SEE WHAT OTHERS THINK",
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        IconButton(
+            onPressed: () {
+              // TODO: Reviews page
+            },
+            iconSize: AcSizes.lg,
+            icon: Icon(Icons.arrow_right_alt,
+                color: Theme.of(context).colorScheme.primary))
+      ],
+    );
   }
 
   Container buildDescription(BuildContext context) {
@@ -113,5 +135,62 @@ class RecipeInfoPage extends StatelessWidget {
       child: Text(recipe.description,
           style: Theme.of(context).textTheme.bodyMedium),
     );
+  }
+
+  Positioned buildStartButton(BuildContext context) {
+    return Positioned(
+        left: 0,
+        right: 0,
+        bottom: AcSizes.lg,
+        child: Center(
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => RecipeViewerPage(recipe: recipe)));
+            },
+            style: ElevatedButton.styleFrom(
+                fixedSize: Size(MediaQuery.of(context).size.width / 2,
+                    AcSizes.xl + AcSizes.lg),
+                textStyle: const TextStyle(
+                    fontSize: AcSizes.fontLarge, fontWeight: FontWeight.w600)),
+            child: const Text("Start"),
+          ),
+        ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: const OnlyReturnAppBar(),
+        body: Stack(
+          children: [
+            ListView(
+              padding: const EdgeInsets.symmetric(horizontal: AcSizes.space),
+              children: [
+                buildTitle(context),
+                const SizedBox(height: AcSizes.space),
+                buildDescription(context),
+                const SizedBox(height: AcSizes.space),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    NoticeComponent(
+                        child: Either.right(
+                            "This tutorial has ${recipe.steps.length} steps"),
+                        type: NoticeType.tip)
+                  ],
+                ),
+                const SizedBox(height: AcSizes.lg),
+                ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 160.0),
+                    child: buildReviewList()),
+                const SizedBox(height: AcSizes.md),
+                buildSeeReviewsButton(context),
+                const SizedBox(height: AcSizes.xxl),
+              ],
+            ),
+            buildStartButton(context)
+          ],
+        ));
   }
 }

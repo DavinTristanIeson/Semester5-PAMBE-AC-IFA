@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
-import 'package:pambe_ac_ifa/models/recipe.dart';
-import 'package:pambe_ac_ifa/models/user.dart';
-import 'package:pambe_ac_ifa/pages/editor/main.dart';
-import 'package:pambe_ac_ifa/pages/recipe/info.dart';
-import 'package:pambe_ac_ifa/pages/recipe/viewer.dart';
+import 'package:pambe_ac_ifa/pages/recipe/main.dart';
 import 'package:pambe_ac_ifa/providers/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -102,19 +98,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: createTheme(),
-        home: AcReactiveFormConfig(
-            child: RecipeInfoPage(
-                recipe: Recipe(
-          creator: User(
-              id: "0",
-              name: "User",
-              email: "placeholder@email.com",
-              onlineImage: "https://www.google.com"),
-          description: "Description",
-          steps: [],
-          title: "Recipe Title",
-          localImage: "",
-        ))),
+        home: const AcReactiveFormConfig(child: RecipePage()),
       ),
     );
   }
