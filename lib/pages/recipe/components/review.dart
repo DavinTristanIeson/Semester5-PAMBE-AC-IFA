@@ -1,7 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
-import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 
@@ -26,6 +27,7 @@ class StarRating extends StatelessWidget {
 
   Widget buildCompactVersion(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(rating.toString(), style: AcTypography.importantDescription),
         Icon(Icons.star, color: Theme.of(context).colorScheme.primary)
@@ -69,7 +71,8 @@ class ReviewCard extends StatelessWidget {
           borderRadius: const BorderRadius.all(AcSizes.br),
           boxShadow: const [AcDecoration.shadowSmall]),
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width / 3,
+        maxWidth: max(200, MediaQuery.of(context).size.width / 3),
+        minWidth: 200,
       ),
       padding: const EdgeInsets.all(AcSizes.md),
       child: Column(
@@ -95,18 +98,21 @@ class ReviewCard extends StatelessWidget {
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(AcSizes.xl + AcSizes.lg),
-          child: MaybeNetworkImage(
-              url: reviewer.onlineImage,
-              fit: BoxFit.cover,
-              constraints: BoxConstraints.tight(
-                  const Size.square(AcSizes.xl + AcSizes.lg))),
+        CircleAvatar(
+          radius: AcSizes.lg + AcSizes.md,
+          backgroundColor: Theme.of(context).colorScheme.tertiary,
+          backgroundImage: reviewer.image,
         ),
         const SizedBox(width: AcSizes.md),
-        Text(reviewer.name, style: AcTypography.importantDescription),
-        const Spacer(),
-        StarRating(rating: rating, type: StarRatingType.compact),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(reviewer.name,
+                style: AcTypography.importantDescription,
+                overflow: TextOverflow.ellipsis),
+            StarRating(rating: rating, type: StarRatingType.compact),
+          ],
+        ),
       ],
     );
   }

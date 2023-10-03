@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 
@@ -27,7 +25,7 @@ enum RecipeStepVariant {
   }
 }
 
-class RecipeStep with SupportsLocalAndOnlineImages {
+class RecipeStep with SupportsLocalAndOnlineImagesMixin {
   String? id;
   String content;
   RecipeStepVariant type;
@@ -47,7 +45,7 @@ class RecipeStep with SupportsLocalAndOnlineImages {
   });
 }
 
-class Recipe with SupportsLocalAndOnlineImages {
+class Recipe with SupportsLocalAndOnlineImagesMixin {
   String? id;
   String title;
   String description;
@@ -66,10 +64,4 @@ class Recipe with SupportsLocalAndOnlineImages {
     required this.creator,
     required this.steps,
   });
-  File? get image {
-    if (localImage == null) {
-      return null;
-    }
-    return File(localImage!);
-  }
 }

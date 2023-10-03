@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/function/future_caller.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
+import 'package:pambe_ac_ifa/pages/editor/components/step.dart';
 import 'package:pambe_ac_ifa/pages/recipe/components/step.dart';
 
 class RecipeStepRenderer extends StatefulWidget {
   final Stream<RecipeStep> stream;
   final Future<void> Function()? next;
-  final Widget image;
+  final ImageProvider image;
 
   const RecipeStepRenderer(
       {super.key,
@@ -77,10 +79,22 @@ class _RecipeStepRendererState extends State<RecipeStepRenderer> {
                     itemCount: steps.length + (isDone ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index == steps.length && isDone) {
-                        return widget.image;
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                              left: AcSizes.lg + StepNumber.defaultDiameter / 4,
+                              right: AcSizes.lg,
+                              bottom: AcSizes.lg),
+                          child: AcImageContainer(
+                              borderRadius: const BorderRadius.all(AcSizes.br),
+                              child: MaybeImage(image: widget.image)),
+                        );
                       }
-                      return RecipeStepComponent(
-                          step: steps[index], number: stepNumbers[index]);
+                      return Padding(
+                        padding: EdgeInsets.only(
+                            bottom: index == steps.length - 1 ? AcSizes.lg : 0),
+                        child: RecipeStepComponent(
+                            step: steps[index], number: stepNumbers[index]),
+                      );
                     }),
                 if (call != null)
                   const Positioned(
@@ -90,7 +104,7 @@ class _RecipeStepRendererState extends State<RecipeStepRenderer> {
                       child: Text("Click anywhere to continue",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: AcSizes.fontLarge,
+                              fontSize: AcSizes.fontEmphasis,
                               color: AcColors.hoverColor,
                               fontWeight: FontWeight.w400))),
               ],

@@ -24,7 +24,7 @@ class RecipeStepTimer extends StatelessWidget {
   final Duration duration;
   const RecipeStepTimer({super.key, required this.duration});
 
-  Widget buildPlayingButton(TimerController controller) {
+  Widget buildPlayingButton(TimerRemote controller) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

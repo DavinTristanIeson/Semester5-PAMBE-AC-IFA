@@ -60,7 +60,6 @@ class RecipeStepWrapper extends StatelessWidget {
       padding: const EdgeInsets.only(
           top: AcSizes.lg,
           right: AcSizes.lg,
-          bottom: AcSizes.lg,
           left: StepNumber.defaultDiameter / 4),
       child: Stack(
         children: [

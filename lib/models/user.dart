@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class User {
   String id;
   String name;
@@ -9,4 +11,8 @@ class User {
     required this.email,
     required this.onlineImage,
   });
+
+  ImageProvider get image {
+    return NetworkImage(onlineImage);
+  }
 }

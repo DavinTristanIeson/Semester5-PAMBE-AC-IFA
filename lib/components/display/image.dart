@@ -3,27 +3,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 
-mixin SupportsLocalAndOnlineImages {
+mixin SupportsLocalAndOnlineImagesMixin {
   String? get localImage;
   String? get onlineImage;
-  Widget buildImage({
-    BorderRadius? borderRadius,
-    BoxConstraints? constraints,
-    BoxFit fit = BoxFit.contain,
-  }) {
+  ImageProvider? get image {
     if (localImage != null) {
-      return MaybeFileImage(
-        image: File(localImage!),
-        fit: fit,
-        constraints: constraints,
-        borderRadius: borderRadius,
-      );
+      return FileImage(File(localImage!));
+    } else if (onlineImage != null) {
+      return NetworkImage(onlineImage!);
     } else {
-      return MaybeNetworkImage(
-          url: onlineImage!,
-          fit: fit,
-          constraints: constraints,
-          borderRadius: borderRadius);
+      return null;
     }
   }
 }
@@ -33,16 +22,12 @@ class AcImageContainer extends StatelessWidget {
   final BorderRadius? borderRadius;
   final BoxConstraints? constraints;
   const AcImageContainer(
-      {super.key, this.child, this.borderRadius, this.constraints});
+      {super.key,
+      this.child,
+      this.borderRadius = defaultBorderRadius,
+      this.constraints});
 
   static const BorderRadius defaultBorderRadius = BorderRadius.all(AcSizes.br);
-
-  static Widget clipImage(Widget image, {BorderRadius? borderRadius}) {
-    return ClipRRect(
-      borderRadius: borderRadius ?? defaultBorderRadius,
-      child: image,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,95 +42,39 @@ class AcImageContainer extends StatelessWidget {
       ),
       constraints: constraints ??
           BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 3),
-      child: child,
+      child: borderRadius != null
+          ? ClipRRect(borderRadius: borderRadius!, child: child)
+          : child,
     );
   }
 }
 
-const String fallbackImagePath = "assets/images/image-not-available.jpg";
-
-class MaybeFileImage extends StatelessWidget {
-  final File? image;
+class MaybeImage extends StatelessWidget {
+  final ImageProvider image;
   final BoxFit fit;
-  final BorderRadius? borderRadius;
-  final BoxConstraints? constraints;
-  const MaybeFileImage(
+  final double? width;
+  final double? height;
+  const MaybeImage(
       {super.key,
-      this.image,
-      this.fit = BoxFit.contain,
-      this.borderRadius,
-      this.constraints});
+      required this.image,
+      this.width,
+      this.height,
+      this.fit = BoxFit.cover});
+  static const String fallbackImagePath =
+      "assets/images/image-not-available.jpg";
 
   @override
   Widget build(BuildContext context) {
-    if (image == null) {
-      return AcImageContainer(
-          child: AcImageContainer.clipImage(
-              Image.asset(fallbackImagePath, fit: fit),
-              borderRadius: borderRadius));
-    }
-    return AcImageContainer(
-        borderRadius: borderRadius,
-        constraints: constraints,
-        child: FutureBuilder(
-            future: image!.exists(),
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.waiting:
-                case ConnectionState.active:
-                  return const Center(child: CircularProgressIndicator());
-                case ConnectionState.none:
-                  return AcImageContainer.clipImage(
-                      Image.asset(fallbackImagePath, fit: fit),
-                      borderRadius: borderRadius);
-                case ConnectionState.done:
-                  if (snapshot.data!) {
-                    return AcImageContainer.clipImage(
-                        Image.file(image!, fit: fit),
-                        borderRadius: borderRadius);
-                  } else {
-                    return AcImageContainer.clipImage(
-                        Image.asset(fallbackImagePath),
-                        borderRadius: borderRadius);
-                  }
-              }
-            }));
-  }
-}
-
-class MaybeNetworkImage extends StatelessWidget {
-  final String url;
-  final BoxFit fit;
-  final BorderRadius? borderRadius;
-  final BoxConstraints? constraints;
-  const MaybeNetworkImage(
-      {super.key,
-      required this.url,
-      this.fit = BoxFit.contain,
-      this.borderRadius,
-      this.constraints});
-
-  @override
-  Widget build(BuildContext context) {
-    return AcImageContainer(
-      borderRadius: borderRadius,
-      constraints: constraints,
-      child: ClipRRect(
-        borderRadius: AcImageContainer.defaultBorderRadius,
-        child: FadeInImage(
-          image: NetworkImage(url),
-          placeholder: const AssetImage(fallbackImagePath),
-          imageErrorBuilder: (context, error, stackTrace) {
-            return AcImageContainer.clipImage(
-                Image.asset(
-                  fallbackImagePath,
-                  fit: fit,
-                ),
-                borderRadius: borderRadius);
-          },
+    return FadeInImage(
+      image: image,
+      placeholder: const AssetImage(fallbackImagePath),
+      imageErrorBuilder: (context, error, stackTrace) {
+        return Image.asset(
+          fallbackImagePath,
           fit: fit,
-        ),
-      ),
+        );
+      },
+      fit: fit,
     );
   }
 }

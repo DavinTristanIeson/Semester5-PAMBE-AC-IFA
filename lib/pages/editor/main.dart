@@ -48,7 +48,7 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
 
   Widget buildAddStepButton() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AcSizes.lg),
+      padding: const EdgeInsets.symmetric(vertical: AcSizes.lg),
       child: Center(
         child: ElevatedButton.icon(
           onPressed: () {

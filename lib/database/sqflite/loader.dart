@@ -1,4 +1,5 @@
 import 'package:pambe_ac_ifa/database/sqflite/migration.dart';
+import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 // Note: This is not tested yet. Use with caution.
@@ -19,7 +20,8 @@ class SqfliteDatabaseLoader {
   }
 
   Future<Database> open(String databaseName) async {
-    return await openDatabase(databaseName,
+    String databasePath = await getDatabasesPath();
+    return await openDatabase(join(databasePath, databaseName),
         version: 1,
         onConfigure: _onConfigure,
         onCreate: _onCreate,

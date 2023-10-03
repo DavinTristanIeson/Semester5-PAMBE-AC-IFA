@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-class TimerController {
+class TimerRemote {
   final int original;
   int current;
   bool isPaused;
@@ -11,7 +11,7 @@ class TimerController {
   void Function() resume;
   void Function() reset;
   void Function() stop;
-  TimerController({
+  TimerRemote({
     required this.original,
     required this.current,
     required this.isPaused,
@@ -37,8 +37,7 @@ class TimerController {
 /// This widget is responsible for disposing of the subscription.
 class TimerBuilder extends StatefulWidget {
   final Duration timer;
-  final Widget Function(BuildContext context, TimerController controller)
-      builder;
+  final Widget Function(BuildContext context, TimerRemote controller) builder;
 
   /// isManual indicates whether the callback is called because the timer is manually stopped or not
   final void Function(bool isManual)? onEnded;
@@ -115,7 +114,7 @@ class _TimerBuilderState extends State<TimerBuilder>
     super.build(context);
     return widget.builder(
         context,
-        TimerController(
+        TimerRemote(
             original: widget.timer.inSeconds,
             current: seconds!,
             isPaused: _subscribe.isPaused,

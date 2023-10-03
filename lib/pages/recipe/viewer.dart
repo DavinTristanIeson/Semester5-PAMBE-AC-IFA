@@ -10,39 +10,33 @@ class RecipeViewerPage extends StatelessWidget {
   final Recipe recipe;
   const RecipeViewerPage({super.key, required this.recipe});
 
-  Future<bool> recipeStepScrollLogic(
-      StreamSink<RecipeStep> sink, Iterator<RecipeStep> iterator) async {
-    bool hasNext = true;
-    while (hasNext) {
-      try {
-        sink.add(iterator.current);
-      } on TypeError catch (_) {
-        hasNext = iterator.moveNext();
-        continue;
-      }
-
-      hasNext = iterator.moveNext();
-      if (!hasNext || iterator.current.type == RecipeStepVariant.regular) {
+  Future<int?> recipeStepScrollLogic(
+      StreamSink<RecipeStep> sink, int index) async {
+    while (index < recipe.steps.length) {
+      RecipeStep current = recipe.steps[index];
+      sink.add(current);
+      index++;
+      RecipeStep? upcoming = recipe.steps.elementAtOrNull(index);
+      if (index >= recipe.steps.length ||
+          upcoming!.type == RecipeStepVariant.regular) {
         await Future.delayed(const Duration(milliseconds: 300));
         break;
+      } else {
+        await Future.delayed(const Duration(milliseconds: 600));
       }
-      await Future.delayed(const Duration(milliseconds: 800));
     }
-    return hasNext;
+    return index == recipe.steps.length ? null : index;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: const OnlyReturnAppBar(),
-        body: UserControlledDataScroll(
-          data: recipe.steps.iterator,
+        body: UserControlledDataScroll<RecipeStep>(
           next: recipeStepScrollLogic,
           builder: (context, stream, next) {
             return RecipeStepRenderer(
-                stream: stream,
-                next: next,
-                image: recipe.buildImage(fit: BoxFit.cover));
+                stream: stream, next: next, image: recipe.image!);
           },
         ));
   }

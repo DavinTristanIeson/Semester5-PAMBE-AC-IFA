@@ -22,12 +22,15 @@ class RecipeInfoPage extends StatelessWidget {
       children: [
         Column(
           children: [
-            recipe.buildImage(
-              constraints: BoxConstraints.tightFor(
-                  width: double.maxFinite, height: imageHeight),
-              borderRadius: const BorderRadius.only(
-                  topLeft: AcSizes.br, topRight: AcSizes.br),
-            ),
+            ConstrainedBox(
+                constraints: BoxConstraints.tightFor(
+                    width: double.maxFinite, height: imageHeight),
+                child: recipe.image == null
+                    ? null
+                    : AcImageContainer(
+                        borderRadius: const BorderRadius.only(
+                            topLeft: AcSizes.br, topRight: AcSizes.br),
+                        child: MaybeImage(image: recipe.image!))),
             Container(
                 decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primary,
@@ -60,25 +63,18 @@ class RecipeInfoPage extends StatelessWidget {
           right: AcSizes.space,
           top: imageHeight - AcSizes.avatarRadius,
           child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                  color: Theme.of(context).colorScheme.primary,
-                  width: AcSizes.md),
-            ),
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(AcSizes.avatarRadius * 2),
-                child: Container(
-                  decoration: BoxDecoration(border: Border.all()),
-                  child: MaybeNetworkImage(
-                    url: recipe.creator.onlineImage,
-                    fit: BoxFit.cover,
-                    constraints: BoxConstraints.tight(
-                        const Size.square(AcSizes.avatarRadius * 2)),
-                  ),
-                )),
-          ),
-        )
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: AcSizes.md),
+              ),
+              child: CircleAvatar(
+                radius: AcSizes.avatarRadius,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                backgroundImage: recipe.creator.image,
+              )),
+        ),
       ],
     );
   }
@@ -137,59 +133,52 @@ class RecipeInfoPage extends StatelessWidget {
     );
   }
 
-  Positioned buildStartButton(BuildContext context) {
-    return Positioned(
-        left: 0,
-        right: 0,
-        bottom: AcSizes.lg,
-        child: Center(
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => RecipeViewerPage(recipe: recipe)));
-            },
-            style: ElevatedButton.styleFrom(
-                fixedSize: Size(MediaQuery.of(context).size.width / 2,
-                    AcSizes.xl + AcSizes.lg),
-                textStyle: const TextStyle(
-                    fontSize: AcSizes.fontLarge, fontWeight: FontWeight.w600)),
-            child: const Text("Start"),
-          ),
-        ));
+  Widget buildStartButton(BuildContext context) {
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => RecipeViewerPage(recipe: recipe)));
+        },
+        style: ElevatedButton.styleFrom(
+            fixedSize: Size(MediaQuery.of(context).size.width / 2, AcSizes.lg),
+            textStyle: const TextStyle(
+                fontSize: AcSizes.fontEmphasis, fontWeight: FontWeight.w600)),
+        child: const Text("Start"),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: const OnlyReturnAppBar(),
-        body: Stack(
+        body: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: AcSizes.space),
           children: [
-            ListView(
-              padding: const EdgeInsets.symmetric(horizontal: AcSizes.space),
+            buildTitle(context),
+            const SizedBox(height: AcSizes.space),
+            buildDescription(context),
+            const SizedBox(height: AcSizes.space),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                buildTitle(context),
-                const SizedBox(height: AcSizes.space),
-                buildDescription(context),
-                const SizedBox(height: AcSizes.space),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    NoticeComponent(
-                        child: Either.right(
-                            "This tutorial has ${recipe.steps.length} steps"),
-                        type: NoticeType.tip)
-                  ],
-                ),
-                const SizedBox(height: AcSizes.lg),
-                ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 160.0),
-                    child: buildReviewList()),
-                const SizedBox(height: AcSizes.md),
-                buildSeeReviewsButton(context),
-                const SizedBox(height: AcSizes.xxl),
+                NoticeComponent(
+                    child: Either.right(
+                        "This tutorial has ${recipe.steps.length} steps"),
+                    type: NoticeType.tip)
               ],
             ),
-            buildStartButton(context)
+            const SizedBox(height: AcSizes.lg),
+            ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 160.0),
+                child: buildReviewList()),
+            const SizedBox(height: AcSizes.md),
+            buildSeeReviewsButton(context),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: AcSizes.lg),
+              child: buildStartButton(context),
+            )
           ],
         ));
   }
