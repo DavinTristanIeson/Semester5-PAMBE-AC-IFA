@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
-import 'package:pambe_ac_ifa/pages/recipe/main.dart';
-import 'package:pambe_ac_ifa/pages/startup/main.dart';
 import 'package:pambe_ac_ifa/providers/auth.dart';
+import 'package:pambe_ac_ifa/switch.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -99,9 +98,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Recipe.Lib',
         theme: createTheme(),
-        home: AcReactiveFormConfig(child: StartupSwitch(builder: (context) {
-          return const RecipePage();
-        })),
+        home: const AcReactiveFormConfig(child: RecipeLibSwitch()),
       ),
     );
   }
