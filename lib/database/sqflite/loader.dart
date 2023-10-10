@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:pambe_ac_ifa/database/sqflite/migration.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -27,5 +29,10 @@ class SqfliteDatabaseLoader {
         onCreate: _onCreate,
         singleInstance: true,
         onUpgrade: _onUpgrade);
+  }
+
+  static Future<void> drop(Database db) async {
+    await db.close();
+    await File(db.path).delete();
   }
 }
