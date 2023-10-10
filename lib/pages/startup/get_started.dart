@@ -10,7 +10,7 @@ class StartupGetStartedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(114, 94, 84, 100),
-      body: Center(
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(top: 60.0),
           child: Column(
@@ -28,7 +28,7 @@ class StartupGetStartedScreen extends StatelessWidget {
               const StartupMessageBoard(
                   text:
                       "Give feedback to the cooks whose recipes you tried out"),
-              const Spacer(),
+              const SizedBox(height: AcSizes.lg),
               OutlinedButton.icon(
                 onPressed: next,
                 icon: const Icon(Icons.arrow_right_alt),

@@ -22,7 +22,12 @@ class _RecipeLibSwitchState extends State<RecipeLibSwitch> {
         }));
   }
 
+  static MaterialPageRoute get defaultRoute {
+    return MaterialPageRoute(builder: (context) => const RecipePage());
+  }
+
   MaterialPageRoute? routeStartup() {
+    if (_pref == null) return null;
     if (_pref!.getBool(AcSharedPrefKeys.isAppOpenedBefore.key) == null) {
       _pref!.setBool(AcSharedPrefKeys.isAppOpenedBefore.key, true);
       return MaterialPageRoute(
@@ -30,20 +35,18 @@ class _RecipeLibSwitchState extends State<RecipeLibSwitch> {
       );
     } else {
       _pref!.setBool(AcSharedPrefKeys.isAppOpenedBefore.key, true);
-      return null;
+      return defaultRoute;
     }
-  }
-
-  MaterialPageRoute get defaultRoute {
-    return MaterialPageRoute(builder: (context) => const RecipePage());
   }
 
   @override
   Widget build(BuildContext context) {
-    MaterialPageRoute route = routeStartup() ?? defaultRoute;
-    Future.microtask(() {
-      Navigator.of(context).push(route);
-    });
+    MaterialPageRoute? route = routeStartup();
+    if (route != null) {
+      Future.microtask(() {
+        Navigator.of(context).push(route);
+      });
+    }
     return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 }

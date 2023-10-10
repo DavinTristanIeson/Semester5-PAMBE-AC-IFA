@@ -45,7 +45,7 @@ class StartupLoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(114, 94, 84, 100),
-      body: Center(
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(top: 60.0),
           child: Column(
@@ -57,7 +57,7 @@ class StartupLoginScreen extends StatelessWidget {
               const StartupMessageBoard(
                   text:
                       "Sign up or log in to share recipes, and bookmark recipes you love"),
-              const Spacer(),
+              const SizedBox(height: AcSizes.lg),
               buildButtons(context),
               const SizedBox(height: AcSizes.lg),
             ],
