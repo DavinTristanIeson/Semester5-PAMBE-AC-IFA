@@ -5,8 +5,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/field/form_array.dart';
+import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/editor/step_editor.dart';
 import 'package:pambe_ac_ifa/pages/editor/title.dart';
+import 'package:pambe_ac_ifa/providers/database.dart';
+import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 
@@ -42,7 +45,25 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
     });
   }
 
-  void save() {}
+  void save(BuildContext context) async {
+    // todo: transaction
+    DatabaseProvider databaseProvider =
+        Provider.of<DatabaseProvider>(context, listen: false);
+    Recipe recipe = await databaseProvider.storeRecipe(
+        title: form.value['title'].toString(),
+        description: form.value['description']?.toString());
+    final steps = form.value['steps'] as List;
+
+    for (int i = 0; i < steps.length; i++) {
+      await databaseProvider.storeRecipeStep(
+        recipe_id: int.parse(recipe.id!),
+        content: steps[i]['content'],
+        type: (steps[i]['variant'] as RecipeStepVariant).name,
+        timer:
+            (steps[i]['timer'] as InputToggle<Duration>).value?.inMilliseconds,
+      );
+    }
+  }
 
   void publish() {}
 
@@ -116,7 +137,9 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
         floatingActionButton: Tooltip(
           message: "Save",
           child: FloatingActionButton(
-            onPressed: save,
+            onPressed: () {
+              save(context);
+            },
             child: const Icon(Icons.save),
           ),
         ),
