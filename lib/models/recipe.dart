@@ -55,13 +55,14 @@ class Recipe with SupportsLocalAndOnlineImagesMixin {
   @override
   String? onlineImage;
   List<RecipeStep> steps;
-  User creator;
+  User? creator;
 
   Recipe({
+    this.id,
     required this.title,
     required this.description,
     this.localImage,
-    required this.creator,
+    this.creator,
     required this.steps,
   });
 }

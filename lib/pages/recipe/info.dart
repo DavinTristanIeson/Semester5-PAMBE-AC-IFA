@@ -51,8 +51,9 @@ class RecipeInfoPage extends StatelessWidget {
                               .titleLarge!
                               .copyWith(fontWeight: FontWeight.bold),
                         ),
-                        Text("by ${recipe.creator.name}",
-                            style: AcTypography.importantDescription)
+                        if (recipe.creator != null)
+                          Text("by ${recipe.creator!.name}",
+                              style: AcTypography.importantDescription)
                       ],
                     ),
                   ],
@@ -72,7 +73,9 @@ class RecipeInfoPage extends StatelessWidget {
               child: CircleAvatar(
                 radius: AcSizes.avatarRadius,
                 backgroundColor: Theme.of(context).colorScheme.surface,
-                backgroundImage: recipe.creator.image,
+                backgroundImage: recipe.creator == null
+                    ? const AssetImage(MaybeImage.fallbackImagePath)
+                    : recipe.creator!.image,
               )),
         ),
       ],
