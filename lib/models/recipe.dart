@@ -1,11 +1,18 @@
+import 'package:json_annotation/json_annotation.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/json.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
-
 import 'user.dart';
 
+part 'recipe.g.dart';
+
 enum RecipeStepVariant {
+  @JsonValue("regular")
   regular,
+  @JsonValue("tip")
   tip,
+
+  @JsonValue("warning")
   warning;
 
   get primaryColor {
@@ -25,44 +32,68 @@ enum RecipeStepVariant {
   }
 }
 
+@JsonSerializable()
 class RecipeStep with SupportsLocalAndOnlineImagesMixin {
   String? id;
   String content;
   RecipeStepVariant type;
-  // Location of file stored on local device
   @override
-  String? localImage;
-  // URL of file stored online
+  String? imagePath;
+
   @override
-  String? onlineImage;
+  @JsonKey(defaultValue: ExternalImageSource.local, includeToJson: false)
+  ExternalImageSource? imageSource;
+
+  @JsonDurationConverter()
   Duration? timer;
 
   RecipeStep(
     this.content, {
     this.type = RecipeStepVariant.regular,
-    this.localImage,
+    this.imagePath,
+    this.imageSource,
     this.timer,
   });
+  factory RecipeStep.fromJson(Map<String, dynamic> json) =>
+      _$RecipeStepFromJson(json);
+  Map<String, dynamic> toJson() => _$RecipeStepToJson(this);
 }
 
+String _parseRecipeId(Object value) {
+  return value.toString();
+}
+
+@JsonSerializable()
 class Recipe with SupportsLocalAndOnlineImagesMixin {
-  String? id;
+  @JsonKey(fromJson: _parseRecipeId)
+  String id;
   String title;
   String description;
+  @JsonEpochConverter()
+  DateTime createdAt;
 
   @override
-  String? localImage;
+  String? imagePath;
+
   @override
-  String? onlineImage;
+  @JsonKey(defaultValue: ExternalImageSource.local)
+  ExternalImageSource? imageSource;
+
   List<RecipeStep> steps;
+
   User? creator;
 
   Recipe({
-    this.id,
+    required this.id,
     required this.title,
     required this.description,
-    this.localImage,
+    required this.createdAt,
+    this.imagePath,
+    this.imageSource,
     this.creator,
     required this.steps,
   });
+
+  factory Recipe.fromJson(Map<String, dynamic> json) => _$RecipeFromJson(json);
+  Map<String, dynamic> toJson() => _$RecipeToJson(this);
 }

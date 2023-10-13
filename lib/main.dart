@@ -2,16 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
-import 'package:pambe_ac_ifa/database/sqflite/loader.dart';
-import 'package:pambe_ac_ifa/database/sqflite/migration.dart';
-import 'package:pambe_ac_ifa/providers/auth.dart';
-import 'package:pambe_ac_ifa/providers/database.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
+import 'package:pambe_ac_ifa/controllers/local_store.dart';
+import 'package:pambe_ac_ifa/init.dart';
 import 'package:pambe_ac_ifa/switch.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  Database db = await initializeSqfliteDatabase();
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => AuthProvider()),
+      ChangeNotifierProvider(create: (context) => LocalRecipeController(db)),
+    ],
+    child: const RecipeLibApp(),
+  ));
+}
+
+class RecipeLibApp extends StatelessWidget {
+  const RecipeLibApp({super.key});
+
   ElevatedButtonThemeData buildElevatedButtonTheme() {
     return ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -82,43 +95,12 @@ void main() async {
         ));
   }
 
-  WidgetsFlutterBinding.ensureInitialized();
-  MigrationManager migrationManager = MigrationManager([
-    SqfliteMigration(1, create: (Transaction transaction) async {
-      transaction.execute('''
-          CREATE TABLE recipes (
-              id INTEGER PRIMARY KEY AUTOINCREMENT, 
-              user_id INTEGER, 
-              title VARCHAR(255) NOT NULL,
-              description VARCHAR(255), 
-              created_at INTEGER
-          );
-      ''');
-      transaction.execute('''
-          CREATE TABLE recipe_steps (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, 
-            recipe_id INTEGER, 
-            content VARCHAR(255) NOT NULL, 
-            type VARCHAR(255) NOT NULL, 
-            timer INTEGER, 
-            created_at INTEGER, 
-            FOREIGN KEY (recipe_id) REFERENCES recipes(id)
-          );
-      ''');
-    }, upgrade: (Transaction transaction) async {}),
-  ]);
-  Database db =
-      await SqfliteDatabaseLoader(migrationManager).open('recipe-lib');
-
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (context) => AuthProvider()),
-      ChangeNotifierProvider(create: (context) => DatabaseProvider(db)),
-    ],
-    child: MaterialApp(
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
       title: 'Recipe.Lib',
       theme: createTheme(),
-      home: const AcReactiveFormConfig(child: RecipeLibSwitch()),
-    ),
-  ));
+      home: RecipeLibSwitch(),
+    );
+  }
 }

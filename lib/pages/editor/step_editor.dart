@@ -22,10 +22,11 @@ enum _RecipeStepEditorAction {
 
 class RecipeStepFormType {
   RecipeStepVariant variant;
-  String? content;
-  XFile? image;
+  String content;
+  XFile? thumbnail;
   Duration? timer;
-  RecipeStepFormType(this.variant, {this.content, this.image, this.timer});
+  RecipeStepFormType(this.variant,
+      {required this.content, this.thumbnail, this.timer});
   static FormGroup toFormGroup() {
     return FormGroup({
       "variant":
@@ -36,6 +37,17 @@ class RecipeStepFormType {
       "thumbnail": FormControl<InputToggle<XFile>>(value: InputToggle.off()),
       "timer": FormControl<InputToggle<Duration>>(value: InputToggle.off()),
     });
+  }
+
+  static RecipeStepFormType fromFormGroup(Map<String, Object?> group) {
+    final thumbnailToggle = group["thumbnail"] as InputToggle<XFile>;
+    final timerToggle = group["timer"] as InputToggle<Duration>;
+    return RecipeStepFormType(
+      group["variant"] as RecipeStepVariant,
+      content: (group["content"] as String?) ?? '',
+      thumbnail: thumbnailToggle.toggle ? thumbnailToggle.value : null,
+      timer: timerToggle.toggle ? timerToggle.value : null,
+    );
   }
 }
 

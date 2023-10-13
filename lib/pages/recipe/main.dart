@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
@@ -11,26 +12,28 @@ class RecipePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return RecipeInfoPage(
         recipe: Recipe(
+          id: '0',
+          createdAt: DateTime.now(),
           creator: User(
               id: "0",
               name: "User",
               email: "placeholder@email.com",
-              onlineImage: "https://www.google.com"),
+              imagePath: "https://www.google.com"),
           description: "Description",
           steps: [
             RecipeStep("Start Tip", type: RecipeStepVariant.tip),
             RecipeStep("Step 1"),
-            RecipeStep("Step 2\nDescription\nDescription 2",
-                localImage: "Test"),
+            RecipeStep("Step 2\nDescription\nDescription 2", imagePath: "Test"),
             RecipeStep("Tip", type: RecipeStepVariant.tip),
             RecipeStep("Step 3"),
             RecipeStep("Step 4", timer: const Duration(seconds: 5)),
             RecipeStep("Warning", type: RecipeStepVariant.warning),
             RecipeStep("Step 5",
-                localImage: "Test", timer: const Duration(seconds: 5)),
+                imagePath: "Test", timer: const Duration(seconds: 5)),
           ],
           title: "Recipe Title",
-          localImage: "",
+          imagePath: "",
+          imageSource: ExternalImageSource.local,
         ),
         reviews: List.generate(
             5,
@@ -41,7 +44,7 @@ class RecipePage extends StatelessWidget {
                     id: "0",
                     name: "User",
                     email: "placeholder@email.com",
-                    onlineImage: "https://www.google.com"),
+                    imagePath: "https://www.google.com"),
                 content: "Rating" * 50)));
   }
 }

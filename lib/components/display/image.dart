@@ -1,18 +1,26 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 
+enum ExternalImageSource {
+  @JsonValue("network")
+  network,
+  @JsonValue("local")
+  local,
+}
+
 mixin SupportsLocalAndOnlineImagesMixin {
-  String? get localImage;
-  String? get onlineImage;
+  String? get imagePath;
+  ExternalImageSource? get imageSource;
+
   ImageProvider? get image {
-    if (localImage != null) {
-      return FileImage(File(localImage!));
-    } else if (onlineImage != null) {
-      return NetworkImage(onlineImage!);
+    if (imagePath == null || imageSource == null) return null;
+    if (imageSource == ExternalImageSource.local) {
+      return FileImage(File(imagePath!));
     } else {
-      return null;
+      return NetworkImage(imagePath!);
     }
   }
 }

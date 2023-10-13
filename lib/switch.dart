@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pambe_ac_ifa/pages/recipe/main.dart';
+import 'package:pambe_ac_ifa/pages/editor/main.dart';
 import 'package:pambe_ac_ifa/pages/startup/main.dart';
-import 'package:pambe_ac_ifa/providers/database.dart';
+import 'package:pambe_ac_ifa/controllers/local_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RecipeLibSwitch extends StatefulWidget {
@@ -23,7 +23,7 @@ class _RecipeLibSwitchState extends State<RecipeLibSwitch> {
   }
 
   static MaterialPageRoute get defaultRoute {
-    return MaterialPageRoute(builder: (context) => const RecipePage());
+    return MaterialPageRoute(builder: (context) => const RecipeEditorPage());
   }
 
   MaterialPageRoute? routeStartup() {

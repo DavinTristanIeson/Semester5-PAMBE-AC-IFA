@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
+import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/field/form_array.dart';
-import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/editor/step_editor.dart';
 import 'package:pambe_ac_ifa/pages/editor/title.dart';
-import 'package:pambe_ac_ifa/providers/database.dart';
+import 'package:pambe_ac_ifa/controllers/local_store.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
@@ -20,7 +20,8 @@ class RecipeEditorPage extends StatefulWidget {
   State<RecipeEditorPage> createState() => _RecipeEditorPageState();
 }
 
-class _RecipeEditorPageState extends State<RecipeEditorPage> {
+class _RecipeEditorPageState extends State<RecipeEditorPage>
+    with SnackbarMessenger {
   late final FormGroup form;
   late final ScrollController _scroll;
 
@@ -29,11 +30,11 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
     super.initState();
     _scroll = ScrollController();
     form = FormGroup({
-      'title': FormControl<String>(validators: [
+      'title': FormControl<String>(value: '', validators: [
         Validators.minLength(5),
         AcValidators.acceptedChars,
       ]),
-      'description': FormControl<String>(validators: [
+      'description': FormControl<String>(value: '', validators: [
         Validators.required,
       ]),
       'thumbnail': FormControl<XFile?>(),
@@ -46,22 +47,19 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
   }
 
   void save(BuildContext context) async {
-    // todo: transaction
-    DatabaseProvider databaseProvider =
-        Provider.of<DatabaseProvider>(context, listen: false);
-    Recipe recipe = await databaseProvider.storeRecipe(
-        title: form.value['title'].toString(),
-        description: form.value['description']?.toString());
-    final steps = form.value['steps'] as List;
-
-    for (int i = 0; i < steps.length; i++) {
-      await databaseProvider.storeRecipeStep(
-        recipe_id: int.parse(recipe.id!),
-        content: steps[i]['content'],
-        type: (steps[i]['variant'] as RecipeStepVariant).name,
-        timer:
-            (steps[i]['timer'] as InputToggle<Duration>).value?.inMilliseconds,
-      );
+    LocalRecipeController controller =
+        Provider.of<LocalRecipeController>(context, listen: false);
+    final steps = (form.value['steps'] as List<Map<String, Object?>?>)
+        .map((step) => RecipeStepFormType.fromFormGroup(step!))
+        .toList();
+    try {
+      await controller.create(
+          title: form.value['title'].toString(),
+          description: form.value['description']?.toString(),
+          steps: steps);
+    } catch (e) {
+      // ignore: use_build_context_synchronously
+      sendError(context, e.toString());
     }
   }
 
@@ -91,7 +89,6 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
   }
 
   Widget buildScroll(BuildContext context) {
-    const detailsEditor = RecipeDetailsEditor();
     final FormArray formArray = form.controls["steps"] as FormArray;
     int length = formArray.controls.length + 2;
     return ListView.builder(
@@ -99,7 +96,7 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
         itemCount: length,
         itemBuilder: (context, i) {
           if (i == 0) {
-            return detailsEditor;
+            return const RecipeDetailsEditor();
           } else if (i == length - 1) {
             return buildAddStepButton();
           }
@@ -122,31 +119,33 @@ class _RecipeEditorPageState extends State<RecipeEditorPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: OnlyReturnAppBar(
-          actions: [
-            Tooltip(
-              message: "Publish Recipe",
-              child: IconButton(
-                  onPressed: publish,
-                  color: Theme.of(context).colorScheme.tertiary,
-                  icon: const Icon(Icons.upload)),
-            ),
-          ],
-        ),
-        floatingActionButton: Tooltip(
-          message: "Save",
-          child: FloatingActionButton(
-            onPressed: () {
-              save(context);
-            },
-            child: const Icon(Icons.save),
+    return AcReactiveFormConfig(
+      child: Scaffold(
+          appBar: OnlyReturnAppBar(
+            actions: [
+              Tooltip(
+                message: "Publish Recipe",
+                child: IconButton(
+                    onPressed: publish,
+                    color: Theme.of(context).colorScheme.tertiary,
+                    icon: const Icon(Icons.upload)),
+              ),
+            ],
           ),
-        ),
-        body: ReactiveForm(
-          formGroup: form,
-          child: FormArrayController(
-              mutate: handleMutate, child: buildScroll(context)),
-        ));
+          floatingActionButton: Tooltip(
+            message: "Save",
+            child: FloatingActionButton(
+              onPressed: () {
+                save(context);
+              },
+              child: const Icon(Icons.save),
+            ),
+          ),
+          body: ReactiveForm(
+            formGroup: form,
+            child: FormArrayController(
+                mutate: handleMutate, child: buildScroll(context)),
+          )),
+    );
   }
 }

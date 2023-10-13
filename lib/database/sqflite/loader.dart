@@ -21,9 +21,15 @@ class SqfliteDatabaseLoader {
     return migrationManager.upgrade(db, previousVersion, currentVersion);
   }
 
-  Future<Database> open(String databaseName) async {
-    String databasePath = await getDatabasesPath();
-    return await openDatabase(join(databasePath, databaseName),
+  Future<Database> open({
+    required String name,
+    bool? override,
+  }) async {
+    String databasePath = join(await getDatabasesPath(), name);
+    if (override != null && override) {
+      deleteDatabase(databasePath);
+    }
+    return await openDatabase(databasePath,
         version: 1,
         onConfigure: _onConfigure,
         onCreate: _onCreate,
