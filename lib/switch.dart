@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pambe_ac_ifa/pages/editor/main.dart';
+import 'package:pambe_ac_ifa/pages/home/main.dart';
 import 'package:pambe_ac_ifa/pages/startup/main.dart';
 import 'package:pambe_ac_ifa/controllers/local_store.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RecipeLibSwitch extends StatefulWidget {
@@ -23,7 +24,7 @@ class _RecipeLibSwitchState extends State<RecipeLibSwitch> {
   }
 
   static MaterialPageRoute get defaultRoute {
-    return MaterialPageRoute(builder: (context) => const RecipeEditorPage());
+    return MaterialPageRoute(builder: (context) => const HomePage());
   }
 
   MaterialPageRoute? routeStartup() {
@@ -44,7 +45,7 @@ class _RecipeLibSwitchState extends State<RecipeLibSwitch> {
     MaterialPageRoute? route = routeStartup();
     if (route != null) {
       Future.microtask(() {
-        Navigator.of(context).push(route);
+        Navigator.of(context).pushReplacement(route);
       });
     }
     return const Scaffold(body: Center(child: CircularProgressIndicator()));

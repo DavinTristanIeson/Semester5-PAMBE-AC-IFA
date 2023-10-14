@@ -3,22 +3,19 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
-import 'package:pambe_ac_ifa/controllers/local_store.dart';
-import 'package:pambe_ac_ifa/init.dart';
 import 'package:pambe_ac_ifa/switch.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Database db = await initializeSqfliteDatabase();
+  // Database db = await initializeSqfliteDatabase();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => AuthProvider()),
-      ChangeNotifierProvider(create: (context) => LocalRecipeController(db)),
+      // ChangeNotifierProvider(create: (context) => LocalRecipeController(db)),
     ],
-    child: const RecipeLibApp(),
+    child: const AcReactiveFormConfig(child: RecipeLibApp()),
   ));
 }
 
@@ -92,6 +89,10 @@ class RecipeLibApp extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: AcColors.primary,
               fontSize: AcSizes.fontLarge),
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          unselectedItemColor: AcColors.background,
+          backgroundColor: AcColors.secondary,
         ));
   }
 
@@ -100,7 +101,7 @@ class RecipeLibApp extends StatelessWidget {
     return MaterialApp(
       title: 'Recipe.Lib',
       theme: createTheme(),
-      home: RecipeLibSwitch(),
+      home: const RecipeLibSwitch(),
     );
   }
 }

@@ -58,7 +58,7 @@ class AcImageContainer extends StatelessWidget {
 }
 
 class MaybeImage extends StatelessWidget {
-  final ImageProvider image;
+  final ImageProvider? image;
   final BoxFit fit;
   final double? width;
   final double? height;
@@ -73,8 +73,16 @@ class MaybeImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (image == null) {
+      return Image.asset(
+        fallbackImagePath,
+        fit: fit,
+        width: width,
+        height: height,
+      );
+    }
     return FadeInImage(
-      image: image,
+      image: image!,
       placeholder: const AssetImage(fallbackImagePath),
       imageErrorBuilder: (context, error, stackTrace) {
         return Image.asset(
@@ -82,6 +90,8 @@ class MaybeImage extends StatelessWidget {
           fit: fit,
         );
       },
+      width: width,
+      height: height,
       fit: fit,
     );
   }
