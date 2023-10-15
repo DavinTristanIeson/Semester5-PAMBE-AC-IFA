@@ -3,18 +3,20 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
+import 'package:pambe_ac_ifa/components/display/review_card.dart';
 import 'package:pambe_ac_ifa/components/display/some_items_scroll.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
-import 'package:pambe_ac_ifa/pages/recipe/components/review.dart';
 import 'package:pambe_ac_ifa/pages/search/main.dart';
+import 'package:provider/provider.dart';
 
 class HomePageBody extends StatelessWidget {
   static RecipeModel debugRecipe = RecipeModel(
     id: '0',
     createdAt: DateTime.now(),
-    creator: User(
+    creator: UserModel(
         id: "0",
         name: "User",
         email: "placeholder@email.com",
@@ -28,6 +30,7 @@ class HomePageBody extends StatelessWidget {
   const HomePageBody({super.key});
 
   Widget buildRecentRecipes(BuildContext context) {
+    final userId = context.watch<AuthProvider>().user!.id;
     return SampleScrollSection(
         itemCount: 3,
         itemBuilder: (context, index) {
@@ -35,12 +38,18 @@ class HomePageBody extends StatelessWidget {
         },
         header: Either.right("Recents"),
         viewMoreButton: Either.right(() {
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const SearchScreen()));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => SearchScreen(
+                    sortBy:
+                        SortBy.descending(RecipeSortBy.lastViewed(by: userId)),
+                    filterBy:
+                        RecipeFilterBy.hasBeenViewedBy(userId, viewed: true),
+                  )));
         }));
   }
 
   Widget buildTrendingRecipes(BuildContext context) {
+    final userId = context.watch<AuthProvider>().user!.id;
     return SampleScrollSection(
         itemCount: 3,
         itemBuilder: (context, index) {
@@ -48,8 +57,12 @@ class HomePageBody extends StatelessWidget {
         },
         header: Either.right("Trending"),
         viewMoreButton: Either.right(() {
-          context.navigator.push(
-              MaterialPageRoute(builder: (context) => const SearchScreen()));
+          context.navigator.push(MaterialPageRoute(
+              builder: (context) => SearchScreen(
+                    sortBy: SortBy.descending(RecipeSortBy.ratings),
+                    filterBy:
+                        RecipeFilterBy.hasBeenViewedBy(userId, viewed: false),
+                  )));
         }));
   }
 
@@ -61,9 +74,11 @@ class HomePageBody extends StatelessWidget {
         itemBuilder: (context, index) {
           return ReviewCard(
             rating: 3.5,
-            reviewer: debugRecipe.creator!,
+            reviewer: debugRecipe.creator,
             reviewedAt: DateTime.now(),
             content: Either.right("Review"),
+            reviewFor:
+                MinimalModel(id: debugRecipe.id, name: debugRecipe.title),
           );
         },
         header: Either.right("Latest Reviews"),

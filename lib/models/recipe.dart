@@ -2,9 +2,10 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/json.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
+import 'package:pambe_ac_ifa/models/container.dart';
 import 'user.dart';
 
-part 'recipe.g.dart';
+part 'gen/recipe.g.dart';
 
 enum RecipeSource {
   local,
@@ -84,7 +85,7 @@ class RecipeLiteModel with SupportsLocalAndOnlineImagesMixin {
   @JsonKey(defaultValue: ExternalImageSource.local)
   ExternalImageSource? imageSource;
 
-  User? creator;
+  UserModel creator;
 
   RecipeLiteModel({
     required this.id,
@@ -93,7 +94,7 @@ class RecipeLiteModel with SupportsLocalAndOnlineImagesMixin {
     required this.createdAt,
     this.imagePath,
     this.imageSource,
-    this.creator,
+    required this.creator,
   });
 
   factory RecipeLiteModel.fromJson(Map<String, dynamic> json) =>
@@ -113,7 +114,7 @@ class RecipeModel extends RecipeLiteModel
     required super.createdAt,
     super.imagePath,
     super.imageSource,
-    super.creator,
+    required super.creator,
     required this.steps,
   });
 
@@ -121,4 +122,68 @@ class RecipeModel extends RecipeLiteModel
       _$RecipeModelFromJson(json);
   @override
   Map<String, dynamic> toJson() => _$RecipeModelToJson(this);
+}
+
+enum RecipeSortByType {
+  lastViewed,
+  createdDate,
+  ratings,
+}
+
+class RecipeSortBy {
+  String? userId;
+  RecipeSortByType type;
+  RecipeSortBy._(this.type);
+  RecipeSortBy.lastViewed({required String by})
+      : userId = by,
+        type = RecipeSortByType.createdDate;
+  static RecipeSortBy get ratings => RecipeSortBy._(RecipeSortByType.ratings);
+  static RecipeSortBy get createdDate =>
+      RecipeSortBy._(RecipeSortByType.createdDate);
+}
+
+enum RecipeFilterByType {
+  createdByUser,
+  createdByUserName,
+  hasBeenViewedBy,
+}
+
+class RecipeFilterBy {
+  String? userId;
+  String? userName;
+  bool? viewed;
+  RecipeFilterByType type;
+  RecipeFilterBy.createdByUser(this.userId)
+      : type = RecipeFilterByType.createdByUser;
+  RecipeFilterBy.createdByUserName(this.userName)
+      : type = RecipeFilterByType.createdByUserName;
+  RecipeFilterBy.hasBeenViewedBy(this.userId, {this.viewed = true})
+      : type = RecipeFilterByType.hasBeenViewedBy;
+}
+
+class RecipeLibSearchState {
+  SortBy<RecipeSortBy> sortBy;
+  RecipeFilterBy? filterBy;
+  String? search;
+  int limit;
+
+  RecipeLibSearchState({
+    required this.search,
+    required this.sortBy,
+    required this.filterBy,
+    this.limit = 15,
+  });
+
+  RecipeLibSearchState copyWith({
+    String? search,
+    SortBy<RecipeSortBy>? sortBy,
+    RecipeFilterBy? filterBy,
+    int? limit,
+  }) {
+    return RecipeLibSearchState(
+        search: search ?? this.search,
+        sortBy: sortBy ?? this.sortBy,
+        filterBy: filterBy ?? this.filterBy,
+        limit: limit ?? this.limit);
+  }
 }

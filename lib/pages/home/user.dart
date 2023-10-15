@@ -47,21 +47,26 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         ],
       ),
       body: buildBody(),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: tab.index,
-        onTap: (value) {
-          setState(() {
-            tab = RecipeLibTabs.values[value];
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.library_books), label: "Library"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.notifications), label: "Notifications"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-        ],
+      bottomNavigationBar: Theme(
+        data: context.theme.copyWith(
+          canvasColor: context.colors.secondary,
+        ),
+        child: BottomNavigationBar(
+          currentIndex: tab.index,
+          onTap: (value) {
+            setState(() {
+              tab = RecipeLibTabs.values[value];
+            });
+          },
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.library_books), label: "Library"),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.notifications), label: "Notifications"),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          ],
+        ),
       ),
     );
   }

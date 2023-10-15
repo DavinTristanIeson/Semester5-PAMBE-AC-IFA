@@ -17,7 +17,7 @@ class RecipeScreen extends StatelessWidget {
         recipe: RecipeModel(
           id: '0',
           createdAt: DateTime.now(),
-          creator: User(
+          creator: UserModel(
               id: "0",
               name: "User",
               email: "placeholder@email.com",
@@ -40,10 +40,10 @@ class RecipeScreen extends StatelessWidget {
         ),
         reviews: List.generate(
             5,
-            (i) => Review(
+            (i) => ReviewModel(
                 rating: 3.5,
                 reviewedAt: DateTime.now(),
-                reviewer: User(
+                reviewer: UserModel(
                     id: "0",
                     name: "User",
                     email: "placeholder@email.com",

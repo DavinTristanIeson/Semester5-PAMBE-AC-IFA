@@ -83,6 +83,7 @@ class RecipeLibApp extends StatelessWidget {
         appBarTheme: const AppBarTheme(
           backgroundColor: AcColors.secondary,
           foregroundColor: AcColors.primary,
+          surfaceTintColor: Colors.transparent,
           elevation: AcSizes.md,
           centerTitle: true,
           titleTextStyle: TextStyle(

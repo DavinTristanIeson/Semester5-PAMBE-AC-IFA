@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-part 'user.g.dart';
+part 'gen/user.g.dart';
 
 @JsonSerializable()
-class User {
+class UserModel {
   String id;
   String name;
   String email;
   String imagePath;
-  User({
+  UserModel({
     required this.id,
     required this.name,
     required this.email,
@@ -19,6 +19,7 @@ class User {
     return NetworkImage(imagePath);
   }
 
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
-  Map<String, dynamic> toJson() => _$UserToJson(this);
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
+  Map<String, dynamic> toJson() => _$UserModelToJson(this);
 }

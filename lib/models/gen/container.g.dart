@@ -1,21 +1,18 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user.dart';
+part of '../container.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-User _$UserFromJson(Map<String, dynamic> json) => User(
+MinimalModel _$MinimalModelFromJson(Map<String, dynamic> json) => MinimalModel(
       id: json['id'] as String,
       name: json['name'] as String,
-      email: json['email'] as String,
-      imagePath: json['imagePath'] as String,
     );
 
-Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
+Map<String, dynamic> _$MinimalModelToJson(MinimalModel instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
-      'email': instance.email,
-      'imagePath': instance.imagePath,
     };

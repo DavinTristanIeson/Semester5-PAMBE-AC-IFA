@@ -1,3 +1,6 @@
+import 'package:json_annotation/json_annotation.dart';
+part 'gen/container.g.dart';
+
 /// A union of two values.
 class Either<TLeft, TRight> {
   TLeft? _left;
@@ -39,4 +42,15 @@ class SortBy<T> {
     isAscending = false;
   }
   bool get isDescending => isAscending;
+}
+
+@JsonSerializable()
+class MinimalModel {
+  String id;
+  String name;
+  MinimalModel({required this.id, required this.name});
+
+  factory MinimalModel.fromJson(Map<String, dynamic> json) =>
+      _$MinimalModelFromJson(json);
+  Map<String, dynamic> toJson() => _$MinimalModelToJson(this);
 }

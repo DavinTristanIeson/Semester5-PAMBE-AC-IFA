@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'recipe.dart';
+part of '../recipe.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -61,9 +61,7 @@ RecipeLiteModel _$RecipeLiteModelFromJson(Map<String, dynamic> json) =>
       imageSource: $enumDecodeNullable(
               _$ExternalImageSourceEnumMap, json['imageSource']) ??
           ExternalImageSource.local,
-      creator: json['creator'] == null
-          ? null
-          : User.fromJson(json['creator'] as Map<String, dynamic>),
+      creator: UserModel.fromJson(json['creator'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$RecipeLiteModelToJson(RecipeLiteModel instance) =>
@@ -86,9 +84,7 @@ RecipeModel _$RecipeModelFromJson(Map<String, dynamic> json) => RecipeModel(
       imageSource: $enumDecodeNullable(
               _$ExternalImageSourceEnumMap, json['imageSource']) ??
           ExternalImageSource.local,
-      creator: json['creator'] == null
-          ? null
-          : User.fromJson(json['creator'] as Map<String, dynamic>),
+      creator: UserModel.fromJson(json['creator'] as Map<String, dynamic>),
       steps: (json['steps'] as List<dynamic>)
           .map((e) => RecipeStep.fromJson(e as Map<String, dynamic>))
           .toList(),

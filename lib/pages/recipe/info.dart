@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
+import 'package:pambe_ac_ifa/components/display/review_card.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
-import 'package:pambe_ac_ifa/pages/recipe/components/review.dart';
 import 'package:pambe_ac_ifa/pages/recipe/viewer.dart';
+import 'package:pambe_ac_ifa/pages/reviews/main.dart';
 
 class RecipeInfoScreen extends StatelessWidget {
   final RecipeModel recipe;
-  final List<Review> reviews;
+  final List<ReviewModel> reviews;
   const RecipeInfoScreen(
       {super.key, required this.recipe, required this.reviews});
 
@@ -51,9 +53,8 @@ class RecipeInfoScreen extends StatelessWidget {
                               .titleLarge!
                               .copyWith(fontWeight: FontWeight.bold),
                         ),
-                        if (recipe.creator != null)
-                          Text("by ${recipe.creator!.name}",
-                              style: AcTypography.importantDescription)
+                        Text("by ${recipe.creator.name}",
+                            style: AcTypography.importantDescription)
                       ],
                     ),
                   ],
@@ -72,10 +73,8 @@ class RecipeInfoScreen extends StatelessWidget {
               ),
               child: CircleAvatar(
                 radius: AcSizes.avatarRadius,
-                backgroundColor: Theme.of(context).colorScheme.surface,
-                backgroundImage: recipe.creator == null
-                    ? const AssetImage(MaybeImage.fallbackImagePath)
-                    : recipe.creator!.image,
+                backgroundColor: Theme.of(context).colorScheme.tertiary,
+                backgroundImage: recipe.creator.image,
               )),
         ),
       ],
@@ -114,7 +113,10 @@ class RecipeInfoScreen extends StatelessWidget {
         ),
         IconButton(
             onPressed: () {
-              // TODO: Reviews page
+              context.navigator.push(MaterialPageRoute(
+                  builder: (context) => ReviewScreen(
+                        recipeId: recipe.id,
+                      )));
             },
             iconSize: AcSizes.lg,
             icon: Icon(Icons.arrow_right_alt,

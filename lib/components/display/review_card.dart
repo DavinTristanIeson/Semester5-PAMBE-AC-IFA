@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
+import 'package:pambe_ac_ifa/pages/reviews/main.dart';
 
 enum StarRatingType {
   compact,
@@ -52,47 +54,63 @@ class StarRating extends StatelessWidget {
 class ReviewCard extends StatelessWidget {
   final double rating;
   final Either<Widget, String>? content;
-  final User reviewer;
+  final UserModel reviewer;
   final DateTime reviewedAt;
+  final MinimalModel? reviewFor;
   const ReviewCard(
       {super.key,
       required this.rating,
       this.content,
       required this.reviewer,
-      required this.reviewedAt});
+      required this.reviewedAt,
+      this.reviewFor});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.all(AcSizes.br),
-          boxShadow: const [AcDecoration.shadowSmall]),
-      constraints: BoxConstraints.tight(Size.fromWidth(
-          clampDouble(MediaQuery.of(context).size.width / 3, 200.0, 300.0))),
-      padding: const EdgeInsets.all(AcSizes.md),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          buildUserAndRating(context),
-          const SizedBox(height: AcSizes.md),
-          if (content != null)
-            content!.leftOr(
-              (right) => Text(right,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  maxLines: 4,
-                  overflow: TextOverflow.ellipsis),
-            ),
-        ],
+    return GestureDetector(
+      onTap: reviewFor == null
+          ? null
+          : () {
+              context.navigator.push(MaterialPageRoute(
+                  builder: (context) => ReviewScreen(
+                        recipeId: reviewFor!.id,
+                      )));
+            },
+      child: Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.all(AcSizes.br),
+            boxShadow: const [AcDecoration.shadowSmall]),
+        constraints: BoxConstraints.tight(Size.fromWidth(
+            clampDouble(MediaQuery.of(context).size.width / 3, 200.0, 300.0))),
+        padding: const EdgeInsets.all(AcSizes.md),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            buildUserAndRating(context),
+            const SizedBox(height: AcSizes.md),
+            if (content != null)
+              content!.leftOr(
+                (right) => Text(right,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis),
+              ),
+          ],
+        ),
       ),
     );
   }
 
   Widget buildUserAndRating(BuildContext context) {
+    Widget reviewerNameWidget = Text(reviewer.name,
+        style: context.texts.titleMedium, overflow: TextOverflow.ellipsis);
+    Widget starRatingWidget =
+        StarRating(rating: rating, type: StarRatingType.compact);
+
     return Row(
-      mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CircleAvatar(
@@ -104,10 +122,18 @@ class ReviewCard extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(reviewer.name,
-                style: AcTypography.importantDescription,
-                overflow: TextOverflow.ellipsis),
-            StarRating(rating: rating, type: StarRatingType.compact),
+            reviewFor != null
+                ? Row(
+                    children: [
+                      reviewerNameWidget,
+                      const SizedBox(width: AcSizes.space),
+                      starRatingWidget
+                    ],
+                  )
+                : reviewerNameWidget,
+            reviewFor != null
+                ? Text("on ${reviewFor!.name}", style: context.texts.titleSmall)
+                : starRatingWidget
           ],
         ),
       ],

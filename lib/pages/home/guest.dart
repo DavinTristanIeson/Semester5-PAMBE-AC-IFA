@@ -4,17 +4,20 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
 import 'package:pambe_ac_ifa/components/display/some_items_scroll.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/login/login.dart';
 import 'package:pambe_ac_ifa/pages/login/register.dart';
 import 'package:pambe_ac_ifa/pages/search/main.dart';
+import 'package:provider/provider.dart';
 
 class GuestHomeScreen extends StatelessWidget {
   const GuestHomeScreen({super.key});
 
   Widget buildTrendingRecipes(BuildContext context) {
+    final userId = context.watch<AuthProvider>().user!.id;
     return SampleScrollSection(
         itemCount: 3,
         itemBuilder: (context, index) {
@@ -22,7 +25,7 @@ class GuestHomeScreen extends StatelessWidget {
               recipe: RecipeModel(
             id: '0',
             createdAt: DateTime.now(),
-            creator: User(
+            creator: UserModel(
                 id: "0",
                 name: "User",
                 email: "placeholder@email.com",
@@ -36,8 +39,12 @@ class GuestHomeScreen extends StatelessWidget {
         },
         header: Either.right("Trending"),
         viewMoreButton: Either.right(() {
-          context.navigator.push(
-              MaterialPageRoute(builder: (context) => const SearchScreen()));
+          context.navigator.push(MaterialPageRoute(
+              builder: (context) => SearchScreen(
+                    sortBy: SortBy.descending(RecipeSortBy.ratings),
+                    filterBy:
+                        RecipeFilterBy.hasBeenViewedBy(userId, viewed: false),
+                  )));
         }));
   }
 

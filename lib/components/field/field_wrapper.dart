@@ -73,11 +73,12 @@ enum AcInputBorderType {
 class AcInputBorderFactory {
   BuildContext context;
   AcInputBorderType type;
-  AcInputBorderFactory(this.context, this.type);
+  final BorderRadius? borderRadius;
+  AcInputBorderFactory(this.context, this.type, {this.borderRadius});
 
   OutlineInputBorder createOutlineInputBorder(Color color) {
     return OutlineInputBorder(
-        borderRadius: const BorderRadius.all(AcSizes.brInput),
+        borderRadius: borderRadius ?? const BorderRadius.all(AcSizes.brInput),
         borderSide: BorderSide(
           color: color,
           width: AcSizes.xs,
