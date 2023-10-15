@@ -5,13 +5,16 @@ import 'package:pambe_ac_ifa/models/review.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/recipe/info.dart';
 
-class RecipePage extends StatelessWidget {
-  const RecipePage({super.key});
+class RecipeScreen extends StatelessWidget {
+  final String id;
+  final RecipeSource source;
+  const RecipeScreen(
+      {super.key, required this.id, this.source = RecipeSource.online});
 
   @override
   Widget build(BuildContext context) {
-    return RecipeInfoPage(
-        recipe: Recipe(
+    return RecipeInfoScreen(
+        recipe: RecipeModel(
           id: '0',
           createdAt: DateTime.now(),
           creator: User(

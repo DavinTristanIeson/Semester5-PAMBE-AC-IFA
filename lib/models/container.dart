@@ -28,3 +28,15 @@ class Either<TLeft, TRight> {
     return this._right != null;
   }
 }
+
+class SortBy<T> {
+  T factor;
+  late bool isAscending;
+  SortBy.ascending(this.factor) {
+    isAscending = true;
+  }
+  SortBy.descending(this.factor) {
+    isAscending = false;
+  }
+  bool get isDescending => isAscending;
+}

@@ -51,7 +51,33 @@ Json? _$JsonConverterToJson<Json, Value>(
 ) =>
     value == null ? null : toJson(value);
 
-Recipe _$RecipeFromJson(Map<String, dynamic> json) => Recipe(
+RecipeLiteModel _$RecipeLiteModelFromJson(Map<String, dynamic> json) =>
+    RecipeLiteModel(
+      id: _parseRecipeId(json['id'] as Object),
+      title: json['title'] as String,
+      description: json['description'] as String,
+      createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
+      imagePath: json['imagePath'] as String?,
+      imageSource: $enumDecodeNullable(
+              _$ExternalImageSourceEnumMap, json['imageSource']) ??
+          ExternalImageSource.local,
+      creator: json['creator'] == null
+          ? null
+          : User.fromJson(json['creator'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$RecipeLiteModelToJson(RecipeLiteModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'description': instance.description,
+      'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
+      'imagePath': instance.imagePath,
+      'imageSource': _$ExternalImageSourceEnumMap[instance.imageSource],
+      'creator': instance.creator,
+    };
+
+RecipeModel _$RecipeModelFromJson(Map<String, dynamic> json) => RecipeModel(
       id: _parseRecipeId(json['id'] as Object),
       title: json['title'] as String,
       description: json['description'] as String,
@@ -68,13 +94,14 @@ Recipe _$RecipeFromJson(Map<String, dynamic> json) => Recipe(
           .toList(),
     );
 
-Map<String, dynamic> _$RecipeToJson(Recipe instance) => <String, dynamic>{
+Map<String, dynamic> _$RecipeModelToJson(RecipeModel instance) =>
+    <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'description': instance.description,
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'imagePath': instance.imagePath,
       'imageSource': _$ExternalImageSourceEnumMap[instance.imageSource],
-      'steps': instance.steps,
       'creator': instance.creator,
+      'steps': instance.steps,
     };

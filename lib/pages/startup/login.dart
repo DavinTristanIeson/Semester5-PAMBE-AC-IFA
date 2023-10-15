@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
-import 'package:pambe_ac_ifa/pages/recipe/main.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/pages/home/main.dart';
+import 'package:pambe_ac_ifa/pages/login/login.dart';
+import 'package:pambe_ac_ifa/pages/login/register.dart';
 import 'package:pambe_ac_ifa/pages/startup/components.dart';
 
 class StartupLoginScreen extends StatelessWidget {
@@ -13,14 +16,20 @@ class StartupLoginScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                context.navigator.push(MaterialPageRoute(
+                    builder: (context) => const LoginScreen()));
+              },
               child: const Text(
                 'Login',
               ),
             ),
             const SizedBox(width: AcSizes.space),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                context.navigator.push(MaterialPageRoute(
+                    builder: (context) => const RegisterScreen()));
+              },
               child: const Text(
                 'Register',
               ),
@@ -31,7 +40,7 @@ class StartupLoginScreen extends StatelessWidget {
         TextButton(
             onPressed: () {
               Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => const RecipePage()));
+                  .push(MaterialPageRoute(builder: (_) => const HomeScreen()));
             },
             style: TextButton.styleFrom(
               foregroundColor: Theme.of(context).colorScheme.tertiary,

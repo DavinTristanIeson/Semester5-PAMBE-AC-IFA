@@ -8,5 +8,9 @@ class AuthProvider extends ChangeNotifier {
     return user == null;
   }
 
+  bool get isLoggedIn {
+    return user != null;
+  }
+
   login() {}
 }

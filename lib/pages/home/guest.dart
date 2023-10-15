@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
 import 'package:pambe_ac_ifa/components/display/some_items_scroll.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
+import 'package:pambe_ac_ifa/pages/login/login.dart';
+import 'package:pambe_ac_ifa/pages/login/register.dart';
+import 'package:pambe_ac_ifa/pages/search/main.dart';
 
-class GuestHomePage extends StatelessWidget {
-  const GuestHomePage({super.key});
+class GuestHomeScreen extends StatelessWidget {
+  const GuestHomeScreen({super.key});
 
   Widget buildTrendingRecipes(BuildContext context) {
     return SampleScrollSection(
         itemCount: 3,
         itemBuilder: (context, index) {
           return RecipeCard(
-              recipe: Recipe(
+              recipe: RecipeModel(
             id: '0',
             createdAt: DateTime.now(),
             creator: User(
@@ -32,7 +36,8 @@ class GuestHomePage extends StatelessWidget {
         },
         header: Either.right("Trending"),
         viewMoreButton: Either.right(() {
-          // TODO: Search Page
+          context.navigator.push(
+              MaterialPageRoute(builder: (context) => const SearchScreen()));
         }));
   }
 
@@ -57,12 +62,14 @@ class GuestHomePage extends StatelessWidget {
         children: [
           TextButton(
               onPressed: () {
-                // TODO: login
+                context.navigator.push(MaterialPageRoute(
+                    builder: (context) => const LoginScreen()));
               },
               child: const Text("Login")),
           TextButton(
               onPressed: () {
-                // TODO: register
+                context.navigator.push(MaterialPageRoute(
+                    builder: (context) => const RegisterScreen()));
               },
               child: const Text("Register")),
         ],

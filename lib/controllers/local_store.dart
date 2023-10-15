@@ -82,7 +82,7 @@ class LocalRecipeController extends ChangeNotifier {
     ''');
   }
 
-  Future<Recipe?> get(id) async {
+  Future<RecipeModel?> get(id) async {
     final data = (await db.query(
       tableName,
     ))
@@ -90,10 +90,10 @@ class LocalRecipeController extends ChangeNotifier {
 
     if (data == null) return null;
 
-    return Recipe.fromJson(data);
+    return RecipeModel.fromJson(data);
   }
 
-  Future<Recipe> create({
+  Future<RecipeModel> create({
     required String title,
     String? description,
     required List<RecipeStepFormType> steps,
@@ -117,7 +117,7 @@ class LocalRecipeController extends ChangeNotifier {
       return id;
     });
 
-    Recipe recipe = (await get(id))!;
+    RecipeModel recipe = (await get(id))!;
     notifyListeners();
     return recipe;
   }

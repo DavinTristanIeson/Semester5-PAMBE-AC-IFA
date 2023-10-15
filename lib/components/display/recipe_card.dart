@@ -1,11 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
+import 'package:pambe_ac_ifa/pages/recipe/main.dart';
+import 'package:provider/provider.dart';
 
 class RecipeCard extends StatelessWidget {
-  final Recipe recipe;
+  final RecipeLiteModel recipe;
   const RecipeCard({super.key, required this.recipe});
 
   Widget buildTitleAndDescription(BuildContext context) {
@@ -21,36 +25,44 @@ class RecipeCard extends StatelessWidget {
     );
   }
 
-  Widget buildButtons() {
+  Widget buildButtons(BuildContext context) {
+    final isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        ElevatedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.remove_red_eye_outlined),
-            label: const Text("View")),
+        if (isLoggedIn)
+          OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: context.colors.secondary,
+                  side: BorderSide(color: context.colors.secondary)),
+              onPressed: () {},
+              icon: const Icon(Icons.bookmark),
+              label: const Text("Bookmark")),
         const SizedBox(
           width: AcSizes.sm,
         ),
         ElevatedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.bookmark),
-            label: const Text("Bookmark")),
+            onPressed: () {
+              context.navigator.push(MaterialPageRoute(
+                  builder: (context) => RecipeScreen(id: recipe.id)));
+            },
+            icon: const Icon(Icons.remove_red_eye_outlined),
+            label: const Text("View")),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    double imageHeight = MediaQuery.of(context).size.height / 3.5;
+    double imageHeight = clampDouble(context.screenHeight / 3.5, 120.0, 200.0);
+    double imageWidth = clampDouble(context.screenWidth / 1.4, 300.0, 450.0);
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: context.colors.surface,
         borderRadius: const BorderRadius.all(AcSizes.br),
         boxShadow: const [AcDecoration.shadowRegular],
       ),
-      constraints: BoxConstraints.tight(Size.fromWidth(
-          clampDouble(MediaQuery.of(context).size.width / 1.4, 300.0, 450.0))),
+      constraints: BoxConstraints.tight(Size(imageWidth, imageHeight)),
       child: Stack(
         children: [
           Column(
@@ -78,7 +90,7 @@ class RecipeCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(
                     right: AcSizes.md, bottom: AcSizes.md),
-                child: buildButtons(),
+                child: buildButtons(context),
               ),
             ],
           ),

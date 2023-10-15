@@ -6,9 +6,9 @@ import 'package:pambe_ac_ifa/components/function/user_controlled_data_scroll.dar
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/recipe/renderer.dart';
 
-class RecipeViewerPage extends StatelessWidget {
-  final Recipe recipe;
-  const RecipeViewerPage({super.key, required this.recipe});
+class RecipeViewerScreen extends StatelessWidget {
+  final RecipeModel recipe;
+  const RecipeViewerScreen({super.key, required this.recipe});
 
   Future<int?> recipeStepScrollLogic(
       StreamSink<RecipeStep> sink, int index) async {

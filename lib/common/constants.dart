@@ -101,7 +101,7 @@ abstract final class AcTypography {
 
 abstract final class AcDecoration {
   static const BoxShadow shadowRegular = BoxShadow(
-      color: AcColors.shadowColor, offset: Offset(0, 2), spreadRadius: 2);
+      color: AcColors.shadowColor, offset: Offset(2, 4), spreadRadius: 2);
   static const BoxShadow shadowSmall = BoxShadow(
       color: AcColors.smallShadowColor, offset: Offset(0, 1), spreadRadius: 1);
 }

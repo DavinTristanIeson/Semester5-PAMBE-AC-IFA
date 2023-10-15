@@ -9,10 +9,10 @@ import 'package:pambe_ac_ifa/models/review.dart';
 import 'package:pambe_ac_ifa/pages/recipe/components/review.dart';
 import 'package:pambe_ac_ifa/pages/recipe/viewer.dart';
 
-class RecipeInfoPage extends StatelessWidget {
-  final Recipe recipe;
+class RecipeInfoScreen extends StatelessWidget {
+  final RecipeModel recipe;
   final List<Review> reviews;
-  const RecipeInfoPage(
+  const RecipeInfoScreen(
       {super.key, required this.recipe, required this.reviews});
 
   Widget buildTitle(BuildContext context) {
@@ -141,7 +141,7 @@ class RecipeInfoPage extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => RecipeViewerPage(recipe: recipe)));
+              builder: (context) => RecipeViewerScreen(recipe: recipe)));
         },
         style: ElevatedButton.styleFrom(
             fixedSize: Size(MediaQuery.of(context).size.width / 2, AcSizes.lg),

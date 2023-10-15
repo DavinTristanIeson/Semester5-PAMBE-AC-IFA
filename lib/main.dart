@@ -91,9 +91,10 @@ class RecipeLibApp extends StatelessWidget {
               fontSize: AcSizes.fontLarge),
         ),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          unselectedItemColor: AcColors.background,
-          backgroundColor: AcColors.secondary,
-        ));
+            unselectedItemColor: AcColors.background,
+            backgroundColor: AcColors.secondary,
+            showUnselectedLabels: false,
+            unselectedIconTheme: IconThemeData(color: AcColors.hoverColor)));
   }
 
   @override

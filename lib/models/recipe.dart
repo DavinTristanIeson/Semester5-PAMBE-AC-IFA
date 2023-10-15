@@ -6,6 +6,11 @@ import 'user.dart';
 
 part 'recipe.g.dart';
 
+enum RecipeSource {
+  local,
+  online,
+}
+
 enum RecipeStepVariant {
   @JsonValue("regular")
   regular,
@@ -64,7 +69,7 @@ String _parseRecipeId(Object value) {
 }
 
 @JsonSerializable()
-class Recipe with SupportsLocalAndOnlineImagesMixin {
+class RecipeLiteModel with SupportsLocalAndOnlineImagesMixin {
   @JsonKey(fromJson: _parseRecipeId)
   String id;
   String title;
@@ -79,11 +84,9 @@ class Recipe with SupportsLocalAndOnlineImagesMixin {
   @JsonKey(defaultValue: ExternalImageSource.local)
   ExternalImageSource? imageSource;
 
-  List<RecipeStep> steps;
-
   User? creator;
 
-  Recipe({
+  RecipeLiteModel({
     required this.id,
     required this.title,
     required this.description,
@@ -91,9 +94,31 @@ class Recipe with SupportsLocalAndOnlineImagesMixin {
     this.imagePath,
     this.imageSource,
     this.creator,
+  });
+
+  factory RecipeLiteModel.fromJson(Map<String, dynamic> json) =>
+      _$RecipeLiteModelFromJson(json);
+  Map<String, dynamic> toJson() => _$RecipeLiteModelToJson(this);
+}
+
+@JsonSerializable()
+class RecipeModel extends RecipeLiteModel
+    with SupportsLocalAndOnlineImagesMixin {
+  List<RecipeStep> steps;
+
+  RecipeModel({
+    required super.id,
+    required super.title,
+    required super.description,
+    required super.createdAt,
+    super.imagePath,
+    super.imageSource,
+    super.creator,
     required this.steps,
   });
 
-  factory Recipe.fromJson(Map<String, dynamic> json) => _$RecipeFromJson(json);
-  Map<String, dynamic> toJson() => _$RecipeToJson(this);
+  factory RecipeModel.fromJson(Map<String, dynamic> json) =>
+      _$RecipeModelFromJson(json);
+  @override
+  Map<String, dynamic> toJson() => _$RecipeModelToJson(this);
 }

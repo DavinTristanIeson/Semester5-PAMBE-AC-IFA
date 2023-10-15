@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
@@ -70,14 +68,13 @@ class ReviewCard extends StatelessWidget {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: const BorderRadius.all(AcSizes.br),
           boxShadow: const [AcDecoration.shadowSmall]),
-      constraints: BoxConstraints(
-        maxWidth: max(200, MediaQuery.of(context).size.width / 3),
-        minWidth: 200,
-      ),
+      constraints: BoxConstraints.tight(Size.fromWidth(
+          clampDouble(MediaQuery.of(context).size.width / 3, 200.0, 300.0))),
       padding: const EdgeInsets.all(AcSizes.md),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           buildUserAndRating(context),
           const SizedBox(height: AcSizes.md),
