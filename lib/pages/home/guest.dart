@@ -42,8 +42,7 @@ class GuestHomeScreen extends StatelessWidget {
           context.navigator.push(MaterialPageRoute(
               builder: (context) => SearchScreen(
                     sortBy: SortBy.descending(RecipeSortBy.ratings),
-                    filterBy:
-                        RecipeFilterBy.hasBeenViewedBy(userId, viewed: false),
+                    filterBy: RecipeFilterBy.viewedBy(userId, viewed: false),
                   )));
         }));
   }

@@ -27,15 +27,21 @@ class RecipeStepFormType {
   Duration? timer;
   RecipeStepFormType(this.variant,
       {required this.content, this.thumbnail, this.timer});
-  static FormGroup toFormGroup() {
+  static FormGroup toFormGroup({RecipeStep? value}) {
     return FormGroup({
-      "variant":
-          FormControl<RecipeStepVariant>(value: RecipeStepVariant.regular),
-      "content": FormControl<String?>(validators: [
+      "variant": FormControl<RecipeStepVariant>(
+          value: value?.type ?? RecipeStepVariant.regular),
+      "content": FormControl<String?>(value: value?.content, validators: [
         Validators.required,
       ]),
-      "thumbnail": FormControl<InputToggle<XFile>>(value: InputToggle.off()),
-      "timer": FormControl<InputToggle<Duration>>(value: InputToggle.off()),
+      "thumbnail": FormControl<InputToggle<XFile>>(
+          value: value?.imagePath == null
+              ? InputToggle.off()
+              : InputToggle.on(XFile(value!.imagePath!))),
+      "timer": FormControl<InputToggle<Duration>>(
+          value: value?.timer == null
+              ? InputToggle.off()
+              : InputToggle.on(value!.timer!)),
     });
   }
 

@@ -82,9 +82,11 @@ class LocalRecipeController extends ChangeNotifier {
     ''');
   }
 
-  Future<RecipeModel?> get(id) async {
+  Future<RecipeModel?> get(int id) async {
     final data = (await db.query(
       tableName,
+      where: "${LocalRecipeColumns.id} = ?",
+      whereArgs: [id],
     ))
         .firstOrNull;
 

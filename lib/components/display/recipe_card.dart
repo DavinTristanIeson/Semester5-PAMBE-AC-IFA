@@ -10,7 +10,8 @@ import 'package:provider/provider.dart';
 
 class RecipeCard extends StatelessWidget {
   final RecipeLiteModel recipe;
-  const RecipeCard({super.key, required this.recipe});
+  final Widget? secondaryAction;
+  const RecipeCard({super.key, required this.recipe, this.secondaryAction});
 
   Widget buildTitleAndDescription(BuildContext context) {
     return Column(
@@ -25,19 +26,27 @@ class RecipeCard extends StatelessWidget {
     );
   }
 
+  static ButtonStyle getSecondaryActionButtonStyle(BuildContext context) =>
+      OutlinedButton.styleFrom(
+          foregroundColor: context.colors.secondary,
+          side: BorderSide(color: context.colors.secondary));
+
   Widget buildButtons(BuildContext context) {
     final isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        if (isLoggedIn)
+        if (secondaryAction == null && isLoggedIn)
           OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
                   foregroundColor: context.colors.secondary,
                   side: BorderSide(color: context.colors.secondary)),
-              onPressed: () {},
+              onPressed: () {
+                // TODO: Bookmark
+              },
               icon: const Icon(Icons.bookmark),
               label: const Text("Bookmark")),
+        if (secondaryAction != null) secondaryAction!,
         const SizedBox(
           width: AcSizes.sm,
         ),

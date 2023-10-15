@@ -42,8 +42,7 @@ class HomePageBody extends StatelessWidget {
               builder: (context) => SearchScreen(
                     sortBy:
                         SortBy.descending(RecipeSortBy.lastViewed(by: userId)),
-                    filterBy:
-                        RecipeFilterBy.hasBeenViewedBy(userId, viewed: true),
+                    filterBy: RecipeFilterBy.viewedBy(userId, viewed: true),
                   )));
         }));
   }
@@ -60,8 +59,7 @@ class HomePageBody extends StatelessWidget {
           context.navigator.push(MaterialPageRoute(
               builder: (context) => SearchScreen(
                     sortBy: SortBy.descending(RecipeSortBy.ratings),
-                    filterBy:
-                        RecipeFilterBy.hasBeenViewedBy(userId, viewed: false),
+                    filterBy: RecipeFilterBy.viewedBy(userId, viewed: false),
                   )));
         }));
   }

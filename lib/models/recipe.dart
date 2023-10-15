@@ -128,6 +128,7 @@ enum RecipeSortByType {
   lastViewed,
   createdDate,
   ratings,
+  bookmarkedDate,
 }
 
 class RecipeSortBy {
@@ -140,12 +141,16 @@ class RecipeSortBy {
   static RecipeSortBy get ratings => RecipeSortBy._(RecipeSortByType.ratings);
   static RecipeSortBy get createdDate =>
       RecipeSortBy._(RecipeSortByType.createdDate);
+  static RecipeSortBy get bookmarkedDate =>
+      RecipeSortBy._(RecipeSortByType.bookmarkedDate);
 }
 
 enum RecipeFilterByType {
   createdByUser,
   createdByUserName,
   hasBeenViewedBy,
+  hasBeenBookmarkedBy,
+  local,
 }
 
 class RecipeFilterBy {
@@ -153,12 +158,16 @@ class RecipeFilterBy {
   String? userName;
   bool? viewed;
   RecipeFilterByType type;
+  RecipeFilterBy._(this.type);
   RecipeFilterBy.createdByUser(this.userId)
       : type = RecipeFilterByType.createdByUser;
   RecipeFilterBy.createdByUserName(this.userName)
       : type = RecipeFilterByType.createdByUserName;
-  RecipeFilterBy.hasBeenViewedBy(this.userId, {this.viewed = true})
+  RecipeFilterBy.viewedBy(this.userId, {this.viewed = true})
       : type = RecipeFilterByType.hasBeenViewedBy;
+  RecipeFilterBy.bookmarkedBy(this.userId)
+      : type = RecipeFilterByType.hasBeenBookmarkedBy;
+  static RecipeFilterBy get local => RecipeFilterBy._(RecipeFilterByType.local);
 }
 
 class RecipeLibSearchState {
