@@ -9,7 +9,7 @@ import 'package:pambe_ac_ifa/components/field/form_array.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/editor/step_editor.dart';
 import 'package:pambe_ac_ifa/pages/editor/title.dart';
-import 'package:pambe_ac_ifa/controllers/local_store.dart';
+import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';

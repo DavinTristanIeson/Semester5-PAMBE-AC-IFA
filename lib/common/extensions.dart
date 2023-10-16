@@ -8,6 +8,16 @@ extension SetUtilities<T> on Set<T> {
   }
 }
 
+extension DateTimeUtilities on DateTime {
+  String _padZero(int timePiece) {
+    return timePiece.toString().padLeft(2, '0');
+  }
+
+  String toLocaleString() {
+    return "${_padZero(day)}/${_padZero(month)}/${_padZero(year)} ${_padZero(hour)}:${_padZero(minute)}";
+  }
+}
+
 extension BuildContextInheritedValues on BuildContext {
   ColorScheme get colors => Theme.of(this).colorScheme;
   ThemeData get theme => Theme.of(this);

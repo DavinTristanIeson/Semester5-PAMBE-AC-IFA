@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pambe_ac_ifa/controllers/local_store.dart';
+import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/pages/editor/body.dart';
 import 'package:provider/provider.dart';
 

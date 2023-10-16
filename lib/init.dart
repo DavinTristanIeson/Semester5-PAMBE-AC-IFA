@@ -1,4 +1,4 @@
-import 'package:pambe_ac_ifa/controllers/local_store.dart';
+import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/database/sqflite/loader.dart';
 import 'package:pambe_ac_ifa/database/sqflite/migration.dart';
 import 'package:sqflite/sqflite.dart';

@@ -3,6 +3,8 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
+import 'package:pambe_ac_ifa/controllers/notification.dart';
+import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/switch.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +15,8 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => AuthProvider()),
+      ChangeNotifierProvider(create: (context) => NotificationController()),
+      ChangeNotifierProvider(create: (context) => RecipeController()),
       // ChangeNotifierProvider(create: (context) => LocalRecipeController(db)),
     ],
     child: const AcReactiveFormConfig(child: RecipeLibApp()),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/pages/home/main.dart';
 import 'package:pambe_ac_ifa/pages/startup/main.dart';
-import 'package:pambe_ac_ifa/controllers/local_store.dart';
+import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RecipeLibSwitch extends StatefulWidget {
