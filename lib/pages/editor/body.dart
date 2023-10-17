@@ -6,7 +6,10 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/field/form_array.dart';
+import 'package:pambe_ac_ifa/controllers/lib/errors.dart';
+import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
+import 'package:pambe_ac_ifa/pages/editor/components/models.dart';
 import 'package:pambe_ac_ifa/pages/editor/step_editor.dart';
 import 'package:pambe_ac_ifa/pages/editor/title.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
@@ -32,19 +35,20 @@ class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody>
     super.initState();
     _scroll = ScrollController();
     form = FormGroup({
-      'title': FormControl<String>(value: widget.recipe?.title, validators: [
+      RecipeFormKeys.title.name:
+          FormControl<String>(value: widget.recipe?.title, validators: [
         Validators.minLength(5),
         AcValidators.acceptedChars,
       ]),
-      'description':
+      RecipeFormKeys.description.name:
           FormControl<String>(value: widget.recipe?.description, validators: [
         Validators.required,
       ]),
-      'thumbnail': FormControl<XFile?>(
+      RecipeFormKeys.image.name: FormControl<XFile?>(
           value: widget.recipe?.imagePath == null
               ? null
               : XFile(widget.recipe!.imagePath!)),
-      'steps': FormArray(
+      RecipeFormKeys.steps.name: FormArray(
           widget.recipe?.steps == null
               ? [
                   RecipeStepFormType.toFormGroup(),
@@ -58,24 +62,45 @@ class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody>
     });
   }
 
-  void save(BuildContext context) async {
+  void save() async {
     LocalRecipeController controller =
         Provider.of<LocalRecipeController>(context, listen: false);
-    final steps = (form.value['steps'] as List<Map<String, Object?>?>)
-        .map((step) => RecipeStepFormType.fromFormGroup(step!))
-        .toList();
+
+    if (form.invalid) {
+      sendError(context, "Please resolve all errors before saving!");
+      return;
+    }
+
+    final steps =
+        (form.value[RecipeFormKeys.steps.name] as List<Map<String, Object?>?>)
+            .map((step) => RecipeStepFormType.fromFormGroup(step!))
+            .toList();
     try {
-      await controller.create(
-          title: form.value['title'].toString(),
-          description: form.value['description']?.toString(),
-          steps: steps);
+      final String title = form.value[RecipeFormKeys.title.name] as String;
+      final String? description =
+          form.value[RecipeFormKeys.description.name] as String?;
+      await controller.put(
+          title: title, description: description, steps: steps);
+      form.markAsPristine();
     } catch (e) {
       // ignore: use_build_context_synchronously
       sendError(context, e.toString());
     }
   }
 
-  void publish() {}
+  void publish() async {
+    if (form.dirty) {
+      sendError(context,
+          "Changes to the recipe should be saved first before publishing!");
+      return;
+    }
+
+    try {
+      context.read<RecipeController>().put(widget.recipe!);
+    } on ApiError catch (e) {
+      sendError(context, e.message);
+    }
+  }
 
   Widget buildAddStepButton() {
     return Padding(
@@ -84,7 +109,8 @@ class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody>
         child: ElevatedButton.icon(
           onPressed: () {
             setState(() {
-              final formArray = form.controls["steps"] as FormArray;
+              final formArray =
+                  form.controls[RecipeFormKeys.steps.name] as FormArray;
               formArray.add(RecipeStepFormType.toFormGroup());
             });
             Future.delayed(const Duration(milliseconds: 100), () {
@@ -101,7 +127,8 @@ class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody>
   }
 
   Widget buildScroll(BuildContext context) {
-    final FormArray formArray = form.controls["steps"] as FormArray;
+    final FormArray formArray =
+        form.controls[RecipeFormKeys.steps.name] as FormArray;
     int length = formArray.controls.length + 2;
     return ListView.builder(
         controller: _scroll,
@@ -123,7 +150,8 @@ class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody>
   }
 
   void handleMutate(bool Function(FormArray formArray) fn) {
-    bool shouldRerender = fn(form.controls["steps"] as FormArray);
+    bool shouldRerender =
+        fn(form.controls[RecipeFormKeys.steps.name] as FormArray);
     if (shouldRerender) {
       setState(() {});
     }
@@ -131,10 +159,10 @@ class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody>
 
   @override
   Widget build(BuildContext context) {
-    return AcReactiveFormConfig(
-      child: Scaffold(
-          appBar: OnlyReturnAppBar(
-            actions: [
+    return Scaffold(
+        appBar: OnlyReturnAppBar(
+          actions: [
+            if (widget.recipe != null)
               Tooltip(
                 message: "Publish Recipe",
                 child: IconButton(
@@ -142,22 +170,19 @@ class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody>
                     color: Theme.of(context).colorScheme.tertiary,
                     icon: const Icon(Icons.upload)),
               ),
-            ],
+          ],
+        ),
+        floatingActionButton: Tooltip(
+          message: "Save",
+          child: FloatingActionButton(
+            onPressed: save,
+            child: const Icon(Icons.save),
           ),
-          floatingActionButton: Tooltip(
-            message: "Save",
-            child: FloatingActionButton(
-              onPressed: () {
-                save(context);
-              },
-              child: const Icon(Icons.save),
-            ),
-          ),
-          body: ReactiveForm(
-            formGroup: form,
-            child: FormArrayController(
-                mutate: handleMutate, child: buildScroll(context)),
-          )),
-    );
+        ),
+        body: ReactiveForm(
+          formGroup: form,
+          child: FormArrayController(
+              mutate: handleMutate, child: buildScroll(context)),
+        ));
   }
 }

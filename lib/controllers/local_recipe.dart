@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
-import 'package:pambe_ac_ifa/pages/editor/step_editor.dart';
+import 'package:pambe_ac_ifa/pages/editor/components/models.dart';
 import 'package:sqflite/sqflite.dart';
 
 enum LocalRecipeColumns {
@@ -91,35 +91,52 @@ class LocalRecipeController extends ChangeNotifier {
         .firstOrNull;
 
     if (data == null) return null;
+    print(data);
 
     return RecipeModel.fromJson(data);
   }
 
-  Future<RecipeModel> create({
+  Future<RecipeModel> put({
+    String? id,
     required String title,
     String? description,
     required List<RecipeStepFormType> steps,
   }) async {
-    int id = await db.transaction((txn) async {
-      int id = await txn.insert(tableName, {
-        LocalRecipeColumns.title.name: title,
-        LocalRecipeColumns.description.name: description,
-        LocalRecipeColumns.createdAt.name: DateTime.now().millisecondsSinceEpoch
-      });
+    int lastId = await db.transaction((txn) async {
+      int lastId;
+      if (id == null) {
+        lastId = await txn.insert(tableName, {
+          LocalRecipeColumns.title.name: title,
+          LocalRecipeColumns.description.name: description,
+          LocalRecipeColumns.createdAt.name:
+              DateTime.now().millisecondsSinceEpoch
+        });
+      } else {
+        lastId = await txn.update(
+            tableName,
+            {
+              LocalRecipeColumns.title.name: title,
+              LocalRecipeColumns.description.name: description,
+              LocalRecipeColumns.createdAt.name:
+                  DateTime.now().millisecondsSinceEpoch
+            },
+            where: "id = ?",
+            whereArgs: [id]);
+      }
 
       for (RecipeStepFormType step in steps) {
         await stepsController.create(
           txn,
-          recipeId: id,
+          recipeId: lastId,
           content: step.content,
           type: step.variant.name,
           timer: step.timer?.inMilliseconds,
         );
       }
-      return id;
+      return lastId;
     });
 
-    RecipeModel recipe = (await get(id))!;
+    RecipeModel recipe = (await get(lastId))!;
     notifyListeners();
     return recipe;
   }

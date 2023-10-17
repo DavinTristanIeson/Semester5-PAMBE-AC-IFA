@@ -7,6 +7,7 @@ import 'package:pambe_ac_ifa/components/field/image_picker.dart';
 import 'package:pambe_ac_ifa/components/field/text_input.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
+import 'package:pambe_ac_ifa/pages/editor/components/models.dart';
 import 'package:pambe_ac_ifa/pages/editor/components/step.dart';
 import 'package:pambe_ac_ifa/pages/editor/components/timer.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -20,49 +21,12 @@ enum _RecipeStepEditorAction {
   toRegular,
 }
 
-class RecipeStepFormType {
-  RecipeStepVariant variant;
-  String content;
-  XFile? thumbnail;
-  Duration? timer;
-  RecipeStepFormType(this.variant,
-      {required this.content, this.thumbnail, this.timer});
-  static FormGroup toFormGroup({RecipeStep? value}) {
-    return FormGroup({
-      "variant": FormControl<RecipeStepVariant>(
-          value: value?.type ?? RecipeStepVariant.regular),
-      "content": FormControl<String?>(value: value?.content, validators: [
-        Validators.required,
-      ]),
-      "thumbnail": FormControl<InputToggle<XFile>>(
-          value: value?.imagePath == null
-              ? InputToggle.off()
-              : InputToggle.on(XFile(value!.imagePath!))),
-      "timer": FormControl<InputToggle<Duration>>(
-          value: value?.timer == null
-              ? InputToggle.off()
-              : InputToggle.on(value!.timer!)),
-    });
-  }
-
-  static RecipeStepFormType fromFormGroup(Map<String, Object?> group) {
-    final thumbnailToggle = group["thumbnail"] as InputToggle<XFile>;
-    final timerToggle = group["timer"] as InputToggle<Duration>;
-    return RecipeStepFormType(
-      group["variant"] as RecipeStepVariant,
-      content: (group["content"] as String?) ?? '',
-      thumbnail: thumbnailToggle.toggle ? thumbnailToggle.value : null,
-      timer: timerToggle.toggle ? timerToggle.value : null,
-    );
-  }
-}
-
 class _RecipeStepEditorInternal extends StatelessWidget {
   const _RecipeStepEditorInternal();
 
   Widget buildContentInput() {
     return ReactiveValueListenableBuilder<String?>(
-        formControlName: "content",
+        formControlName: RecipeStepFormKeys.content.name,
         builder: (context, control, child) {
           String? error =
               ReactiveFormConfig.of(context)!.translateAny(control.errors);
@@ -91,7 +55,7 @@ class _RecipeStepEditorInternal extends StatelessWidget {
 
   Widget buildThumbnail() {
     return ReactiveValueListenableBuilder<InputToggle<XFile>>(
-        formControlName: "thumbnail",
+        formControlName: RecipeStepFormKeys.image.name,
         builder: (context, control, child) {
           if (control.value == null || !control.value!.toggle) {
             return const SizedBox.shrink();
@@ -109,7 +73,7 @@ class _RecipeStepEditorInternal extends StatelessWidget {
 
   Widget buildTimer() {
     return ReactiveValueListenableBuilder<InputToggle<Duration>>(
-        formControlName: "timer",
+        formControlName: RecipeStepFormKeys.timer.name,
         builder: (context, control, child) {
           if (control.value == null || !control.value!.toggle) {
             return const SizedBox.shrink();
@@ -155,12 +119,12 @@ class _RecipeStepEditorMenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final form = ReactiveForm.of(context, listen: true) as FormGroup;
-    final thumbnailControl =
-        form.controls["thumbnail"] as FormControl<InputToggle<XFile>>;
-    final timerControl =
-        form.controls["timer"] as FormControl<InputToggle<Duration>>;
-    final variantControl =
-        form.controls["variant"] as FormControl<RecipeStepVariant>;
+    final thumbnailControl = form.controls[RecipeStepFormKeys.image.name]
+        as FormControl<InputToggle<XFile>>;
+    final timerControl = form.controls[RecipeStepFormKeys.timer.name]
+        as FormControl<InputToggle<Duration>>;
+    final variantControl = form.controls[RecipeStepFormKeys.type.name]
+        as FormControl<RecipeStepVariant>;
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -315,7 +279,7 @@ class RecipeStepEditor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ReactiveValueListenableBuilder<RecipeStepVariant>(
-        formControlName: "variant",
+        formControlName: RecipeStepFormKeys.type.name,
         builder: (context, control, child) {
           return RecipeStepWrapper(
             index: index + 1,

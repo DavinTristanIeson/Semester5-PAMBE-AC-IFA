@@ -4,6 +4,7 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/field/field_wrapper.dart';
 import 'package:pambe_ac_ifa/components/field/image_picker.dart';
 import 'package:pambe_ac_ifa/components/field/text_input.dart';
+import 'package:pambe_ac_ifa/pages/editor/components/models.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 
@@ -87,7 +88,7 @@ class RecipeDetailsEditor extends StatelessWidget {
     return Column(
       children: [
         ReactiveValueListenableBuilder<XFile?>(
-            formControlName: "thumbnail",
+            formControlName: RecipeFormKeys.image.name,
             builder: (context, control, child) {
               return ImagePickerField(
                   value: control.value,
@@ -98,7 +99,7 @@ class RecipeDetailsEditor extends StatelessWidget {
                   });
             }),
         ReactiveValueListenableBuilder<String?>(
-          formControlName: "title",
+          formControlName: RecipeFormKeys.title.name,
           builder: (context, control, child) {
             return _TitleEditorTitleField(
                 value: control.value,

@@ -63,7 +63,7 @@ class RecipeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double imageHeight = clampDouble(context.screenHeight / 3.5, 120.0, 200.0);
+    double imageHeight = clampDouble(context.screenHeight / 3.5, 120.0, 180.0);
     double imageWidth = clampDouble(context.screenWidth / 1.4, 300.0, 450.0);
     return Container(
       decoration: BoxDecoration(
