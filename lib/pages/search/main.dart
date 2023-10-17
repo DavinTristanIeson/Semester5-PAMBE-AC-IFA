@@ -17,12 +17,12 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  late RecipeLibSearchState searchState;
+  late RecipeSearchState searchState;
 
   @override
   void initState() {
     super.initState();
-    searchState = RecipeLibSearchState(
+    searchState = RecipeSearchState(
         search: widget.search,
         sortBy: widget.sortBy ?? SortBy.descending(RecipeSortBy.ratings),
         filterBy: null);

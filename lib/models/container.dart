@@ -32,6 +32,12 @@ class Either<TLeft, TRight> {
   }
 }
 
+class Pair<T1, T2> {
+  T1 first;
+  T2 second;
+  Pair(this.first, this.second);
+}
+
 class SortBy<T> {
   T factor;
   late bool isAscending;
@@ -42,6 +48,7 @@ class SortBy<T> {
     isAscending = false;
   }
   bool get isDescending => isAscending;
+  String get apiParams => "${isAscending ? '' : '-'}${factor.toString()}";
 }
 
 @JsonSerializable()
@@ -53,4 +60,19 @@ class MinimalModel {
   factory MinimalModel.fromJson(Map<String, dynamic> json) =>
       _$MinimalModelFromJson(json);
   Map<String, dynamic> toJson() => _$MinimalModelToJson(this);
+}
+
+@JsonSerializable(genericArgumentFactories: true)
+class ApiResult<T> {
+  String message;
+  T data;
+  ApiResult({required this.message, required this.data});
+
+  factory ApiResult.fromJson(
+    Map<String, dynamic> json,
+    T Function(Object? json) fromJsonT,
+  ) =>
+      _$ApiResultFromJson(json, fromJsonT);
+  Map<String, dynamic> toJson(Object Function(T value) toJsonT) =>
+      _$ApiResultToJson(this, toJsonT);
 }

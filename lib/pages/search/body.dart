@@ -7,7 +7,7 @@ import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 
 class SearchScreenBody extends StatefulWidget {
-  final RecipeLibSearchState searchState;
+  final RecipeSearchState searchState;
   const SearchScreenBody({super.key, required this.searchState});
 
   @override
@@ -41,7 +41,7 @@ class _SearchScreenBodyState extends State<SearchScreenBody> {
   }
 
   Future<List<RecipeLiteModel>> fetchRecipes(
-      RecipeLibSearchState state, int pageKey) async {
+      RecipeSearchState state, int pageKey) async {
     return [
       RecipeModel(
         id: '0',

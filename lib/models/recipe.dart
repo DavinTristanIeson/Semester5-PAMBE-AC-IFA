@@ -128,7 +128,10 @@ enum RecipeSortByType {
   lastViewed,
   createdDate,
   ratings,
-  bookmarkedDate,
+  bookmarkedDate;
+
+  @override
+  toString() => name;
 }
 
 class RecipeSortBy {
@@ -150,7 +153,10 @@ enum RecipeFilterByType {
   createdByUserName,
   hasBeenViewedBy,
   hasBeenBookmarkedBy,
-  local,
+  local;
+
+  @override
+  toString() => name;
 }
 
 class RecipeFilterBy {
@@ -168,31 +174,57 @@ class RecipeFilterBy {
   RecipeFilterBy.bookmarkedBy(this.userId)
       : type = RecipeFilterByType.hasBeenBookmarkedBy;
   static RecipeFilterBy get local => RecipeFilterBy._(RecipeFilterByType.local);
+  Pair<String, dynamic> get apiParams {
+    return switch (type) {
+      RecipeFilterByType.createdByUser => Pair(type.name, userId),
+      RecipeFilterByType.createdByUserName => Pair(type.name, userName),
+      RecipeFilterByType.hasBeenViewedBy =>
+        Pair(type.name, "${viewed! ? '' : '-'}$userId"),
+      RecipeFilterByType.hasBeenBookmarkedBy => Pair(type.name, userId),
+      RecipeFilterByType.local => Pair(type.name, userId),
+    };
+  }
 }
 
-class RecipeLibSearchState {
+class RecipeSearchState {
   SortBy<RecipeSortBy> sortBy;
   RecipeFilterBy? filterBy;
   String? search;
   int limit;
 
-  RecipeLibSearchState({
+  RecipeSearchState({
     required this.search,
     required this.sortBy,
     required this.filterBy,
     this.limit = 15,
   });
 
-  RecipeLibSearchState copyWith({
+  RecipeSearchState copyWith({
     String? search,
     SortBy<RecipeSortBy>? sortBy,
     RecipeFilterBy? filterBy,
     int? limit,
   }) {
-    return RecipeLibSearchState(
+    return RecipeSearchState(
         search: search ?? this.search,
         sortBy: sortBy ?? this.sortBy,
         filterBy: filterBy ?? this.filterBy,
         limit: limit ?? this.limit);
+  }
+
+  Map<String, Object?> getApiParams({int page = 0}) {
+    final Map<String, Object?> params = {
+      "sort": sortBy.apiParams,
+      "limit": limit,
+      "page": page,
+    };
+    if (search != null) {
+      params["search"] = search;
+    }
+    if (filterBy != null) {
+      Pair<String, dynamic> filters = filterBy!.apiParams;
+      params[filters.first] = filters.second;
+    }
+    return params;
   }
 }
