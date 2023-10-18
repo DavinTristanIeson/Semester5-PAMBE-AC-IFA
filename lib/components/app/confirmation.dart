@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 
 /// Default confirmation dialog. Used with showDialog
@@ -19,7 +20,7 @@ class SimpleConfirmationDialog extends StatelessWidget {
         ? title.left!
         : Text(
             title?.right ?? defaultText,
-            style: Theme.of(context).textTheme.displayMedium,
+            style: context.texts.titleLarge,
           );
   }
 

@@ -9,6 +9,7 @@ class SampleScrollSection extends StatelessWidget {
   final Widget Function(BuildContext context, int index) itemBuilder;
   final Either<Widget, String> header;
   final Either<Widget, void Function()>? viewMoreButton;
+  final Either<Widget, String>? emptyView;
   final BoxConstraints? constraints;
   final double space;
   const SampleScrollSection({
@@ -19,7 +20,26 @@ class SampleScrollSection extends StatelessWidget {
     this.space = AcSizes.space,
     required this.header,
     required this.viewMoreButton,
+    this.emptyView,
   });
+
+  Widget buildEmptyView(BuildContext context) {
+    if (emptyView != null && emptyView!.hasLeft) {
+      return emptyView!.left!;
+    }
+    return Container(
+      decoration: const BoxDecoration(
+          color: Color.fromRGBO(0, 0, 0, 0.3),
+          borderRadius: BorderRadius.all(AcSizes.br)),
+      child: Center(
+        child: Text(
+          emptyView?.right ?? "No data",
+          style: context.texts.titleMedium!
+              .copyWith(color: context.colors.tertiary),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,15 +65,18 @@ class SampleScrollSection extends StatelessWidget {
         ConstrainedBox(
           constraints:
               constraints ?? BoxConstraints.tight(Size.fromHeight(itemHeight)),
-          child: ListView.builder(
-            itemCount: itemCount,
-            itemBuilder: (context, index) {
-              return Padding(
-                  padding: EdgeInsets.only(right: space, bottom: AcSizes.md),
-                  child: itemBuilder(context, index));
-            },
-            scrollDirection: Axis.horizontal,
-          ),
+          child: itemCount == 0
+              ? buildEmptyView(context)
+              : ListView.builder(
+                  itemCount: itemCount,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                        padding:
+                            EdgeInsets.only(right: space, bottom: AcSizes.md),
+                        child: itemBuilder(context, index));
+                  },
+                  scrollDirection: Axis.horizontal,
+                ),
         )
       ],
     );

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
@@ -61,10 +60,16 @@ class RecipeCard extends StatelessWidget {
     );
   }
 
+  static Size getDefaultImageSize(BuildContext context) {
+    return Size(context.relativeWidth(1 / 1.4, 300.0, 450.0),
+        context.relativeHeight(1 / 3.5, 120.0, 180.0));
+  }
+
   @override
   Widget build(BuildContext context) {
-    double imageHeight = clampDouble(context.screenHeight / 3.5, 120.0, 180.0);
-    double imageWidth = clampDouble(context.screenWidth / 1.4, 300.0, 450.0);
+    Size defaultSize = getDefaultImageSize(context);
+    double imageHeight = defaultSize.height;
+    double imageWidth = defaultSize.width;
     return Container(
       decoration: BoxDecoration(
         color: context.colors.surface,

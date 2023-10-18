@@ -91,7 +91,6 @@ class LocalRecipeController extends ChangeNotifier {
         .firstOrNull;
 
     if (data == null) return null;
-    print(data);
 
     return RecipeModel.fromJson(data);
   }

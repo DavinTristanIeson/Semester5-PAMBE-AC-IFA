@@ -9,6 +9,7 @@ import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/editor/main.dart';
+import 'package:pambe_ac_ifa/pages/library/your_recipes.dart';
 import 'package:pambe_ac_ifa/pages/search/main.dart';
 import 'package:provider/provider.dart';
 
@@ -56,35 +57,6 @@ class LibraryScreen extends StatelessWidget {
         }));
   }
 
-  Widget buildYourRecipesSection(BuildContext context) {
-    return SampleScrollSection(
-        itemCount: 3,
-        itemBuilder: (context, index) {
-          return RecipeCard(
-            recipe: debugRecipe,
-            secondaryAction: OutlinedButton.icon(
-              style: RecipeCard.getSecondaryActionButtonStyle(context),
-              onPressed: () {
-                context.navigator.push(MaterialPageRoute(
-                    builder: (context) => RecipeEditorScreen(
-                          recipeId: debugRecipe.id,
-                        )));
-              },
-              icon: const Icon(Icons.edit),
-              label: const Text("Edit"),
-            ),
-          );
-        },
-        header: Either.right("Your Recipes"),
-        viewMoreButton: Either.right(() {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => SearchScreen(
-                    sortBy: SortBy.descending(RecipeSortBy.createdDate),
-                    filterBy: RecipeFilterBy.local,
-                  )));
-        }));
-  }
-
   @override
   Widget build(BuildContext context) {
     const EdgeInsets edgeInsets = EdgeInsets.only(
@@ -97,13 +69,10 @@ class LibraryScreen extends StatelessWidget {
               padding: edgeInsets,
               child: buildBookmarkedSection(context),
             ),
-            Padding(
-              padding: edgeInsets,
-              child: buildYourRecipesSection(context),
-            ),
+            const YourRecipesSection(),
             const SizedBox(
               height: AcSizes.xxl,
-            )
+            ),
           ],
         ),
         Positioned(
