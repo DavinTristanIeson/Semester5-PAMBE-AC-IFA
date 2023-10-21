@@ -6,11 +6,13 @@ import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
 import 'package:pambe_ac_ifa/components/display/review_card.dart';
 import 'package:pambe_ac_ifa/components/display/some_items_scroll.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
+import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/search/main.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class HomePageBody extends StatelessWidget {
   static RecipeModel debugRecipe = RecipeModel(
@@ -23,28 +25,64 @@ class HomePageBody extends StatelessWidget {
         imagePath: "https://www.google.com"),
     description: "Description",
     steps: [],
-    title: "Recipe Title",
+    title: "Recipe Titlex",
     imagePath: "",
     imageSource: ExternalImageSource.local,
   );
   const HomePageBody({super.key});
 
   Widget buildRecentRecipes(BuildContext context) {
+    RecipeController controller =
+        Provider.of<RecipeController>(context, listen: true);
+
     final userId = context.watch<AuthProvider>().user!.id;
-    return SampleScrollSection(
-        itemCount: 3,
-        itemBuilder: (context, index) {
-          return RecipeCard(recipe: debugRecipe);
-        },
-        header: Either.right("Recents"),
-        viewMoreButton: Either.right(() {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => SearchScreen(
-                    sortBy:
-                        SortBy.descending(RecipeSortBy.lastViewed(by: userId)),
-                    filterBy: RecipeFilterBy.viewedBy(userId, viewed: true),
-                  )));
-        }));
+    return FutureBuilder(
+        future: http.get(Uri.parse("http://101.128.75.229:3000/api/recipes")),
+        // future: controller.getAll(RecipeSearchState(
+        //     search: 'abc',
+        //     sortBy: SortBy.ascending(RecipeSortBy.createdDate),
+        //     filterBy: RecipeFilterBy.local)),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData) {
+            return SampleScrollSection(
+                itemCount: 3,
+                itemBuilder: (context, index) {
+                  return RecipeCard(recipe: debugRecipe);
+                },
+                header: Either.right("Recents"),
+                viewMoreButton: Either.right(() {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => SearchScreen(
+                            sortBy: SortBy.descending(
+                                RecipeSortBy.lastViewed(by: userId)),
+                            filterBy:
+                                RecipeFilterBy.viewedBy(userId, viewed: true),
+                          )));
+                }));
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return SampleScrollSection(
+                itemCount: 3,
+                itemBuilder: (context, index) {
+                  return RecipeCard(recipe: debugRecipe);
+                },
+                header: Either.right("Recents"),
+                viewMoreButton: Either.right(() {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => SearchScreen(
+                            sortBy: SortBy.descending(
+                                RecipeSortBy.lastViewed(by: userId)),
+                            filterBy:
+                                RecipeFilterBy.viewedBy(userId, viewed: true),
+                          )));
+                }));
+          } else {
+            if (snapshot.hasError) {
+              print(snapshot.error);
+            }
+            return const Text('Error');
+          }
+        });
   }
 
   Widget buildTrendingRecipes(BuildContext context) {

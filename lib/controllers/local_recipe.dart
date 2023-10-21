@@ -39,7 +39,7 @@ class LocalRecipeStepsController {
             ${LocalRecipeStepColumns.content} VARCHAR(255) NOT NULL, 
             ${LocalRecipeStepColumns.type} VARCHAR(255) NOT NULL, 
             ${LocalRecipeStepColumns.timer} INTEGER, 
-            ${LocalRecipeStepColumns.createdAt} INTEGER, 
+            ${LocalRecipeStepColumns.createdAt} INTEGER,
             FOREIGN KEY (${LocalRecipeStepColumns.recipeId}) REFERENCES ${LocalRecipeController.tableName}(id)
           );
       ''');

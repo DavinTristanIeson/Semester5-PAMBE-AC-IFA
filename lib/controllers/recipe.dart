@@ -8,7 +8,7 @@ import 'package:path/path.dart';
 /// Ini untuk resep yang disimpan online
 class RecipeController extends ChangeNotifier with HttpController {
   @override
-  final String baseUrl = join(globalBaseUrl, "api/recipes");
+  final String baseUrl = join(globalBaseUrl, "api");
 
   Future<ApiResult<List<RecipeLiteModel>>> getAll(
     RecipeSearchState search, {
@@ -34,7 +34,7 @@ class RecipeController extends ChangeNotifier with HttpController {
   }
 
   Future<ApiResult<RecipeModel>> put(RecipeModel recipe) async {
-    final response = await http.post(urlOf("/recipes"),
+    final response = await http.post(urlOf("/api/recipes"),
         headers: {
           "Content-Type": "application/json",
         },
@@ -47,7 +47,7 @@ class RecipeController extends ChangeNotifier with HttpController {
   }
 
   Future<ApiResult<RecipeModel>> update(RecipeModel recipe) async {
-    final response = await http.put(urlOf("/recipes"),
+    final response = await http.put(urlOf("/api/recipes"),
         headers: {
           "Content-Type": "application/json",
         },
@@ -60,7 +60,7 @@ class RecipeController extends ChangeNotifier with HttpController {
   }
 
   Future<ApiResult> delete(String id) async {
-    final response = await http.delete(urlOf("/recipes/$id"));
+    final response = await http.delete(urlOf("/api/recipes/$id"));
     final ApiResult res = processHttpResponse(response,
         transform: (json) => ApiResult.fromJson(json, (json) => json));
     return res;

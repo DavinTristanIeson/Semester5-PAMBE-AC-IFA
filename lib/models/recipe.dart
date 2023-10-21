@@ -221,10 +221,12 @@ class RecipeSearchState {
     if (search != null) {
       params["search"] = search;
     }
+    Map<String, String> filterParams = {};
     if (filterBy != null) {
       Pair<String, dynamic> filters = filterBy!.apiParams;
-      params[filters.first] = filters.second;
+      filterParams[filters.first] = filters.second;
     }
+    params["filter"] = filterParams;
     return params;
   }
 }
