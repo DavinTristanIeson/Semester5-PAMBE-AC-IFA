@@ -14,12 +14,31 @@ enum ApiErrorType {
 
   final String defaultMessage;
   const ApiErrorType({required this.defaultMessage});
+  @override
+  toString() => name;
 }
 
 class ApiError implements Exception {
   final String? customMessage;
   final ApiErrorType type;
+  final Exception? innerException;
+  final Error? innerError;
 
-  const ApiError(this.type, [this.customMessage]);
+  ApiError(this.type, {String? message, this.innerException, this.innerError})
+      : customMessage = message {
+    if (innerException != null) {
+      // ignore: avoid_print
+      print(innerException.toString());
+    }
+    if (innerError != null) {
+      // ignore: avoid_print
+      print("${innerError.toString()}\n${innerError!.stackTrace}");
+    }
+  }
   String get message => customMessage ?? type.defaultMessage;
+  String? get errorMessage =>
+      innerException?.toString() ?? innerError?.toString();
+  @override
+  toString() =>
+      "Error [Type: $type]: $message${innerException == null ? '' : "\n$errorMessage"}";
 }

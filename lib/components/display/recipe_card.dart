@@ -17,7 +17,7 @@ class RecipeCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(recipe.title, style: Theme.of(context).textTheme.titleMedium),
-        Text("by ${recipe.creator.name}",
+        Text("by ${recipe.user.name}",
             style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: AcSizes.lg),
         Text(recipe.description),
@@ -121,7 +121,7 @@ class RecipeCard extends StatelessWidget {
                 child: CircleAvatar(
                     radius: AcSizes.avatarRadius,
                     backgroundColor: Theme.of(context).colorScheme.tertiary,
-                    backgroundImage: recipe.creator.image)),
+                    backgroundImage: recipe.user.image)),
           )
         ],
       ),
@@ -147,11 +147,11 @@ class RecipeHorizontalCard extends StatelessWidget {
           },
           leading: CircleAvatar(
             backgroundColor: context.colors.tertiary,
-            backgroundImage: recipe.creator.image,
+            backgroundImage: recipe.user.image,
           ),
           title: Text(recipe.title,
               style: Theme.of(context).textTheme.titleMedium),
-          subtitle: Text("by ${recipe.creator.name}",
+          subtitle: Text("by ${recipe.user.name}",
               style: Theme.of(context).textTheme.titleSmall),
           trailing: MaybeImage(
               image: recipe.image,

@@ -6,12 +6,15 @@ import 'package:pambe_ac_ifa/controllers/lib/errors.dart';
 import 'package:path/path.dart';
 
 /// CHANGE THIS TO THE URL OF THE SERVER BEFORE RUNNING
-const String globalBaseUrl = "localhost:3000";
+final Uri globalBaseUrl =
+    Uri(scheme: 'https', host: "bewildered-jersey-lion.cyclic.app");
 
 mixin HttpController {
-  String get baseUrl => globalBaseUrl;
+  Uri get baseUrl => globalBaseUrl;
   Uri urlOf(String path, {Map<String, dynamic>? params}) {
-    return Uri.http(join(baseUrl, path), '', params);
+    Uri resultUrl = baseUrl.replace(
+        path: join(baseUrl.path, path), queryParameters: params);
+    return resultUrl;
   }
 
   T processHttpResponse<T>(
@@ -20,29 +23,32 @@ mixin HttpController {
     int expectedStatus = HttpStatus.ok,
   }) {
     if (response.statusCode >= 500) {
-      throw const ApiError(ApiErrorType.serverIssues);
+      throw ApiError(ApiErrorType.serverIssues);
     }
 
     final Map<String, Object?> rawJson;
     try {
       rawJson = jsonDecode(response.body);
-    } catch (e) {
-      throw const ApiError(ApiErrorType.parseJson);
+    } on Exception catch (e) {
+      throw ApiError(ApiErrorType.parseJson, innerException: e);
     }
 
     if (response.statusCode != expectedStatus) {
       if (rawJson.containsKey("message") && rawJson["message"] is String) {
-        throw ApiError(ApiErrorType.fromServer, rawJson["message"] as String);
+        throw ApiError(ApiErrorType.fromServer,
+            message: rawJson["message"] as String);
       } else {
-        throw const ApiError(ApiErrorType.fromServer);
+        throw ApiError(ApiErrorType.fromServer);
       }
     }
 
     final T result;
     try {
       result = transform(rawJson);
-    } catch (e) {
-      throw const ApiError(ApiErrorType.shapeMismatch);
+    } on Error catch (e) {
+      throw ApiError(ApiErrorType.shapeMismatch, innerError: e);
+    } on Exception catch (e) {
+      throw ApiError(ApiErrorType.shapeMismatch, innerException: e);
     }
 
     return result;

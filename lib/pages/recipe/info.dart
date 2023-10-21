@@ -53,7 +53,7 @@ class RecipeInfoScreen extends StatelessWidget {
                               .titleLarge!
                               .copyWith(fontWeight: FontWeight.bold),
                         ),
-                        Text("by ${recipe.creator.name}",
+                        Text("by ${recipe.user.name}",
                             style: AcTypography.importantDescription)
                       ],
                     ),
@@ -74,7 +74,7 @@ class RecipeInfoScreen extends StatelessWidget {
               child: CircleAvatar(
                 radius: AcSizes.avatarRadius,
                 backgroundColor: Theme.of(context).colorScheme.tertiary,
-                backgroundImage: recipe.creator.image,
+                backgroundImage: recipe.user.image,
               )),
         ),
       ],

@@ -1,42 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
-import 'package:pambe_ac_ifa/components/display/image.dart';
+import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
-import 'package:pambe_ac_ifa/components/display/some_items_scroll.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
+import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
-import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/editor/main.dart';
+import 'package:pambe_ac_ifa/pages/home/components/async_scroll_section.dart';
 import 'package:pambe_ac_ifa/pages/library/your_recipes.dart';
 import 'package:pambe_ac_ifa/pages/search/main.dart';
 import 'package:provider/provider.dart';
 
-class LibraryScreen extends StatelessWidget {
-  static RecipeModel debugRecipe = RecipeModel(
-    id: '0',
-    createdAt: DateTime.now(),
-    creator: UserModel(
-        id: "0",
-        name: "User",
-        email: "placeholder@email.com",
-        imagePath: "https://www.google.com"),
-    description: "Description",
-    steps: [],
-    title: "Recipe Title",
-    imagePath: "",
-    imageSource: ExternalImageSource.local,
-  );
+class LibraryScreen extends StatelessWidget with SnackbarMessenger {
   const LibraryScreen({super.key});
 
   Widget buildBookmarkedSection(BuildContext context) {
+    final controller = context.watch<RecipeController>();
     final userId = context.watch<AuthProvider>().user!.id;
-    return SampleScrollSection(
-        itemCount: 3,
-        itemBuilder: (context, index) {
+    return AsyncApiSampleScrollSection(
+        future: controller.getAll(RecipeSearchState(
+            limit: 5,
+            sortBy: SortBy.descending(RecipeSortBy.lastViewed),
+            filterBy: RecipeFilterBy.bookmarkedBy(userId))),
+        itemBuilder: (context, data) {
           return RecipeCard(
-            recipe: debugRecipe,
+            recipe: data,
             secondaryAction: OutlinedButton.icon(
                 style: RecipeCard.getSecondaryActionButtonStyle(context),
                 onPressed: () {
@@ -46,13 +36,14 @@ class LibraryScreen extends StatelessWidget {
                 label: const Text("Remove")),
           );
         },
-        header: Either.right("Bookmarks"),
+        itemConstraints:
+            BoxConstraints.tight(RecipeCard.getDefaultImageSize(context)),
+        header: Either.right("Recents"),
         viewMoreButton: Either.right(() {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => SearchScreen(
-                    sortBy:
-                        SortBy.descending(RecipeSortBy.lastViewed(by: userId)),
-                    filterBy: RecipeFilterBy.bookmarkedBy(userId),
+                    sortBy: SortBy.descending(RecipeSortBy.lastViewed),
+                    filterBy: RecipeFilterBy.viewedBy(userId, viewed: true),
                   )));
         }));
   }

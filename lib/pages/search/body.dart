@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
-import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
+import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
-import 'package:pambe_ac_ifa/models/user.dart';
+import 'package:provider/provider.dart';
 
 class SearchScreenBody extends StatefulWidget {
   final RecipeSearchState searchState;
@@ -16,18 +16,17 @@ class SearchScreenBody extends StatefulWidget {
 
 class _SearchScreenBodyState extends State<SearchScreenBody> {
   final PagingController<int, RecipeLiteModel> _pagination =
-      PagingController(firstPageKey: 0);
+      PagingController(firstPageKey: 1);
 
   @override
   void initState() {
     _pagination.addPageRequestListener((pageKey) async {
-      List<RecipeLiteModel> recipes =
-          await fetchRecipes(widget.searchState, pageKey);
-      // if (recipes.length != widget.searchState.limit) {
-      //   _pagination.appendLastPage(recipes);
-      // } else {
-      _pagination.appendPage(recipes, pageKey + 1);
-      // }
+      List<RecipeLiteModel> recipes = await fetch(widget.searchState, pageKey);
+      if (recipes.length != widget.searchState.limit) {
+        _pagination.appendLastPage(recipes);
+      } else {
+        _pagination.appendPage(recipes, pageKey + 1);
+      }
     });
     super.initState();
   }
@@ -40,24 +39,11 @@ class _SearchScreenBodyState extends State<SearchScreenBody> {
     }
   }
 
-  Future<List<RecipeLiteModel>> fetchRecipes(
+  Future<List<RecipeLiteModel>> fetch(
       RecipeSearchState state, int pageKey) async {
-    return [
-      RecipeModel(
-        id: '0',
-        createdAt: DateTime.now(),
-        creator: UserModel(
-            id: "0",
-            name: "User",
-            email: "placeholder@email.com",
-            imagePath: "https://www.google.com"),
-        description: "Description",
-        steps: [],
-        title: "Recipe Title",
-        imagePath: "",
-        imageSource: ExternalImageSource.local,
-      )
-    ];
+    final res =
+        await context.read<RecipeController>().getAll(state, page: pageKey);
+    return res.data;
   }
 
   @override

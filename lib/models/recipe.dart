@@ -85,7 +85,7 @@ class RecipeLiteModel with SupportsLocalAndOnlineImagesMixin {
   @JsonKey(defaultValue: ExternalImageSource.local)
   ExternalImageSource? imageSource;
 
-  UserModel creator;
+  UserModel user;
 
   RecipeLiteModel({
     required this.id,
@@ -94,7 +94,7 @@ class RecipeLiteModel with SupportsLocalAndOnlineImagesMixin {
     required this.createdAt,
     this.imagePath,
     this.imageSource,
-    required this.creator,
+    required this.user,
   });
 
   factory RecipeLiteModel.fromJson(Map<String, dynamic> json) =>
@@ -114,17 +114,22 @@ class RecipeModel extends RecipeLiteModel
     required super.createdAt,
     super.imagePath,
     super.imageSource,
-    required super.creator,
+    required super.user,
     required this.steps,
   });
 
   factory RecipeModel.fromJson(Map<String, dynamic> json) =>
       _$RecipeModelFromJson(json);
+  factory RecipeModel.fromLocal(Map<String, dynamic> json, UserModel user) {
+    final jsonCopy = Map<String, dynamic>.from(json);
+    jsonCopy["user"] = user.toJson();
+    return _$RecipeModelFromJson(jsonCopy);
+  }
   @override
   Map<String, dynamic> toJson() => _$RecipeModelToJson(this);
 }
 
-enum RecipeSortByType {
+enum RecipeSortBy {
   lastViewed,
   createdDate,
   ratings,
@@ -132,20 +137,6 @@ enum RecipeSortByType {
 
   @override
   toString() => name;
-}
-
-class RecipeSortBy {
-  String? userId;
-  RecipeSortByType type;
-  RecipeSortBy._(this.type);
-  RecipeSortBy.lastViewed({required String by})
-      : userId = by,
-        type = RecipeSortByType.createdDate;
-  static RecipeSortBy get ratings => RecipeSortBy._(RecipeSortByType.ratings);
-  static RecipeSortBy get createdDate =>
-      RecipeSortBy._(RecipeSortByType.createdDate);
-  static RecipeSortBy get bookmarkedDate =>
-      RecipeSortBy._(RecipeSortByType.bookmarkedDate);
 }
 
 enum RecipeFilterByType {
@@ -174,30 +165,32 @@ class RecipeFilterBy {
   RecipeFilterBy.bookmarkedBy(this.userId)
       : type = RecipeFilterByType.hasBeenBookmarkedBy;
   static RecipeFilterBy get local => RecipeFilterBy._(RecipeFilterByType.local);
-  Pair<String, dynamic> get apiParams {
+  Pair<String, String?> get apiParams {
     return switch (type) {
-      RecipeFilterByType.createdByUser => Pair(type.name, userId),
-      RecipeFilterByType.createdByUserName => Pair(type.name, userName),
+      RecipeFilterByType.createdByUser => Pair(type.name, userId!),
+      RecipeFilterByType.createdByUserName => Pair(type.name, userName!),
       RecipeFilterByType.hasBeenViewedBy =>
         Pair(type.name, "${viewed! ? '' : '-'}$userId"),
-      RecipeFilterByType.hasBeenBookmarkedBy => Pair(type.name, userId),
-      RecipeFilterByType.local => Pair(type.name, userId),
+      RecipeFilterByType.hasBeenBookmarkedBy => Pair(type.name, userId!),
+      RecipeFilterByType.local => Pair(type.name, null),
     };
   }
 }
 
 class RecipeSearchState {
-  SortBy<RecipeSortBy> sortBy;
+  late SortBy<RecipeSortBy> sortBy;
   RecipeFilterBy? filterBy;
   String? search;
   int limit;
 
   RecipeSearchState({
-    required this.search,
-    required this.sortBy,
-    required this.filterBy,
+    this.search,
+    SortBy<RecipeSortBy>? sortBy,
+    this.filterBy,
     this.limit = 15,
-  });
+  }) {
+    this.sortBy = sortBy ?? SortBy.descending(RecipeSortBy.createdDate);
+  }
 
   RecipeSearchState copyWith({
     String? search,
@@ -212,21 +205,21 @@ class RecipeSearchState {
         limit: limit ?? this.limit);
   }
 
-  Map<String, Object?> getApiParams({int page = 0}) {
-    final Map<String, Object?> params = {
+  Map<String, dynamic> getApiParams({int page = 0}) {
+    final Map<String, String> params = {
       "sort": sortBy.apiParams,
-      "limit": limit,
-      "page": page,
+      "limit": limit.toString(),
+      "page": page.toString(),
     };
     if (search != null) {
-      params["search"] = search;
+      params["search"] = search!;
     }
-    Map<String, String> filterParams = {};
     if (filterBy != null) {
       Pair<String, dynamic> filters = filterBy!.apiParams;
-      filterParams[filters.first] = filters.second;
+      if (filters.second != null) {
+        params["filter[${filters.first}]"] = filters.second.toString();
+      }
     }
-    params["filter"] = filterParams;
     return params;
   }
 }

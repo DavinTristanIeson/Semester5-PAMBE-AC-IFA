@@ -6,6 +6,7 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/field/form_array.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/lib/errors.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
@@ -63,24 +64,27 @@ class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody>
   }
 
   void save() async {
-    LocalRecipeController controller =
-        Provider.of<LocalRecipeController>(context, listen: false);
-
+    final controller = context.read<LocalRecipeController>();
+    final user = context.read<AuthProvider>().user!;
     if (form.invalid) {
       sendError(context, "Please resolve all errors before saving!");
       return;
     }
 
-    final steps =
-        (form.value[RecipeFormKeys.steps.name] as List<Map<String, Object?>?>)
-            .map((step) => RecipeStepFormType.fromFormGroup(step!))
-            .toList();
+    final steps = (form.value[RecipeFormKeys.steps.name] as List)
+        .cast<Map<String, Object?>?>()
+        .map((step) => RecipeStepFormType.fromFormGroup(step!))
+        .toList();
     try {
       final String title = form.value[RecipeFormKeys.title.name] as String;
       final String? description =
           form.value[RecipeFormKeys.description.name] as String?;
       await controller.put(
-          title: title, description: description, steps: steps);
+          title: title,
+          description: description,
+          steps: steps,
+          user: user,
+          id: widget.recipe?.id);
       form.markAsPristine();
     } catch (e) {
       // ignore: use_build_context_synchronously

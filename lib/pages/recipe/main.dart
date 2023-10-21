@@ -17,7 +17,7 @@ class RecipeScreen extends StatelessWidget {
         recipe: RecipeModel(
           id: '0',
           createdAt: DateTime.now(),
-          creator: UserModel(
+          user: UserModel(
               id: "0",
               name: "User",
               email: "placeholder@email.com",

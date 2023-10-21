@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
+import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/editor/components/models.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -82,7 +83,7 @@ class LocalRecipeController extends ChangeNotifier {
     ''');
   }
 
-  Future<RecipeModel?> get(int id) async {
+  Future<RecipeModel?> get(int id, UserModel currentUser) async {
     final data = (await db.query(
       tableName,
       where: "${LocalRecipeColumns.id} = ?",
@@ -92,15 +93,15 @@ class LocalRecipeController extends ChangeNotifier {
 
     if (data == null) return null;
 
-    return RecipeModel.fromJson(data);
+    return RecipeModel.fromLocal(data, currentUser);
   }
 
-  Future<RecipeModel> put({
-    String? id,
-    required String title,
-    String? description,
-    required List<RecipeStepFormType> steps,
-  }) async {
+  Future<RecipeModel> put(
+      {String? id,
+      required String title,
+      String? description,
+      required List<RecipeStepFormType> steps,
+      required UserModel user}) async {
     int lastId = await db.transaction((txn) async {
       int lastId;
       if (id == null) {
@@ -135,7 +136,7 @@ class LocalRecipeController extends ChangeNotifier {
       return lastId;
     });
 
-    RecipeModel recipe = (await get(lastId))!;
+    RecipeModel recipe = (await get(lastId, user))!;
     notifyListeners();
     return recipe;
   }

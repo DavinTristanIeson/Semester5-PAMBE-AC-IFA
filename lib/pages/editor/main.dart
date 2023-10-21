@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/pages/editor/body.dart';
 import 'package:provider/provider.dart';
@@ -9,10 +10,12 @@ class RecipeEditorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = context.watch<LocalRecipeController>();
+    final user = context.watch<AuthProvider>().user!;
     return FutureBuilder(
         future: recipeId == null || int.tryParse(recipeId!) == null
             ? Future.value(null)
-            : context.watch<LocalRecipeController>().get(int.parse(recipeId!)),
+            : controller.get(int.parse(recipeId!), user),
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
