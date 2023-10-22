@@ -28,8 +28,11 @@ class OnlyReturnAppBar extends StatelessWidget implements PreferredSizeWidget {
       appBarChildren.addAll(actions!);
     }
     return Padding(
-      padding: const EdgeInsets.symmetric(
-          horizontal: AcSizes.lg, vertical: AcSizes.lg),
+      padding: const EdgeInsets.only(
+          left: AcSizes.lg,
+          right: AcSizes.lg,
+          top: AcSizes.xl + AcSizes.md,
+          bottom: AcSizes.md),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: appBarChildren,

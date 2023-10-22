@@ -17,7 +17,7 @@ enum NotificationType {
   const NotificationType({required this.icon, required this.color});
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class NotificationModel {
   NotificationType type;
   String title;

@@ -1,51 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
-import 'package:pambe_ac_ifa/components/display/image.dart';
-import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
-import 'package:pambe_ac_ifa/components/display/some_items_scroll.dart';
-import 'package:pambe_ac_ifa/controllers/auth.dart';
-import 'package:pambe_ac_ifa/models/container.dart';
-import 'package:pambe_ac_ifa/models/recipe.dart';
-import 'package:pambe_ac_ifa/models/user.dart';
+import 'package:pambe_ac_ifa/pages/home/components/sections.dart';
 import 'package:pambe_ac_ifa/pages/login/login.dart';
 import 'package:pambe_ac_ifa/pages/login/register.dart';
-import 'package:pambe_ac_ifa/pages/search/main.dart';
-import 'package:provider/provider.dart';
 
 class GuestHomeScreen extends StatelessWidget {
   const GuestHomeScreen({super.key});
-
-  Widget buildTrendingRecipes(BuildContext context) {
-    final userId = context.watch<AuthProvider>().user!.id;
-    return SampleScrollSection(
-        itemCount: 3,
-        itemBuilder: (context, index) {
-          return RecipeCard(
-              recipe: RecipeModel(
-            id: '0',
-            createdAt: DateTime.now(),
-            user: UserModel(
-                id: "0",
-                name: "User",
-                email: "placeholder@email.com",
-                imagePath: "https://www.google.com"),
-            description: "Description",
-            steps: [],
-            title: "Recipe Title",
-            imagePath: "",
-            imageSource: ExternalImageSource.local,
-          ));
-        },
-        header: Either.right("Trending"),
-        viewMoreButton: Either.right(() {
-          context.navigator.push(MaterialPageRoute(
-              builder: (context) => SearchScreen(
-                    sortBy: SortBy.descending(RecipeSortBy.ratings),
-                    filterBy: RecipeFilterBy.viewedBy(userId, viewed: false),
-                  )));
-        }));
-  }
 
   Widget buildTickPoint(String text) {
     return Row(
@@ -117,9 +78,9 @@ class GuestHomeScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AcSizes.space),
-            child: buildTrendingRecipes(context),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: AcSizes.space),
+            child: HomeTrendingRecipesSection(),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(

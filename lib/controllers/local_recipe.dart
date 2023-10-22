@@ -9,6 +9,7 @@ import 'package:sqflite/sqflite.dart';
 enum LocalRecipeColumns {
   id,
   userId,
+  remoteId,
   title,
   description,
   createdAt,
@@ -41,7 +42,7 @@ class LocalRecipeStepsController {
     return txn.execute('''
           CREATE TABLE $tableName (
             ${LocalRecipeStepColumns.id} INTEGER PRIMARY KEY AUTOINCREMENT, 
-            ${LocalRecipeStepColumns.recipeId} INTEGER, 
+            ${LocalRecipeStepColumns.recipeId} INTEGER,
             ${LocalRecipeStepColumns.content} TEXT NOT NULL, 
             ${LocalRecipeStepColumns.type} TEXT NOT NULL, 
             ${LocalRecipeStepColumns.timer} INTEGER, 
@@ -79,15 +80,25 @@ class LocalRecipeStepsController {
     }
   }
 
-  void remove(Batch batch, int id) {
+  Future<void> remove(Batch batch, int id, {RecipeStepModel? former}) async {
+    if (former?.imagePath != null) {
+      await resources.remove(former!.imagePath!);
+    }
     batch.delete(tableName,
         where: "${LocalRecipeStepColumns.id.name} = ?", whereArgs: [id]);
   }
 
+  Future<void> removeAll(Transaction txn, int recipeId) async {
+    await txn.delete(tableName,
+        where: "${LocalRecipeStepColumns.recipeId.name} = ?",
+        whereArgs: [recipeId]);
+  }
+
   Future<List<Map<String, Object?>>> getAll({
+    Transaction? txn,
     required int recipeId,
   }) async {
-    return db.query(tableName,
+    return (txn ?? db).query(tableName,
         where: "${LocalRecipeStepColumns.recipeId.name} = ?",
         whereArgs: [recipeId],
         orderBy: LocalRecipeStepColumns.id.name);
@@ -119,9 +130,9 @@ class LocalRecipeStepsController {
         stepMap.remove(formerStep.id);
       }
     }
-    for (final unusedStep in stepMap.entries) {
-      remove(batch, int.parse(unusedStep.value.id));
-    }
+
+    await Future.wait(stepMap.entries
+        .map((unusedStep) => remove(batch, int.parse(unusedStep.value.id))));
     await batch.commit(noResult: true);
   }
 }
@@ -141,6 +152,7 @@ class LocalRecipeController extends ChangeNotifier {
         CREATE TABLE $tableName (
             ${LocalRecipeColumns.id} INTEGER PRIMARY KEY AUTOINCREMENT, 
             ${LocalRecipeColumns.userId} TEXT NOT NULL, 
+            ${LocalRecipeColumns.remoteId} TEXT, 
             ${LocalRecipeColumns.title} VARCHAR(255) NOT NULL,
             ${LocalRecipeColumns.description} TEXT, 
             ${LocalRecipeColumns.createdAt} INTEGER NOT NULL,
@@ -154,6 +166,7 @@ class LocalRecipeController extends ChangeNotifier {
       tableName,
       where: "${LocalRecipeColumns.id} = ?",
       whereArgs: [id],
+      limit: 1,
     ))
         .firstOrNull;
 
@@ -202,8 +215,10 @@ class LocalRecipeController extends ChangeNotifier {
       if (former == null) {
         lastId = await txn.insert(tableName, data);
       } else {
-        lastId = await txn
-            .update(tableName, data, where: "id = ?", whereArgs: [former.id]);
+        await txn.update(tableName, data,
+            where: "${LocalRecipeColumns.id.name} = ?",
+            whereArgs: [int.parse(former.id)]);
+        lastId = int.parse(former.id);
       }
       await stepsController.putMany(txn,
           recipeId: lastId, steps: steps, former: former?.steps);
@@ -216,6 +231,33 @@ class LocalRecipeController extends ChangeNotifier {
     RecipeModel recipe = (await get(lastId, user: user))!;
     notifyListeners();
     return recipe;
+  }
+
+  Future<void> remove(RecipeModel recipe) async {
+    await db.transaction((txn) async {
+      await Future.wait(recipe.steps.map((step) async {
+        if (step.imagePath != null) {
+          await resources.remove(step.imagePath!);
+        }
+      }));
+      stepsController.removeAll(txn, int.parse(recipe.id));
+      if (recipe.imagePath != null) {
+        await resources.remove(recipe.imagePath!);
+      }
+      await txn.delete(tableName,
+          where: "${LocalRecipeColumns.id.name} = ?", whereArgs: [recipe.id]);
+    });
+    notifyListeners();
+  }
+
+  Future<void> setRemoteId(int localId, int? remoteId) async {
+    await db.update(
+        tableName,
+        {
+          LocalRecipeColumns.remoteId.name: remoteId,
+        },
+        where: "${LocalRecipeColumns.id.name} = ?",
+        whereArgs: [localId]);
   }
 }
 

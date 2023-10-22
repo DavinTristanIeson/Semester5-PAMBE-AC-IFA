@@ -43,10 +43,16 @@ String _parseRecipeId(Object value) {
   return value.toString();
 }
 
-@JsonSerializable()
+String? _parseRemoteRecipeId(Object? value) {
+  // ignore: prefer_null_aware_operators
+  return value == null ? null : value.toString();
+}
+
+@JsonSerializable(explicitToJson: true)
 class RecipeStepModel with SupportsLocalAndOnlineImagesMixin {
   @JsonKey(fromJson: _parseRecipeId)
   String id;
+
   String content;
   RecipeStepVariant type;
   @override
@@ -72,10 +78,14 @@ class RecipeStepModel with SupportsLocalAndOnlineImagesMixin {
   Map<String, dynamic> toJson() => _$RecipeStepModelToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class RecipeLiteModel with SupportsLocalAndOnlineImagesMixin {
   @JsonKey(fromJson: _parseRecipeId)
   String id;
+  // Only used for remote IDs
+  @JsonKey(fromJson: _parseRemoteRecipeId, includeToJson: false)
+  String? remoteId;
+
   String title;
   String description;
   @JsonEpochConverter()
@@ -90,15 +100,15 @@ class RecipeLiteModel with SupportsLocalAndOnlineImagesMixin {
 
   UserModel user;
 
-  RecipeLiteModel({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.createdAt,
-    this.imagePath,
-    this.imageSource,
-    required this.user,
-  });
+  RecipeLiteModel(
+      {required this.id,
+      required this.title,
+      required this.description,
+      required this.createdAt,
+      this.imagePath,
+      this.imageSource,
+      required this.user,
+      this.remoteId});
 
   factory RecipeLiteModel.fromJson(Map<String, dynamic> json) {
     try {
@@ -122,7 +132,7 @@ class RecipeLiteModel with SupportsLocalAndOnlineImagesMixin {
   Map<String, dynamic> toJson() => _$RecipeLiteModelToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class RecipeModel extends RecipeLiteModel
     with SupportsLocalAndOnlineImagesMixin {
   List<RecipeStepModel> steps;
@@ -161,6 +171,12 @@ class RecipeModel extends RecipeLiteModel
   }
   @override
   Map<String, dynamic> toJson() => _$RecipeModelToJson(this);
+
+  RecipeModel withRemoteId(String? remoteId) {
+    final json = toJson();
+    json["remoteId"] = remoteId;
+    return RecipeModel.fromJson(json);
+  }
 }
 
 enum RecipeSortBy {

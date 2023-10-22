@@ -6,7 +6,6 @@ import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
-import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
@@ -33,6 +32,7 @@ class RecipeScreen extends StatelessWidget with SnackbarMessenger {
       }
     } catch (e) {
       sendError(context, e.toString());
+      rethrow;
     }
   }
 

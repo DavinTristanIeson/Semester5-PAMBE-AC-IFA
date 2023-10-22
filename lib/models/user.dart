@@ -8,7 +8,7 @@ String _parseUserId(Object value) {
   return value.toString();
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class UserModel {
   @JsonKey(fromJson: _parseUserId)
   String id;

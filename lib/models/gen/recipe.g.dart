@@ -64,6 +64,7 @@ RecipeLiteModel _$RecipeLiteModelFromJson(Map<String, dynamic> json) =>
               _$ExternalImageSourceEnumMap, json['imageSource']) ??
           ExternalImageSource.local,
       user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
+      remoteId: _parseRemoteRecipeId(json['remoteId']),
     );
 
 Map<String, dynamic> _$RecipeLiteModelToJson(RecipeLiteModel instance) =>
@@ -74,7 +75,7 @@ Map<String, dynamic> _$RecipeLiteModelToJson(RecipeLiteModel instance) =>
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'imagePath': instance.imagePath,
       'imageSource': _$ExternalImageSourceEnumMap[instance.imageSource],
-      'user': instance.user,
+      'user': instance.user.toJson(),
     };
 
 RecipeModel _$RecipeModelFromJson(Map<String, dynamic> json) => RecipeModel(
@@ -90,7 +91,7 @@ RecipeModel _$RecipeModelFromJson(Map<String, dynamic> json) => RecipeModel(
       steps: (json['steps'] as List<dynamic>)
           .map((e) => RecipeStepModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-    );
+    )..remoteId = _parseRemoteRecipeId(json['remoteId']);
 
 Map<String, dynamic> _$RecipeModelToJson(RecipeModel instance) =>
     <String, dynamic>{
@@ -100,6 +101,6 @@ Map<String, dynamic> _$RecipeModelToJson(RecipeModel instance) =>
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'imagePath': instance.imagePath,
       'imageSource': _$ExternalImageSourceEnumMap[instance.imageSource],
-      'user': instance.user,
-      'steps': instance.steps,
+      'user': instance.user.toJson(),
+      'steps': instance.steps.map((e) => e.toJson()).toList(),
     };

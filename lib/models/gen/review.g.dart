@@ -19,5 +19,5 @@ Map<String, dynamic> _$ReviewModelToJson(ReviewModel instance) =>
       'content': instance.content,
       'reviewedAt': const JsonEpochConverter().toJson(instance.reviewedAt),
       'rating': instance.rating,
-      'reviewer': instance.reviewer,
+      'reviewer': instance.reviewer.toJson(),
     };

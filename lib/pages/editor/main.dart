@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
-import 'package:pambe_ac_ifa/pages/editor/body.dart';
+import 'package:pambe_ac_ifa/pages/editor/form.dart';
 import 'package:provider/provider.dart';
 
 class RecipeEditorScreen extends StatefulWidget {
@@ -45,12 +45,12 @@ class _RecipeEditorScreenState extends State<RecipeEditorScreen> {
     if (!loaded) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (widget.recipeId == null || recipe == null) {
-      return RecipeEditorScreenBody(
+    if (recipe == null) {
+      return RecipeEditorScreenForm(
         onChanged: onRecipeChanged,
       );
     } else {
-      return RecipeEditorScreenBody(
+      return RecipeEditorScreenForm(
         recipe: recipe,
         onChanged: onRecipeChanged,
       );

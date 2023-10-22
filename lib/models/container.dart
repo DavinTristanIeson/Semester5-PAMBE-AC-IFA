@@ -72,7 +72,7 @@ class MinimalModel {
   Map<String, dynamic> toJson() => _$MinimalModelToJson(this);
 }
 
-@JsonSerializable(genericArgumentFactories: true)
+@JsonSerializable(genericArgumentFactories: true, explicitToJson: true)
 class ApiResult<T> {
   String message;
   T data;

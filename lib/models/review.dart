@@ -5,7 +5,7 @@ import 'package:pambe_ac_ifa/models/user.dart';
 
 part 'gen/review.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class ReviewModel {
   String? content;
 

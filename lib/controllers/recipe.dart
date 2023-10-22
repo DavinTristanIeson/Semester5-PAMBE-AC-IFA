@@ -37,17 +37,22 @@ class RecipeController extends ChangeNotifier with HttpController {
     return res;
   }
 
-  Future<ApiResult<RecipeModel>> put(RecipeModel recipe) async {
+  // FIXME: Change void to String later
+  Future<ApiResult<void>> put(RecipeModel recipe) async {
     final response = await makeNetworkCall(() {
-      return http.post(urlOf("recipes"),
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: jsonEncode(recipe.toJson()));
+      final url = urlOf("recipes");
+      final Map<String, String> headers = {
+        "Content-Type": "application/json",
+      };
+      final body = jsonEncode(recipe.toJson());
+      if (recipe.remoteId == null) {
+        return http.post(url, headers: headers, body: body);
+      } else {
+        return http.put(url, headers: headers, body: body);
+      }
     });
-    final ApiResult<RecipeModel> res = processHttpResponse(response,
-        transform: (json) => ApiResult.fromJson(json,
-            (json) => RecipeModel.fromJson(json as Map<String, dynamic>)));
+    final ApiResult<void> res = processHttpResponse(response,
+        transform: (json) => ApiResult.fromJson(json, (json) {}));
     notifyListeners();
     return res;
   }
@@ -65,7 +70,7 @@ class RecipeController extends ChangeNotifier with HttpController {
     return res;
   }
 
-  Future<ApiResult> delete(String id) async {
+  Future<ApiResult> remove(int id) async {
     final response =
         await makeNetworkCall(() => http.delete(urlOf("recipes/$id")));
     final ApiResult res = processHttpResponse(response,
