@@ -1,5 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:pambe_ac_ifa/controllers/lib/http.dart';
+import 'package:pambe_ac_ifa/database/interfaces/http.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:http/http.dart' as http;
@@ -13,8 +15,8 @@ class RecipeController extends ChangeNotifier with HttpController {
     RecipeSearchState search, {
     int page = 0,
   }) async {
-    final response = await http
-        .get(urlOf("recipes", params: search.getApiParams(page: page)));
+    final response = await makeNetworkCall(() =>
+        http.get(urlOf("recipes", params: search.getApiParams(page: page))));
     final ApiResult<List<RecipeLiteModel>> res = processHttpResponse(response,
         transform: (json) => ApiResult.fromJson(
             json,
@@ -27,7 +29,8 @@ class RecipeController extends ChangeNotifier with HttpController {
   }
 
   Future<ApiResult<RecipeModel>> get(String id) async {
-    final response = await http.get(urlOf("recipes/$id"));
+    final response =
+        await makeNetworkCall(() => http.get(urlOf("recipes/$id")));
     final ApiResult<RecipeModel> res = processHttpResponse(response,
         transform: (json) => ApiResult.fromJson(json,
             (json) => RecipeModel.fromJson(json as Map<String, dynamic>)));
@@ -35,11 +38,13 @@ class RecipeController extends ChangeNotifier with HttpController {
   }
 
   Future<ApiResult<RecipeModel>> put(RecipeModel recipe) async {
-    final response = await http.post(urlOf("recipes"),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: recipe.toJson());
+    final response = await makeNetworkCall(() {
+      return http.post(urlOf("recipes"),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: jsonEncode(recipe.toJson()));
+    });
     final ApiResult<RecipeModel> res = processHttpResponse(response,
         transform: (json) => ApiResult.fromJson(json,
             (json) => RecipeModel.fromJson(json as Map<String, dynamic>)));
@@ -48,11 +53,11 @@ class RecipeController extends ChangeNotifier with HttpController {
   }
 
   Future<ApiResult<RecipeModel>> update(RecipeModel recipe) async {
-    final response = await http.put(urlOf("recipes"),
+    final response = await makeNetworkCall(() => http.put(urlOf("recipes"),
         headers: {
           "Content-Type": "application/json",
         },
-        body: recipe.toJson());
+        body: recipe.toJson()));
     final ApiResult<RecipeModel> res = processHttpResponse(response,
         transform: (json) => ApiResult.fromJson(json,
             (json) => RecipeModel.fromJson(json as Map<String, dynamic>)));
@@ -61,7 +66,8 @@ class RecipeController extends ChangeNotifier with HttpController {
   }
 
   Future<ApiResult> delete(String id) async {
-    final response = await http.delete(urlOf("recipes/$id"));
+    final response =
+        await makeNetworkCall(() => http.delete(urlOf("recipes/$id")));
     final ApiResult res = processHttpResponse(response,
         transform: (json) => ApiResult.fromJson(json, (json) => json));
     return res;

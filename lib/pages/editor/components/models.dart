@@ -11,6 +11,7 @@ enum RecipeFormKeys {
 }
 
 enum RecipeStepFormKeys {
+  id,
   type,
   content,
   image,
@@ -18,14 +19,20 @@ enum RecipeStepFormKeys {
 }
 
 class RecipeStepFormType {
-  RecipeStepVariant variant;
+  String? id;
+  RecipeStepVariant type;
   String content;
-  XFile? thumbnail;
+  XFile? image;
   Duration? timer;
-  RecipeStepFormType(this.variant,
-      {required this.content, this.thumbnail, this.timer});
-  static FormGroup toFormGroup({RecipeStep? value}) {
+  RecipeStepFormType(
+      {this.id,
+      required this.type,
+      required this.content,
+      this.image,
+      this.timer});
+  static FormGroup toFormGroup({RecipeStepModel? value}) {
     return FormGroup({
+      RecipeStepFormKeys.id.name: FormControl<String?>(value: value?.id),
       RecipeStepFormKeys.type.name: FormControl<RecipeStepVariant>(
           value: value?.type ?? RecipeStepVariant.regular),
       RecipeStepFormKeys.content.name:
@@ -49,9 +56,10 @@ class RecipeStepFormType {
     final timerToggle =
         group[RecipeStepFormKeys.timer.name] as InputToggle<Duration>;
     return RecipeStepFormType(
-      group[RecipeStepFormKeys.type.name] as RecipeStepVariant,
+      id: group[RecipeStepFormKeys.id.name] as String?,
+      type: group[RecipeStepFormKeys.type.name] as RecipeStepVariant,
       content: (group[RecipeStepFormKeys.content.name] as String?) ?? '',
-      thumbnail: thumbnailToggle.toggle ? thumbnailToggle.value : null,
+      image: thumbnailToggle.toggle ? thumbnailToggle.value : null,
       timer: timerToggle.toggle ? timerToggle.value : null,
     );
   }

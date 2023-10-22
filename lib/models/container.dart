@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 part 'gen/container.g.dart';
 
 /// A union of two values.
@@ -61,8 +62,13 @@ class MinimalModel {
   String name;
   MinimalModel({required this.id, required this.name});
 
-  factory MinimalModel.fromJson(Map<String, dynamic> json) =>
-      _$MinimalModelFromJson(json);
+  factory MinimalModel.fromJson(Map<String, dynamic> json) {
+    try {
+      return _$MinimalModelFromJson(json);
+    } catch (e) {
+      throw ApiError(ApiErrorType.shapeMismatch, inner: e);
+    }
+  }
   Map<String, dynamic> toJson() => _$MinimalModelToJson(this);
 }
 
@@ -75,8 +81,15 @@ class ApiResult<T> {
   factory ApiResult.fromJson(
     Map<String, dynamic> json,
     T Function(Object? json) fromJsonT,
-  ) =>
-      _$ApiResultFromJson(json, fromJsonT);
+  ) {
+    try {
+      return _$ApiResultFromJson(json, fromJsonT);
+    } on ApiError catch (_) {
+      rethrow;
+    } catch (e) {
+      throw ApiError(ApiErrorType.shapeMismatch, inner: e);
+    }
+  }
   Map<String, dynamic> toJson(Object Function(T value) toJsonT) =>
       _$ApiResultToJson(this, toJsonT);
 }

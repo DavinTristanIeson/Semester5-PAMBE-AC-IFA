@@ -6,8 +6,10 @@ part of '../recipe.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-RecipeStep _$RecipeStepFromJson(Map<String, dynamic> json) => RecipeStep(
-      json['content'] as String,
+RecipeStepModel _$RecipeStepModelFromJson(Map<String, dynamic> json) =>
+    RecipeStepModel(
+      id: _parseRecipeId(json['id'] as Object),
+      content: json['content'] as String,
       type: $enumDecodeNullable(_$RecipeStepVariantEnumMap, json['type']) ??
           RecipeStepVariant.regular,
       imagePath: json['imagePath'] as String?,
@@ -16,9 +18,9 @@ RecipeStep _$RecipeStepFromJson(Map<String, dynamic> json) => RecipeStep(
           ExternalImageSource.local,
       timer: _$JsonConverterFromJson<int, Duration>(
           json['timer'], const JsonDurationConverter().fromJson),
-    )..id = json['id'] as String?;
+    );
 
-Map<String, dynamic> _$RecipeStepToJson(RecipeStep instance) =>
+Map<String, dynamic> _$RecipeStepModelToJson(RecipeStepModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'content': instance.content,
@@ -86,7 +88,7 @@ RecipeModel _$RecipeModelFromJson(Map<String, dynamic> json) => RecipeModel(
           ExternalImageSource.local,
       user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
       steps: (json['steps'] as List<dynamic>)
-          .map((e) => RecipeStep.fromJson(e as Map<String, dynamic>))
+          .map((e) => RecipeStepModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

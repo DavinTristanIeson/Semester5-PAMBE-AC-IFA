@@ -6,6 +6,7 @@ import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/notification.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/database/sqflite/resource.dart';
 import 'package:pambe_ac_ifa/init.dart';
 import 'package:pambe_ac_ifa/switch.dart';
 import 'package:provider/provider.dart';
@@ -14,13 +15,15 @@ import 'package:sqflite/sqflite.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Database db = await initializeSqfliteDatabase();
+  Database db = await initializeSqfliteDatabase(override: false);
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => AuthProvider()),
       ChangeNotifierProvider(create: (context) => NotificationController()),
       ChangeNotifierProvider(create: (context) => RecipeController()),
-      ChangeNotifierProvider(create: (context) => LocalRecipeController(db)),
+      ChangeNotifierProvider(
+          create: (context) =>
+              LocalRecipeController(db, resources: LocalImageController())),
     ],
     child: const AcReactiveFormConfig(child: RecipeLibApp()),
   ));

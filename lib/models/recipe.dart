@@ -2,6 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/json.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
+import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'user.dart';
 
@@ -38,9 +39,14 @@ enum RecipeStepVariant {
   }
 }
 
+String _parseRecipeId(Object value) {
+  return value.toString();
+}
+
 @JsonSerializable()
-class RecipeStep with SupportsLocalAndOnlineImagesMixin {
-  String? id;
+class RecipeStepModel with SupportsLocalAndOnlineImagesMixin {
+  @JsonKey(fromJson: _parseRecipeId)
+  String id;
   String content;
   RecipeStepVariant type;
   @override
@@ -53,20 +59,17 @@ class RecipeStep with SupportsLocalAndOnlineImagesMixin {
   @JsonDurationConverter()
   Duration? timer;
 
-  RecipeStep(
-    this.content, {
+  RecipeStepModel({
+    required this.id,
+    required this.content,
     this.type = RecipeStepVariant.regular,
     this.imagePath,
     this.imageSource,
     this.timer,
   });
-  factory RecipeStep.fromJson(Map<String, dynamic> json) =>
-      _$RecipeStepFromJson(json);
-  Map<String, dynamic> toJson() => _$RecipeStepToJson(this);
-}
-
-String _parseRecipeId(Object value) {
-  return value.toString();
+  factory RecipeStepModel.fromJson(Map<String, dynamic> json) =>
+      _$RecipeStepModelFromJson(json);
+  Map<String, dynamic> toJson() => _$RecipeStepModelToJson(this);
 }
 
 @JsonSerializable()
@@ -97,15 +100,32 @@ class RecipeLiteModel with SupportsLocalAndOnlineImagesMixin {
     required this.user,
   });
 
-  factory RecipeLiteModel.fromJson(Map<String, dynamic> json) =>
-      _$RecipeLiteModelFromJson(json);
+  factory RecipeLiteModel.fromJson(Map<String, dynamic> json) {
+    try {
+      return _$RecipeLiteModelFromJson(json);
+    } catch (e) {
+      throw ApiError(ApiErrorType.shapeMismatch, inner: e);
+    }
+  }
+  factory RecipeLiteModel.fromLocal(Map<String, dynamic> json, UserModel user) {
+    try {
+      final jsonCopy = Map<String, dynamic>.from(json);
+      jsonCopy["user"] = user.toJson();
+      if (jsonCopy.containsKey("imagePath") && jsonCopy["imagePath"] != null) {
+        jsonCopy["imageSource"] = ExternalImageSource.local.name;
+      }
+      return _$RecipeLiteModelFromJson(jsonCopy);
+    } catch (e) {
+      throw ApiError(ApiErrorType.shapeMismatch, inner: e);
+    }
+  }
   Map<String, dynamic> toJson() => _$RecipeLiteModelToJson(this);
 }
 
 @JsonSerializable()
 class RecipeModel extends RecipeLiteModel
     with SupportsLocalAndOnlineImagesMixin {
-  List<RecipeStep> steps;
+  List<RecipeStepModel> steps;
 
   RecipeModel({
     required super.id,
@@ -118,12 +138,26 @@ class RecipeModel extends RecipeLiteModel
     required this.steps,
   });
 
-  factory RecipeModel.fromJson(Map<String, dynamic> json) =>
-      _$RecipeModelFromJson(json);
-  factory RecipeModel.fromLocal(Map<String, dynamic> json, UserModel user) {
-    final jsonCopy = Map<String, dynamic>.from(json);
-    jsonCopy["user"] = user.toJson();
-    return _$RecipeModelFromJson(jsonCopy);
+  factory RecipeModel.fromJson(Map<String, dynamic> json) {
+    try {
+      return _$RecipeModelFromJson(json);
+    } catch (e) {
+      throw ApiError(ApiErrorType.shapeMismatch, inner: e);
+    }
+  }
+  factory RecipeModel.fromLocal(Map<String, dynamic> json, UserModel user,
+      List<Map<String, Object?>> steps) {
+    try {
+      final jsonCopy = Map<String, dynamic>.from(json);
+      jsonCopy["user"] = user.toJson();
+      jsonCopy["steps"] = steps;
+      if (jsonCopy.containsKey("imagePath") && jsonCopy["imagePath"] != null) {
+        jsonCopy["imageSource"] = ExternalImageSource.local.name;
+      }
+      return _$RecipeModelFromJson(jsonCopy);
+    } catch (e) {
+      throw ApiError(ApiErrorType.shapeMismatch, inner: e);
+    }
   }
   @override
   Map<String, dynamic> toJson() => _$RecipeModelToJson(this);

@@ -9,7 +9,7 @@ import 'package:pambe_ac_ifa/pages/editor/components/step.dart';
 import 'package:pambe_ac_ifa/pages/recipe/components/step.dart';
 
 class RecipeStepRenderer extends StatefulWidget {
-  final Stream<RecipeStep> stream;
+  final Stream<RecipeStepModel> stream;
   final Future<void> Function()? next;
   final ImageProvider image;
 
@@ -25,7 +25,7 @@ class RecipeStepRenderer extends StatefulWidget {
 class _RecipeStepRendererState extends State<RecipeStepRenderer> {
   late final StreamSubscription _subscribe;
   final ScrollController _scroll = ScrollController();
-  List<RecipeStep> steps = [];
+  List<RecipeStepModel> steps = [];
   // Cannot just use a single counter mutated by ListView.itemBuilder
   // because itemBuilder will be called when an item that was out of view comes back into view
   // Which means that Step 1 might become Step 6 when you scroll back up.

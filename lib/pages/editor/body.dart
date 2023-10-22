@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
+import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/field/form_array.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
-import 'package:pambe_ac_ifa/controllers/lib/errors.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
+import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/editor/components/models.dart';
 import 'package:pambe_ac_ifa/pages/editor/step_editor.dart';
@@ -20,7 +22,9 @@ import 'package:pambe_ac_ifa/common/validation.dart';
 
 class RecipeEditorScreenBody extends StatefulWidget {
   final RecipeModel? recipe;
-  const RecipeEditorScreenBody({super.key, this.recipe});
+  final void Function(RecipeModel recipe) onChanged;
+  const RecipeEditorScreenBody(
+      {super.key, this.recipe, required this.onChanged});
 
   @override
   State<RecipeEditorScreenBody> createState() => _RecipeEditorScreenBodyState();
@@ -28,39 +32,49 @@ class RecipeEditorScreenBody extends StatefulWidget {
 
 class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody>
     with SnackbarMessenger {
-  late final FormGroup form;
+  late FormGroup form;
   late final ScrollController _scroll;
 
   @override
   void initState() {
     super.initState();
     _scroll = ScrollController();
-    form = FormGroup({
+    form = defaultValue(widget.recipe);
+  }
+
+  FormGroup defaultValue(RecipeModel? recipe) {
+    return FormGroup({
       RecipeFormKeys.title.name:
-          FormControl<String>(value: widget.recipe?.title, validators: [
+          FormControl<String>(value: recipe?.title, validators: [
         Validators.minLength(5),
         AcValidators.acceptedChars,
       ]),
       RecipeFormKeys.description.name:
-          FormControl<String>(value: widget.recipe?.description, validators: [
+          FormControl<String>(value: recipe?.description, validators: [
         Validators.required,
       ]),
       RecipeFormKeys.image.name: FormControl<XFile?>(
-          value: widget.recipe?.imagePath == null
-              ? null
-              : XFile(widget.recipe!.imagePath!)),
+          value: recipe?.imagePath == null ? null : XFile(recipe!.imagePath!)),
       RecipeFormKeys.steps.name: FormArray(
-          widget.recipe?.steps == null
+          recipe?.steps == null
               ? [
                   RecipeStepFormType.toFormGroup(),
                 ]
-              : widget.recipe!.steps
+              : recipe!.steps
                   .map((step) => RecipeStepFormType.toFormGroup(value: step))
                   .toList(),
           validators: [
             Validators.minLength(1),
           ]),
     });
+  }
+
+  @override
+  didUpdateWidget(covariant RecipeEditorScreenBody oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.recipe != widget.recipe) {
+      form = defaultValue(widget.recipe);
+    }
   }
 
   void save() async {
@@ -76,16 +90,21 @@ class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody>
         .map((step) => RecipeStepFormType.fromFormGroup(step!))
         .toList();
     try {
-      final String title = form.value[RecipeFormKeys.title.name] as String;
-      final String? description =
+      final title = form.value[RecipeFormKeys.title.name] as String;
+      final description =
           form.value[RecipeFormKeys.description.name] as String?;
-      await controller.put(
+      final image = form.value[RecipeFormKeys.image.name] as XFile?;
+      final recipe = await controller.put(
           title: title,
           description: description,
           steps: steps,
           user: user,
-          id: widget.recipe?.id);
+          image: image,
+          former: widget.recipe);
       form.markAsPristine();
+      widget.onChanged(recipe);
+      // ignore: use_build_context_synchronously
+      sendSuccess(context, "$title has been saved locally.");
     } catch (e) {
       // ignore: use_build_context_synchronously
       sendError(context, e.toString());
@@ -93,17 +112,30 @@ class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody>
   }
 
   void publish() async {
-    if (form.dirty) {
+    if (form.dirty || widget.recipe == null) {
       sendError(context,
           "Changes to the recipe should be saved first before publishing!");
       return;
     }
 
-    try {
-      context.read<RecipeController>().put(widget.recipe!);
-    } on ApiError catch (e) {
-      sendError(context, e.message);
-    }
+    showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleConfirmationDialog(
+              onConfirm: () async {
+                try {
+                  await context.read<RecipeController>().put(widget.recipe!);
+                } on ApiError catch (e) {
+                  // ignore: use_build_context_synchronously
+                  sendError(context, e.message);
+                }
+              },
+              context: context,
+              positiveText: Either.right("Publish"),
+              title: Either.right("Publish ${widget.recipe!.title}"),
+              message: Either.right(
+                  "Do you want to publish your recipe (or the local changes to your recipe) online?"));
+        });
   }
 
   Widget buildAddStepButton() {

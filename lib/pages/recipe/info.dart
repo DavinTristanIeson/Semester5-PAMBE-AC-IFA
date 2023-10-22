@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
-import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/components/display/review_card.dart';
@@ -156,35 +155,32 @@ class RecipeInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: const OnlyReturnAppBar(),
-        body: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: AcSizes.space),
-          children: [
-            buildTitle(context),
-            const SizedBox(height: AcSizes.space),
-            buildDescription(context),
-            const SizedBox(height: AcSizes.space),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                NoticeComponent(
-                    child: Either.right(
-                        "This tutorial has ${recipe.steps.length} steps"),
-                    type: NoticeType.tip)
-              ],
-            ),
-            const SizedBox(height: AcSizes.lg),
-            ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 160.0),
-                child: buildReviewList()),
-            const SizedBox(height: AcSizes.md),
-            buildSeeReviewsButton(context),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: AcSizes.lg),
-              child: buildStartButton(context),
-            )
-          ],
-        ));
+    return ListView(
+        padding: const EdgeInsets.symmetric(horizontal: AcSizes.space),
+        children: [
+          buildTitle(context),
+          const SizedBox(height: AcSizes.space),
+          buildDescription(context),
+          const SizedBox(height: AcSizes.space),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              NoticeComponent(
+                  child: Either.right(
+                      "This tutorial has ${recipe.steps.length} steps"),
+                  type: NoticeType.tip)
+            ],
+          ),
+          const SizedBox(height: AcSizes.lg),
+          ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 160.0),
+              child: buildReviewList()),
+          const SizedBox(height: AcSizes.md),
+          buildSeeReviewsButton(context),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AcSizes.lg),
+            child: buildStartButton(context),
+          )
+        ]);
   }
 }

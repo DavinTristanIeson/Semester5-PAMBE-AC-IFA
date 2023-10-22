@@ -41,7 +41,7 @@ class ImagePickerField extends StatelessWidget {
   Widget buildImage(BuildContext context) {
     return Image.file(
       File(value!.path),
-      fit: BoxFit.contain,
+      fit: BoxFit.cover,
     );
   }
 

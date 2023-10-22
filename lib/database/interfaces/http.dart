@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
-import 'package:pambe_ac_ifa/controllers/lib/errors.dart';
+import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:path/path.dart';
 
 /// CHANGE THIS TO THE URL OF THE SERVER BEFORE RUNNING
@@ -30,7 +30,7 @@ mixin HttpController {
     try {
       rawJson = jsonDecode(response.body);
     } on Exception catch (e) {
-      throw ApiError(ApiErrorType.parseJson, innerException: e);
+      throw ApiError(ApiErrorType.invalidJson, inner: e);
     }
 
     if (response.statusCode != expectedStatus) {
@@ -43,14 +43,21 @@ mixin HttpController {
     }
 
     final T result;
+    print(rawJson);
     try {
       result = transform(rawJson);
-    } on Error catch (e) {
-      throw ApiError(ApiErrorType.shapeMismatch, innerError: e);
-    } on Exception catch (e) {
-      throw ApiError(ApiErrorType.shapeMismatch, innerException: e);
+    } catch (e) {
+      throw ApiError(ApiErrorType.shapeMismatch, inner: e);
     }
 
     return result;
+  }
+
+  Future<Response> makeNetworkCall(Future<Response> Function() fn) async {
+    try {
+      return await fn();
+    } catch (e) {
+      throw ApiError(ApiErrorType.serverUnreachable, inner: e);
+    }
   }
 }

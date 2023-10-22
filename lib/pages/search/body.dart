@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
+import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:provider/provider.dart';
@@ -39,8 +41,20 @@ class _SearchScreenBodyState extends State<SearchScreenBody> {
     }
   }
 
+  bool get isLocal {
+    return widget.searchState.filterBy?.type == RecipeFilterByType.local;
+  }
+
   Future<List<RecipeLiteModel>> fetch(
       RecipeSearchState state, int pageKey) async {
+    if (state.filterBy?.type == RecipeFilterByType.local) {
+      final user = context.read<AuthProvider>().user!;
+      final res = await context
+          .read<LocalRecipeController>()
+          .getAll(user: user, searchState: state, page: pageKey);
+      return res;
+    }
+
     final res =
         await context.read<RecipeController>().getAll(state, page: pageKey);
     return res.data;
@@ -60,6 +74,10 @@ class _SearchScreenBodyState extends State<SearchScreenBody> {
             itemBuilder: (context, item, index) => Padding(
                 padding: const EdgeInsets.symmetric(
                     vertical: AcSizes.sm, horizontal: AcSizes.space),
-                child: RecipeHorizontalCard(recipe: item))));
+                child: RecipeHorizontalCard(
+                  recipe: item,
+                  recipeSource:
+                      isLocal ? RecipeSource.local : RecipeSource.online,
+                ))));
   }
 }

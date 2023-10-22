@@ -25,7 +25,7 @@ class _SearchScreenState extends State<SearchScreen> {
     searchState = RecipeSearchState(
         search: widget.search,
         sortBy: widget.sortBy ?? SortBy.descending(RecipeSortBy.ratings),
-        filterBy: null);
+        filterBy: widget.filterBy);
   }
 
   @override

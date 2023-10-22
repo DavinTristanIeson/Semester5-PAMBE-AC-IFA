@@ -6,7 +6,7 @@ import 'package:pambe_ac_ifa/pages/editor/components/step.dart';
 import 'package:pambe_ac_ifa/pages/recipe/components/timer.dart';
 
 class RecipeStepComponent extends StatelessWidget {
-  final RecipeStep step;
+  final RecipeStepModel step;
   final int number;
   const RecipeStepComponent(
       {super.key, required this.step, required this.number});

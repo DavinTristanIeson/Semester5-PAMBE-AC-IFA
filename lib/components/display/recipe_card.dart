@@ -9,8 +9,13 @@ import 'package:provider/provider.dart';
 
 class RecipeCard extends StatelessWidget {
   final RecipeLiteModel recipe;
+  final RecipeSource recipeSource;
   final Widget? secondaryAction;
-  const RecipeCard({super.key, required this.recipe, this.secondaryAction});
+  const RecipeCard(
+      {super.key,
+      required this.recipe,
+      this.secondaryAction,
+      this.recipeSource = RecipeSource.online});
 
   Widget buildTitleAndDescription(BuildContext context) {
     return Column(
@@ -52,7 +57,10 @@ class RecipeCard extends StatelessWidget {
         ElevatedButton.icon(
             onPressed: () {
               context.navigator.push(MaterialPageRoute(
-                  builder: (context) => RecipeScreen(id: recipe.id)));
+                  builder: (context) => RecipeScreen(
+                        id: recipe.id,
+                        source: recipeSource,
+                      )));
             },
             icon: const Icon(Icons.remove_red_eye_outlined),
             label: const Text("View")),
@@ -131,7 +139,11 @@ class RecipeCard extends StatelessWidget {
 
 class RecipeHorizontalCard extends StatelessWidget {
   final RecipeLiteModel recipe;
-  const RecipeHorizontalCard({super.key, required this.recipe});
+  final RecipeSource recipeSource;
+  const RecipeHorizontalCard(
+      {super.key,
+      required this.recipe,
+      this.recipeSource = RecipeSource.online});
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +155,8 @@ class RecipeHorizontalCard extends StatelessWidget {
           splashColor: context.colors.primary.withOpacity(0.3),
           onTap: () {
             context.navigator.push(MaterialPageRoute(
-                builder: (context) => RecipeScreen(id: recipe.id)));
+                builder: (context) =>
+                    RecipeScreen(id: recipe.id, source: recipeSource)));
           },
           leading: CircleAvatar(
             backgroundColor: context.colors.tertiary,

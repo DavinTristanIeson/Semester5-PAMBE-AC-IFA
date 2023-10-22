@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
+import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 part 'gen/user.g.dart';
 
 String _parseUserId(Object value) {
@@ -28,7 +29,12 @@ class UserModel {
     return NetworkImage(imagePath!);
   }
 
-  factory UserModel.fromJson(Map<String, dynamic> json) =>
-      _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    try {
+      return _$UserModelFromJson(json);
+    } catch (e) {
+      throw ApiError(ApiErrorType.shapeMismatch, inner: e);
+    }
+  }
   Map<String, dynamic> toJson() => _$UserModelToJson(this);
 }

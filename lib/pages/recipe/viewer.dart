@@ -11,12 +11,12 @@ class RecipeViewerScreen extends StatelessWidget {
   const RecipeViewerScreen({super.key, required this.recipe});
 
   Future<int?> recipeStepScrollLogic(
-      StreamSink<RecipeStep> sink, int index) async {
+      StreamSink<RecipeStepModel> sink, int index) async {
     while (index < recipe.steps.length) {
-      RecipeStep current = recipe.steps[index];
+      RecipeStepModel current = recipe.steps[index];
       sink.add(current);
       index++;
-      RecipeStep? upcoming = recipe.steps.elementAtOrNull(index);
+      RecipeStepModel? upcoming = recipe.steps.elementAtOrNull(index);
       if (index >= recipe.steps.length ||
           upcoming!.type == RecipeStepVariant.regular) {
         await Future.delayed(const Duration(milliseconds: 300));
@@ -32,7 +32,7 @@ class RecipeViewerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: const OnlyReturnAppBar(),
-        body: UserControlledDataScroll<RecipeStep>(
+        body: UserControlledDataScroll<RecipeStepModel>(
           next: recipeStepScrollLogic,
           builder: (context, stream, next) {
             return RecipeStepRenderer(

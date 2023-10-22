@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:pambe_ac_ifa/common/constants.dart';
 
 mixin SnackbarMessenger {
   void sendMessage(BuildContext context, String message) {
@@ -23,6 +24,21 @@ mixin SnackbarMessenger {
               fontWeight: FontWeight.bold,
             )),
         backgroundColor: Theme.of(context).colorScheme.errorContainer,
+      ));
+    });
+  }
+
+  void sendSuccess(BuildContext context, String message) {
+    ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      messenger.showSnackBar(SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Text(message,
+            style: const TextStyle(
+              color: AcColors.success,
+              fontWeight: FontWeight.bold,
+            )),
+        backgroundColor: AcColors.successLight,
       ));
     });
   }
