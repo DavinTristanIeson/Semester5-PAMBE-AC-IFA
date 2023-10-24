@@ -3,7 +3,7 @@ import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 
 class AuthProvider extends ChangeNotifier {
-  IUserResourceManager userManager;
+  IUserController userManager;
 
   AuthProvider({
     required this.userManager,

@@ -1,7 +1,7 @@
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 
-class FirebaseUserManager implements IUserResourceManager {
+class FirebaseUserManager implements IUserController {
   @override
   Future<UserModel> getMe() async {
     return UserModel(

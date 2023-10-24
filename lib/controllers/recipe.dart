@@ -37,22 +37,22 @@ class RecipeController extends ChangeNotifier with HttpController {
     return res;
   }
 
-  // FIXME: Change void to String later
-  Future<ApiResult<void>> put(RecipeModel recipe) async {
+  Future<ApiResult<int>> put(RecipeModel recipe) async {
     final response = await makeNetworkCall(() {
       final url = urlOf("recipes");
       final Map<String, String> headers = {
         "Content-Type": "application/json",
       };
       final body = jsonEncode(recipe.toJson());
+      print(recipe.remoteId);
       if (recipe.remoteId == null) {
         return http.post(url, headers: headers, body: body);
       } else {
         return http.put(url, headers: headers, body: body);
       }
     });
-    final ApiResult<void> res = processHttpResponse(response,
-        transform: (json) => ApiResult.fromJson(json, (json) {}));
+    final ApiResult<int> res = processHttpResponse(response,
+        transform: (json) => ApiResult.fromJson(json, (json) => json as int));
     notifyListeners();
     return res;
   }

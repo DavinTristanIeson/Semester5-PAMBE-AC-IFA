@@ -4,9 +4,9 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 
 mixin SnackbarMessenger {
   void sendMessage(BuildContext context, String message) {
-    ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(context);
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      messenger.showSnackBar(SnackBar(
+      messenger?.showSnackBar(SnackBar(
         behavior: SnackBarBehavior.floating,
         content: Text(message),
       ));
@@ -14,9 +14,9 @@ mixin SnackbarMessenger {
   }
 
   void sendError(BuildContext context, String message) {
-    ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(context);
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      messenger.showSnackBar(SnackBar(
+      messenger?.showSnackBar(SnackBar(
         behavior: SnackBarBehavior.floating,
         content: Text(message,
             style: const TextStyle(
@@ -29,9 +29,9 @@ mixin SnackbarMessenger {
   }
 
   void sendSuccess(BuildContext context, String message) {
-    ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(context);
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      messenger.showSnackBar(SnackBar(
+      messenger?.showSnackBar(SnackBar(
         behavior: SnackBarBehavior.floating,
         content: Text(message,
             style: const TextStyle(

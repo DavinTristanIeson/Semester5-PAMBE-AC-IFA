@@ -251,6 +251,7 @@ class LocalRecipeController extends ChangeNotifier {
   }
 
   Future<void> setRemoteId(int localId, int? remoteId) async {
+    print("$localId, $remoteId");
     await db.update(
         tableName,
         {

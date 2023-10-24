@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
+import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 
 typedef LoginPayload = ({String email, String password});
@@ -18,8 +19,16 @@ abstract class IImageResourceManager {
   Future<void> remove(String imagePath);
 }
 
-abstract class IUserResourceManager {
+abstract class IUserController {
   Future<UserModel> login(LoginPayload payload);
   Future<UserModel> register(RegisterPayload payload);
   Future<UserModel> getMe();
+}
+
+abstract class IRecipeController {
+  Future<List<RecipeLiteModel>> getAll(RecipeSearchState searchState,
+      {int? page});
+  Future<RecipeModel> get(String id);
+  Future<int> put(RecipeModel recipe);
+  Future<void> remove();
 }
