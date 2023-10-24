@@ -35,7 +35,7 @@ enum LocalRecipeStepColumns {
 class LocalRecipeStepsController {
   static const tableName = "recipe_steps";
   final Database db;
-  late final IImageResourceController resources;
+  late final IImageResourceManager resources;
   LocalRecipeStepsController(this.db, {required this.resources});
 
   static Future<void> initialize(Transaction txn) {
@@ -142,7 +142,7 @@ class LocalRecipeController extends ChangeNotifier {
 
   final Database db;
   late final LocalRecipeStepsController stepsController;
-  late final IImageResourceController resources;
+  late final IImageResourceManager resources;
   LocalRecipeController(this.db, {required this.resources}) {
     stepsController = LocalRecipeStepsController(db, resources: resources);
   }

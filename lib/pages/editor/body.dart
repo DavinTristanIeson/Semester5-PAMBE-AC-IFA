@@ -21,6 +21,12 @@ class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody> {
     _scroll = ScrollController();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    _scroll.dispose();
+  }
+
   void handleMutate(bool Function(FormArray formArray) fn) {
     final form = ReactiveForm.of(context) as FormGroup;
     bool shouldRerender =

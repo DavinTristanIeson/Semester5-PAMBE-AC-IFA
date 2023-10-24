@@ -9,19 +9,30 @@ class OnlyReturnAppBar extends StatelessWidget implements PreferredSizeWidget {
     return const Size.fromHeight(kToolbarHeight * 2);
   }
 
+  static Widget buildBackButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(AcSizes.space),
+      child: Row(
+        children: [
+          ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.tertiary,
+                foregroundColor: Colors.black,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.chevron_left),
+              label: const Text("Back"))
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> appBarChildren = [
-      ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.tertiary,
-            foregroundColor: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          icon: const Icon(Icons.chevron_left),
-          label: const Text("Back")),
+      buildBackButton(context),
     ];
     if (actions != null) {
       appBarChildren.add(const Spacer());

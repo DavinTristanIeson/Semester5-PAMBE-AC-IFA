@@ -1,15 +1,16 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
 
 class RecipeLibLogoTitle extends StatelessWidget {
   const RecipeLibLogoTitle({super.key});
 
   @override
   Widget build(BuildContext context) {
+    double radius = context.relativeWidth(0.25, 60.0, 120.0);
     return Column(children: [
       CircleAvatar(
-        radius: clampDouble(MediaQuery.of(context).size.width / 4, 80.0, 150.0),
+        radius: radius,
         backgroundColor: Colors.black,
         backgroundImage: const AssetImage("assets/images/logo.png"),
       ),
@@ -18,7 +19,7 @@ class RecipeLibLogoTitle extends StatelessWidget {
         "Recipe.Lib",
         style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 40,
+            fontSize: 20.0 + 20.0 * ((radius - 60.0) / 60.0),
             color: Theme.of(context).colorScheme.primary),
       ),
       const SizedBox(height: 10),

@@ -6,7 +6,7 @@ import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-class LocalImageController implements IImageResourceController {
+class LocalImageController implements IImageResourceManager {
   static Future<String> getImageStoragePath() async {
     return joinAll([
       (await getApplicationDocumentsDirectory()).path,

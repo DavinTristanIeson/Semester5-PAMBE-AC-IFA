@@ -6,6 +6,7 @@ import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/notification.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/database/firebase/user.dart';
 import 'package:pambe_ac_ifa/database/sqflite/resource.dart';
 import 'package:pambe_ac_ifa/init.dart';
 import 'package:pambe_ac_ifa/switch.dart';
@@ -18,7 +19,9 @@ void main() async {
   Database db = await initializeSqfliteDatabase(override: false);
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => AuthProvider()),
+      ChangeNotifierProvider(
+          create: (context) =>
+              AuthProvider(userManager: FirebaseUserManager())),
       ChangeNotifierProvider(create: (context) => NotificationController()),
       ChangeNotifierProvider(create: (context) => RecipeController()),
       ChangeNotifierProvider(

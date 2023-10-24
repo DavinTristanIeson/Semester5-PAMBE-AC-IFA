@@ -17,6 +17,10 @@ class AcReactiveFormConfig extends StatelessWidget {
             "Field has a minimum length of ${(error as Map<String, Object>)["requiredLength"]} characters",
         AcValidationMessage.acceptedChars: (error) =>
             "Field only accepts spaces, numbers, and alphabetic characters",
+        AcValidationMessage.passwordConfirmationMismatch: (error) =>
+            "Password confirmation must be the same as password",
+        ValidationMessage.email: (error) =>
+            "Field must contain a valid email address",
       },
       child: child,
     );
@@ -52,4 +56,5 @@ extension AcValidators on Validators {
 
 extension AcValidationMessage on ValidationMessage {
   static const acceptedChars = "acceptedChars";
+  static const passwordConfirmationMismatch = "passwordConfirmationMismatch";
 }

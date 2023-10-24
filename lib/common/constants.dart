@@ -104,4 +104,8 @@ abstract final class AcDecoration {
       color: AcColors.shadowColor, offset: Offset(2, 4), spreadRadius: 2);
   static const BoxShadow shadowSmall = BoxShadow(
       color: AcColors.smallShadowColor, offset: Offset(0, 1), spreadRadius: 1);
+  static const Gradient recipeLibRadialGradient = RadialGradient(
+    colors: [AcColors.secondary, AcColors.background],
+    center: Alignment(0.0, -0.6),
+  );
 }

@@ -36,6 +36,12 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
     form = defaultValue(widget.recipe);
   }
 
+  @override
+  void dispose() {
+    form.dispose();
+    super.dispose();
+  }
+
   FormGroup defaultValue(RecipeModel? recipe) {
     return FormGroup({
       RecipeFormKeys.title.name:

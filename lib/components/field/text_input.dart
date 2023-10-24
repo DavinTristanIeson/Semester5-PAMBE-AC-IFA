@@ -38,12 +38,15 @@ class BoxTextInput extends StatelessWidget {
   final String? value;
   final void Function(String?) onChanged;
   final bool multiline;
-  const BoxTextInput(
-      {super.key,
-      required this.placeholder,
-      required this.value,
-      required this.onChanged,
-      this.multiline = false});
+  final bool obscureText;
+  const BoxTextInput({
+    super.key,
+    required this.placeholder,
+    required this.value,
+    required this.onChanged,
+    this.multiline = false,
+    this.obscureText = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +60,7 @@ class BoxTextInput extends StatelessWidget {
                 hintText: placeholder,
                 hintStyle: AcTypography.placeholder)),
         controller: controller,
+        obscureText: obscureText,
         maxLines: multiline ? null : 1,
         minLines: multiline ? 4 : null,
         onChanged: onChanged,
@@ -72,6 +76,7 @@ class AcTextInput extends StatelessWidget {
   final String? placeholder;
   final String? value;
   final bool multiline;
+  final bool obscureText;
   final void Function(String?) onChanged;
   const AcTextInput(
       {super.key,
@@ -81,7 +86,8 @@ class AcTextInput extends StatelessWidget {
       this.error,
       this.placeholder,
       this.multiline = true,
-      this.required = false});
+      this.required = false,
+      this.obscureText = false});
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +100,7 @@ class AcTextInput extends StatelessWidget {
           placeholder: placeholder,
           onChanged: onChanged,
           multiline: multiline,
+          obscureText: obscureText,
         ));
   }
 }
