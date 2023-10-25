@@ -3,30 +3,32 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
-import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/notification.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/database/firebase/user.dart';
-import 'package:pambe_ac_ifa/database/sqflite/resource.dart';
-import 'package:pambe_ac_ifa/init.dart';
+import 'package:pambe_ac_ifa/database/http/recipe.dart';
 import 'package:pambe_ac_ifa/switch.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  Database db = await initializeSqfliteDatabase(override: false);
+  // Database db = await initializeSqfliteDatabase(override: false);
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
           create: (context) =>
               AuthProvider(userManager: FirebaseUserManager())),
       ChangeNotifierProvider(create: (context) => NotificationController()),
-      ChangeNotifierProvider(create: (context) => RecipeController()),
       ChangeNotifierProvider(
           create: (context) =>
-              LocalRecipeController(db, resources: LocalImageController())),
+              RecipeController(recipeManager: HttpRecipeManager())),
+      // ChangeNotifierProvider(
+      //     create: (context) => LocalRecipeController(
+      //             recipeTable: RecipeTable(
+      //           db,
+      //           resources: LocalImageManager(),
+      //         ))),
     ],
     child: const AcReactiveFormConfig(child: RecipeLibApp()),
   ));

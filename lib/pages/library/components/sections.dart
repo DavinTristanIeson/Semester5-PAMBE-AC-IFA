@@ -56,14 +56,10 @@ class LibraryLocalRecipesSection extends StatelessWidget {
     final controller = context.watch<LocalRecipeController>();
     final user = context.watch<AuthProvider>().user!;
     return AsyncApiSampleScrollSection(
-        future: Future(() async {
-          final results = await controller.getAll(
-              user: user,
-              searchState: RecipeSearchState(
-                  limit: 5,
-                  sortBy: SortBy.descending(RecipeSortBy.createdDate)));
-          return ApiResult(message: 'Success', data: results);
-        }),
+        future: controller.getAll(
+            user: user,
+            searchState: RecipeSearchState(
+                limit: 5, sortBy: SortBy.descending(RecipeSortBy.createdDate))),
         itemBuilder: (context, data) {
           return RecipeCard(
             recipe: data,

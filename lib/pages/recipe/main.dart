@@ -28,7 +28,7 @@ class RecipeScreen extends StatelessWidget with SnackbarMessenger {
       } else {
         final controller = context.watch<RecipeController>();
         final result = await controller.get(id);
-        return result.data;
+        return result;
       }
     } catch (e) {
       sendError(context, e.toString());

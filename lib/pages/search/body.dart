@@ -59,7 +59,7 @@ class _SearchScreenBodyState extends State<SearchScreenBody> {
 
     final res =
         await context.read<RecipeController>().getAll(state, page: pageKey);
-    return res.data;
+    return res;
   }
 
   @override

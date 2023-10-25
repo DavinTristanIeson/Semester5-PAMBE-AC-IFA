@@ -255,11 +255,11 @@ class RecipeSearchState {
         limit: limit ?? this.limit);
   }
 
-  Map<String, dynamic> getApiParams({int page = 0}) {
+  Map<String, dynamic> getApiParams({int? page}) {
     final Map<String, String> params = {
       "sort": sortBy.apiParams,
       "limit": limit.toString(),
-      "page": page.toString(),
+      "page": (page ?? 1).toString(),
     };
     if (search != null) {
       params["search"] = search!;

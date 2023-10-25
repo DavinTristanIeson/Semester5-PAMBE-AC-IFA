@@ -128,10 +128,9 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
                 LocalRecipeController localController =
                     context.read<LocalRecipeController>();
                 try {
-                  await remoteController.put(widget.recipe!);
-                  // FIXME: use result data as remote id
+                  final recipe = await remoteController.put(widget.recipe!);
                   await localController.setRemoteId(
-                      int.parse(widget.recipe!.id), null);
+                      int.parse(widget.recipe!.id), int.parse(recipe.id));
                   widget.onChanged(widget.recipe!.withRemoteId(null));
                   // ignore: use_build_context_synchronously
                   sendSuccess(context,
@@ -159,7 +158,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
                 final remoteController = context.read<RecipeController>();
                 final localController = context.read<LocalRecipeController>();
                 try {
-                  await remoteController.remove(int.parse(widget.recipe!.id));
+                  await remoteController.remove(widget.recipe!.id);
                   await localController.setRemoteId(
                       int.parse(widget.recipe!.id), null);
                   // ignore: use_build_context_synchronously

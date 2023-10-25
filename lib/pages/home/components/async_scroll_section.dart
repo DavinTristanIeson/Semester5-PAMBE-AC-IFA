@@ -9,7 +9,7 @@ import 'package:pambe_ac_ifa/models/container.dart';
 
 class AsyncApiSampleScrollSection<T> extends StatelessWidget
     with SnackbarMessenger {
-  final Future<ApiResult<List<T>>> future;
+  final Future<List<T>> future;
   final Widget Function(BuildContext context, T data) itemBuilder;
   final Either<Widget, String> header;
   final Either<Widget, void Function()>? viewMoreButton;
@@ -30,9 +30,9 @@ class AsyncApiSampleScrollSection<T> extends StatelessWidget
   Widget build(BuildContext context) {
     return FutureBuilder(future: future.catchError((error) {
       sendError(context, error.toString());
-      return ApiResult(message: "Failure", data: <T>[]);
+      return Future<List<T>>.value([]);
     }), builder: (context, snapshot) {
-      final data = snapshot.data?.data;
+      final data = snapshot.data;
       return SampleScrollSection(
         itemCount: snapshot.connectionState != ConnectionState.done
             ? 5

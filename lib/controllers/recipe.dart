@@ -1,80 +1,34 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:pambe_ac_ifa/database/interfaces/http.dart';
-import 'package:pambe_ac_ifa/models/container.dart';
+import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
-import 'package:http/http.dart' as http;
 
 /// Ini untuk resep yang disimpan online
-class RecipeController extends ChangeNotifier with HttpController {
-  @override
-  final Uri baseUrl = globalBaseUrl.replace(path: "api");
+class RecipeController extends ChangeNotifier {
+  IRecipeResourceManager recipeManager;
+  RecipeController({required this.recipeManager});
 
-  Future<ApiResult<List<RecipeLiteModel>>> getAll(
-    RecipeSearchState search, {
+  Future<List<RecipeLiteModel>> getAll(
+    RecipeSearchState searchState, {
     int page = 0,
   }) async {
-    final response = await makeNetworkCall(() =>
-        http.get(urlOf("recipes", params: search.getApiParams(page: page))));
-    final ApiResult<List<RecipeLiteModel>> res = processHttpResponse(response,
-        transform: (json) => ApiResult.fromJson(
-            json,
-            (json) => (json as List)
-                    .cast<Map<String, Object?>>()
-                    .map<RecipeLiteModel>((map) {
-                  return RecipeLiteModel.fromJson(map);
-                }).toList()));
-    return res;
+    return recipeManager.getAll(
+      page: page,
+      searchState: searchState,
+    );
   }
 
-  Future<ApiResult<RecipeModel>> get(String id) async {
-    final response =
-        await makeNetworkCall(() => http.get(urlOf("recipes/$id")));
-    final ApiResult<RecipeModel> res = processHttpResponse(response,
-        transform: (json) => ApiResult.fromJson(json,
-            (json) => RecipeModel.fromJson(json as Map<String, dynamic>)));
-    return res;
+  Future<RecipeModel> get(String id) async {
+    return recipeManager.get(id);
   }
 
-  // FIXME: Change void to String later
-  Future<ApiResult<void>> put(RecipeModel recipe) async {
-    final response = await makeNetworkCall(() {
-      final url = urlOf("recipes");
-      final Map<String, String> headers = {
-        "Content-Type": "application/json",
-      };
-      final body = jsonEncode(recipe.toJson());
-      if (recipe.remoteId == null) {
-        return http.post(url, headers: headers, body: body);
-      } else {
-        return http.put(url, headers: headers, body: body);
-      }
-    });
-    final ApiResult<void> res = processHttpResponse(response,
-        transform: (json) => ApiResult.fromJson(json, (json) {}));
+  Future<RecipeModel> put(RecipeModel recipe) async {
+    final result = await recipeManager.put(recipe);
     notifyListeners();
-    return res;
+    return result;
   }
 
-  Future<ApiResult<RecipeModel>> update(RecipeModel recipe) async {
-    final response = await makeNetworkCall(() => http.put(urlOf("recipes"),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: recipe.toJson()));
-    final ApiResult<RecipeModel> res = processHttpResponse(response,
-        transform: (json) => ApiResult.fromJson(json,
-            (json) => RecipeModel.fromJson(json as Map<String, dynamic>)));
+  Future<void> remove(String id) async {
+    await recipeManager.remove(id);
     notifyListeners();
-    return res;
-  }
-
-  Future<ApiResult> remove(int id) async {
-    final response =
-        await makeNetworkCall(() => http.delete(urlOf("recipes/$id")));
-    final ApiResult res = processHttpResponse(response,
-        transform: (json) => ApiResult.fromJson(json, (json) => json));
-    return res;
   }
 }
