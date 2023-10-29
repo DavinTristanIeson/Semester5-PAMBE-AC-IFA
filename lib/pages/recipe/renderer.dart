@@ -11,7 +11,7 @@ import 'package:pambe_ac_ifa/pages/recipe/components/step.dart';
 class RecipeStepRenderer extends StatefulWidget {
   final Stream<RecipeStepModel> stream;
   final Future<void> Function()? next;
-  final ImageProvider image;
+  final ImageProvider? image;
 
   const RecipeStepRenderer(
       {super.key,

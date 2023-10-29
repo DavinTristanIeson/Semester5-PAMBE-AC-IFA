@@ -36,7 +36,7 @@ class RecipeViewerScreen extends StatelessWidget {
           next: recipeStepScrollLogic,
           builder: (context, stream, next) {
             return RecipeStepRenderer(
-                stream: stream, next: next, image: recipe.image!);
+                stream: stream, next: next, image: recipe.image);
           },
         ));
   }
