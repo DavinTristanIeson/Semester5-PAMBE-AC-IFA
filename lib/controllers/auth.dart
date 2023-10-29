@@ -10,7 +10,11 @@ class AuthProvider extends ChangeNotifier {
   });
 
   // Placeholder methods until we implement firebase
-  UserModel? user;
+  UserModel? user = UserModel(
+      id: "0",
+      name: "User",
+      email: "placeholder@email.com",
+      imagePath: "https://www.google.com");
   bool get isGuest {
     return user == null;
   }

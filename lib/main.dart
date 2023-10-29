@@ -3,23 +3,35 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
+import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/notification.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/database/firebase/user.dart';
 import 'package:pambe_ac_ifa/database/http/recipe.dart';
+import 'package:pambe_ac_ifa/database/sqflite/lib/image.dart';
+import 'package:pambe_ac_ifa/database/sqflite/tables/recipe.dart';
+import 'package:pambe_ac_ifa/database/sqflite/tables/recipe_images.dart';
+import 'package:pambe_ac_ifa/init.dart';
 import 'package:pambe_ac_ifa/switch.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:sqflite/sqflite.dart';
 import 'firebase_options.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  WidgetsFlutterBinding.ensureInitialized();
+  Database db = await initializeSqfliteDatabase(override: false);
+  final recipeTable = RecipeTable(
+    db,
+    imageManager:
+        LocalRecipeImageManager(imageManager: LocalFileImageManager()),
+  );
+  recipeTable.cleanupUnusedImages();
 
-  // Database db = await initializeSqfliteDatabase(override: false);
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -29,12 +41,8 @@ void main() async {
       ChangeNotifierProvider(
           create: (context) =>
               RecipeController(recipeManager: HttpRecipeManager())),
-      // ChangeNotifierProvider(
-      //     create: (context) => LocalRecipeController(
-      //             recipeTable: RecipeTable(
-      //           db,
-      //           resources: LocalImageManager(),
-      //         ))),
+      ChangeNotifierProvider(
+          create: (context) => LocalRecipeController(recipeTable: recipeTable)),
     ],
     child: const AcReactiveFormConfig(child: RecipeLibApp()),
   ));

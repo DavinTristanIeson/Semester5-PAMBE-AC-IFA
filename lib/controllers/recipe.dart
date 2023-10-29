@@ -21,7 +21,7 @@ class RecipeController extends ChangeNotifier {
     return recipeManager.get(id);
   }
 
-  Future<RecipeModel> put(RecipeModel recipe) async {
+  Future<RecipeModel> put(LocalRecipeModel recipe) async {
     final result = await recipeManager.put(recipe);
     notifyListeners();
     return result;

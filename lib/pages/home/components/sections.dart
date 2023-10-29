@@ -21,7 +21,10 @@ class HomeRecentRecipesSection extends StatelessWidget {
             limit: 5,
             sortBy: SortBy.descending(RecipeSortBy.lastViewed),
             filterBy: RecipeFilterBy.viewedBy(userId))),
-        itemBuilder: (context, data) => RecipeCard(recipe: data),
+        itemBuilder: (context, data) => RecipeCard(
+              recipe: data,
+              recipeSource: RecipeSource.remote(data.id),
+            ),
         header: Either.right("Recents"),
         viewMoreButton: Either.right(() {
           Navigator.of(context).push(MaterialPageRoute(
@@ -47,7 +50,10 @@ class HomeTrendingRecipesSection extends StatelessWidget {
           sortBy: SortBy.descending(RecipeSortBy.ratings),
           filterBy: RecipeFilterBy.viewedBy(userId),
         )),
-        itemBuilder: (context, data) => RecipeCard(recipe: data),
+        itemBuilder: (context, data) => RecipeCard(
+              recipe: data,
+              recipeSource: RecipeSource.remote(data.id),
+            ),
         header: Either.right("Trending"),
         viewMoreButton: Either.right(() {
           context.navigator.push(MaterialPageRoute(

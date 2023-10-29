@@ -14,14 +14,13 @@ Future<Database> initializeSqfliteDatabase({bool? override}) async {
   ]);
 
   final localImageDirectory =
-      Directory(await LocalImageManager.getImageStoragePath());
+      Directory(await LocalFileImageManager.getImageStoragePath());
   if (await localImageDirectory.exists()) {
     if (override == true) {
       await localImageDirectory.delete(recursive: true);
     }
-  } else {
-    await localImageDirectory.create(recursive: true);
   }
+  await localImageDirectory.create(recursive: true);
 
   return SqfliteDatabaseLoader(migrationManager)
       .open(name: 'recipe-lib', override: override);

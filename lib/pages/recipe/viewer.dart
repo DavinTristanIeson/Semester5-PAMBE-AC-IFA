@@ -7,17 +7,19 @@ import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/recipe/renderer.dart';
 
 class RecipeViewerScreen extends StatelessWidget {
-  final RecipeModel recipe;
-  const RecipeViewerScreen({super.key, required this.recipe});
+  final AbstractRecipeLiteModel recipe;
+  final List<AbstractRecipeStepModel> steps;
+  const RecipeViewerScreen(
+      {super.key, required this.recipe, required this.steps});
 
   Future<int?> recipeStepScrollLogic(
-      StreamSink<RecipeStepModel> sink, int index) async {
-    while (index < recipe.steps.length) {
-      RecipeStepModel current = recipe.steps[index];
+      StreamSink<AbstractRecipeStepModel> sink, int index) async {
+    while (index < steps.length) {
+      AbstractRecipeStepModel current = steps[index];
       sink.add(current);
       index++;
-      RecipeStepModel? upcoming = recipe.steps.elementAtOrNull(index);
-      if (index >= recipe.steps.length ||
+      AbstractRecipeStepModel? upcoming = steps.elementAtOrNull(index);
+      if (index >= steps.length ||
           upcoming!.type == RecipeStepVariant.regular) {
         await Future.delayed(const Duration(milliseconds: 300));
         break;
@@ -25,14 +27,14 @@ class RecipeViewerScreen extends StatelessWidget {
         await Future.delayed(const Duration(milliseconds: 600));
       }
     }
-    return index == recipe.steps.length ? null : index;
+    return index == steps.length ? null : index;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: const OnlyReturnAppBar(),
-        body: UserControlledDataScroll<RecipeStepModel>(
+        body: UserControlledDataScroll<AbstractRecipeStepModel>(
           next: recipeStepScrollLogic,
           builder: (context, stream, next) {
             return RecipeStepRenderer(

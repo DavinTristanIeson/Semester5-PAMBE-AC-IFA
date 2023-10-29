@@ -6,7 +6,7 @@ import 'package:pambe_ac_ifa/pages/editor/components/step.dart';
 import 'package:pambe_ac_ifa/pages/recipe/components/timer.dart';
 
 class RecipeStepComponent extends StatelessWidget {
-  final RecipeStepModel step;
+  final AbstractRecipeStepModel step;
   final int number;
   const RecipeStepComponent(
       {super.key, required this.step, required this.number});
@@ -35,6 +35,7 @@ class RecipeStepComponent extends StatelessWidget {
                       Size.fromHeight(MediaQuery.of(context).size.height / 4)),
                   child: MaybeImage(image: step.image!),
                 ),
+              if (step.image != null) const SizedBox(height: AcSizes.space),
               buildContent(),
             ],
           ),

@@ -23,6 +23,12 @@ enum ApiErrorType {
   storeFailure(
       name: "Store Failure",
       message: "An error occurred while storing the resource"),
+  deleteFailure(
+      name: "Delete Failure",
+      message: "An error occurred while deleting the resource"),
+  cleanupFailure(
+      name: "Cleanup Failure",
+      message: "An error occurred during a scheduled cleanup task"),
   fetchFailure(
       name: "Fetch Failure",
       message: "An error occurred while getting the resource");

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/editor/form.dart';
 import 'package:provider/provider.dart';
 
 class RecipeEditorScreen extends StatefulWidget {
-  final String? recipeId;
+  final int? recipeId;
   const RecipeEditorScreen({super.key, this.recipeId});
 
   @override
@@ -14,16 +13,15 @@ class RecipeEditorScreen extends StatefulWidget {
 }
 
 class _RecipeEditorScreenState extends State<RecipeEditorScreen> {
-  RecipeModel? recipe;
+  LocalRecipeModel? recipe;
   bool loaded = false;
 
   @override
   void initState() {
     super.initState();
     final controller = context.read<LocalRecipeController>();
-    final user = context.read<AuthProvider>().user!;
     if (widget.recipeId != null) {
-      controller.get(int.parse(widget.recipeId!), user: user).then((value) {
+      controller.get(widget.recipeId!).then((value) {
         setState(() {
           recipe = value;
           loaded = true;
@@ -34,7 +32,7 @@ class _RecipeEditorScreenState extends State<RecipeEditorScreen> {
     }
   }
 
-  void onRecipeChanged(RecipeModel recipe) {
+  void onRecipeChanged(LocalRecipeModel recipe) {
     setState(() {
       this.recipe = recipe;
     });

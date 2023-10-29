@@ -8,6 +8,32 @@ extension SetUtilities<T> on Set<T> {
   }
 }
 
+extension MapUtilities<K, V> on Map<K, V> {
+  void addEntry(MapEntry<K, V> entry) {
+    this[entry.key] = entry.value;
+  }
+}
+
+extension IterableUtilities<T> on Iterable<T> {
+  T? find(bool Function(T element) fn) {
+    return where((element) => fn(element)).firstOrNull;
+  }
+
+  bool exists(bool Function(T element) fn) {
+    return find(fn) != null;
+  }
+
+  List<List<T>> categorize(int? Function(T element) fn, int categoryCount) {
+    List<List<T>> categories = List.generate(categoryCount, (index) => []);
+    forEach((element) {
+      int? index = fn(element);
+      if (index == null) return;
+      categories[index].add(element);
+    });
+    return categories;
+  }
+}
+
 extension DateTimeUtilities on DateTime {
   String _padZero(int timePiece) {
     return timePiece.toString().padLeft(2, '0');

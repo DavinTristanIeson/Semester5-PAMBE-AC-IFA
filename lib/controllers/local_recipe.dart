@@ -16,16 +16,15 @@ class LocalRecipeController extends ChangeNotifier {
   RecipeTable recipeTable;
   LocalRecipeController({required this.recipeTable});
 
-  Future<RecipeModel?> get(int id, {required UserModel user}) async {
-    return recipeTable.get(id, user: user);
+  Future<LocalRecipeModel?> get(int id) async {
+    return recipeTable.get(id);
   }
 
-  Future<List<RecipeLiteModel>> getAll(
+  Future<List<LocalRecipeLiteModel>> getAll(
       {required UserModel user,
       required RecipeSearchState searchState,
       int page = 1}) async {
     return recipeTable.getAll(
-        user: user,
         filter: searchState.filterBy,
         limit: searchState.limit,
         page: page,
@@ -33,30 +32,29 @@ class LocalRecipeController extends ChangeNotifier {
         sort: searchState.sortBy);
   }
 
-  Future<RecipeModel> put(
+  Future<LocalRecipeModel> put(
       {required String title,
       String? description,
       required List<RecipeStepFormType> steps,
       XFile? image,
       required UserModel user,
-      RecipeModel? former}) async {
+      int? id}) async {
     final result = await recipeTable.put(
         title: title,
         description: description,
         steps: steps,
         image: image,
-        user: user,
-        former: former);
+        id: id);
     notifyListeners();
     return result;
   }
 
-  Future<void> remove(RecipeModel recipe) async {
-    await recipeTable.remove(recipe);
+  Future<void> remove(int id) async {
+    await recipeTable.remove(id);
     notifyListeners();
   }
 
-  Future<void> setRemoteId(int localId, int? remoteId) async {
+  Future<void> setRemoteId(int localId, String? remoteId) async {
     await recipeTable.setRemoteId(localId, remoteId);
   }
 }

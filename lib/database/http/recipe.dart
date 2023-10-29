@@ -37,7 +37,7 @@ class HttpRecipeManager
   }
 
   @override
-  Future<RecipeModel> put(RecipeModel recipe) async {
+  Future<RecipeModel> put(LocalRecipeModel recipe) async {
     final response = await makeNetworkCall(() {
       final url = urlOf("recipes");
       final Map<String, String> headers = {

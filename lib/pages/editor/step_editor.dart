@@ -53,7 +53,7 @@ class _RecipeStepEditorInternal extends StatelessWidget {
         });
   }
 
-  Widget buildThumbnail() {
+  Widget buildThumbnail(BuildContext context) {
     return ReactiveValueListenableBuilder<InputToggle<XFile>>(
         formControlName: RecipeStepFormKeys.image.name,
         builder: (context, control, child) {
@@ -64,6 +64,8 @@ class _RecipeStepEditorInternal extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: AcSizes.md),
             child: ImagePickerField(
                 value: control.value?.value,
+                error: ReactiveFormConfig.of(context)
+                    ?.translateAny(control.errors),
                 onChanged: (XFile? value) {
                   control.value = control.value?.withValue(value);
                 }),
@@ -93,7 +95,7 @@ class _RecipeStepEditorInternal extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        buildThumbnail(),
+        buildThumbnail(context),
         buildTimer(),
         buildContentInput(),
       ],
@@ -134,9 +136,11 @@ class _RecipeStepEditorMenuButton extends StatelessWidget {
           onSelected: (_RecipeStepEditorAction action) {
             switch (action) {
               case _RecipeStepEditorAction.toggleImage:
-                thumbnailControl.value = thumbnailControl.value?.toggled();
+                thumbnailControl.value =
+                    thumbnailControl.value?.toggled() ?? InputToggle.off();
               case _RecipeStepEditorAction.toggleTimer:
-                timerControl.value = timerControl.value?.toggled();
+                timerControl.value =
+                    timerControl.value?.toggled() ?? InputToggle.off();
               case _RecipeStepEditorAction.toTip:
                 variantControl.value = RecipeStepVariant.tip;
               case _RecipeStepEditorAction.toWarning:

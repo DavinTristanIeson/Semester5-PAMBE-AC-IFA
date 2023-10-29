@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
@@ -15,7 +16,10 @@ typedef RegisterPayload = ({
 
 abstract class IImageResourceManager {
   Future<File?> get(String imagePath);
+  Future<List<String>> getAll();
   Future<File?> put(XFile? resource, {String? former});
+  Future<void> process(Map<String, XFile?> resources);
+  Future<MapEntry<String, XFile>> reserve(XFile resource);
   Future<void> remove(String imagePath);
 }
 
@@ -29,6 +33,6 @@ abstract class IRecipeResourceManager {
   Future<List<RecipeLiteModel>> getAll(
       {int? page, RecipeSearchState? searchState});
   Future<RecipeModel> get(String id);
-  Future<RecipeModel> put(RecipeModel recipe);
+  Future<RecipeModel> put(LocalRecipeModel recipe);
   Future<void> remove(String id);
 }

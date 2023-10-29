@@ -17,8 +17,8 @@ import 'package:reactive_forms/reactive_forms.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 
 class RecipeEditorScreenForm extends StatefulWidget {
-  final RecipeModel? recipe;
-  final void Function(RecipeModel recipe) onChanged;
+  final LocalRecipeModel? recipe;
+  final void Function(LocalRecipeModel recipe) onChanged;
   const RecipeEditorScreenForm(
       {super.key, this.recipe, required this.onChanged});
 
@@ -42,7 +42,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
     super.dispose();
   }
 
-  FormGroup defaultValue(RecipeModel? recipe) {
+  FormGroup defaultValue(LocalRecipeModel? recipe) {
     return FormGroup({
       RecipeFormKeys.title.name:
           FormControl<String>(value: recipe?.title, validators: [
@@ -100,12 +100,13 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
           steps: steps,
           user: user,
           image: image,
-          former: widget.recipe);
+          id: widget.recipe?.id);
       form.markAsPristine();
       widget.onChanged(recipe);
       // ignore: use_build_context_synchronously
       sendSuccess(context, "$title has been saved locally.");
     } catch (e) {
+      print(e);
       // ignore: use_build_context_synchronously
       sendError(context, e.toString());
     }
@@ -130,7 +131,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
                 try {
                   final recipe = await remoteController.put(widget.recipe!);
                   await localController.setRemoteId(
-                      int.parse(widget.recipe!.id), int.parse(recipe.id));
+                      widget.recipe!.id, recipe.id);
                   widget.onChanged(widget.recipe!.withRemoteId(null));
                   // ignore: use_build_context_synchronously
                   sendSuccess(context,
@@ -158,9 +159,10 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
                 final remoteController = context.read<RecipeController>();
                 final localController = context.read<LocalRecipeController>();
                 try {
-                  await remoteController.remove(widget.recipe!.id);
-                  await localController.setRemoteId(
-                      int.parse(widget.recipe!.id), null);
+                  if (widget.recipe!.remoteId != null) {
+                    await remoteController.remove(widget.recipe!.remoteId!);
+                  }
+                  await localController.setRemoteId(widget.recipe!.id, null);
                   // ignore: use_build_context_synchronously
                   sendSuccess(context,
                       "${widget.recipe!.title} is no longer available to the public");
@@ -189,7 +191,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
                 try {
                   await context
                       .read<LocalRecipeController>()
-                      .remove(widget.recipe!);
+                      .remove(widget.recipe!.id);
                   close = true;
                 } catch (e) {
                   // ignore: use_build_context_synchronously

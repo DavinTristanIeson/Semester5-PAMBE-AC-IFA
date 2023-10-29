@@ -26,6 +26,7 @@ class LibraryBookmarkedRecipesSection extends StatelessWidget {
         itemBuilder: (context, data) {
           return RecipeCard(
             recipe: data,
+            recipeSource: RecipeSource.remote(data.id),
             secondaryAction: OutlinedButton.icon(
                 style: RecipeCard.getSecondaryActionButtonStyle(context),
                 onPressed: () {
@@ -63,7 +64,7 @@ class LibraryLocalRecipesSection extends StatelessWidget {
         itemBuilder: (context, data) {
           return RecipeCard(
             recipe: data,
-            recipeSource: RecipeSource.local,
+            recipeSource: RecipeSource.local(data.id),
             secondaryAction: OutlinedButton.icon(
               style: RecipeCard.getSecondaryActionButtonStyle(context),
               onPressed: () {

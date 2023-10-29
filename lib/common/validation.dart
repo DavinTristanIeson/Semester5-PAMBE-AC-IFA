@@ -21,6 +21,7 @@ class AcReactiveFormConfig extends StatelessWidget {
             "Password confirmation must be the same as password",
         ValidationMessage.email: (error) =>
             "Field must contain a valid email address",
+        AcValidationMessage.imageRequired: (error) => "Image is required",
       },
       child: child,
     );
@@ -57,4 +58,5 @@ extension AcValidators on Validators {
 extension AcValidationMessage on ValidationMessage {
   static const acceptedChars = "acceptedChars";
   static const passwordConfirmationMismatch = "passwordConfirmationMismatch";
+  static const imageRequired = "imageRequired";
 }

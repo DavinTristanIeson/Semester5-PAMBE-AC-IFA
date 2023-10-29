@@ -19,13 +19,14 @@ class SearchScreenBody extends StatefulWidget {
 }
 
 class _SearchScreenBodyState extends State<SearchScreenBody> {
-  final PagingController<int, RecipeLiteModel> _pagination =
+  final PagingController<int, AbstractRecipeLiteModel> _pagination =
       PagingController(firstPageKey: 1);
 
   @override
   void initState() {
     _pagination.addPageRequestListener((pageKey) async {
-      List<RecipeLiteModel> recipes = await fetch(widget.searchState, pageKey);
+      List<AbstractRecipeLiteModel> recipes =
+          await fetch(widget.searchState, pageKey);
       if (recipes.length != widget.searchState.limit) {
         _pagination.appendLastPage(recipes);
       } else {
@@ -47,7 +48,7 @@ class _SearchScreenBodyState extends State<SearchScreenBody> {
     return widget.searchState.filterBy?.type == RecipeFilterByType.local;
   }
 
-  Future<List<RecipeLiteModel>> fetch(
+  Future<List<AbstractRecipeLiteModel>> fetch(
       RecipeSearchState state, int pageKey) async {
     if (state.filterBy?.type == RecipeFilterByType.local) {
       final user = context.read<AuthProvider>().user!;
@@ -70,7 +71,7 @@ class _SearchScreenBodyState extends State<SearchScreenBody> {
 
   @override
   Widget build(BuildContext context) {
-    return PagedListView<int, RecipeLiteModel>(
+    return PagedListView<int, AbstractRecipeLiteModel>(
         pagingController: _pagination,
         builderDelegate: PagedChildBuilderDelegate(
             noItemsFoundIndicatorBuilder: (context) {
@@ -84,8 +85,9 @@ class _SearchScreenBodyState extends State<SearchScreenBody> {
                     vertical: AcSizes.sm, horizontal: AcSizes.space),
                 child: RecipeHorizontalCard(
                   recipe: item,
-                  recipeSource:
-                      isLocal ? RecipeSource.local : RecipeSource.online,
+                  recipeSource: isLocal
+                      ? RecipeSource.local((item as LocalRecipeLiteModel).id)
+                      : RecipeSource.remote((item as RecipeLiteModel).id),
                 ))));
   }
 }
