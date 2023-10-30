@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
@@ -6,8 +7,8 @@ import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/notification.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/database/firebase/recipe.dart';
 import 'package:pambe_ac_ifa/database/firebase/user.dart';
-import 'package:pambe_ac_ifa/database/http/recipe.dart';
 import 'package:pambe_ac_ifa/database/sqflite/lib/image.dart';
 import 'package:pambe_ac_ifa/database/sqflite/tables/recipe.dart';
 import 'package:pambe_ac_ifa/database/sqflite/tables/recipe_images.dart';
@@ -32,15 +33,18 @@ void main() async {
   );
   recipeTable.cleanupUnusedImages();
 
+  final userManager = FirebaseUserManager(FirebaseFirestore.instance);
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
-          create: (context) =>
-              AuthProvider(userManager: FirebaseUserManager())),
+          create: (context) => AuthProvider(userManager: userManager)),
       ChangeNotifierProvider(create: (context) => NotificationController()),
       ChangeNotifierProvider(
-          create: (context) =>
-              RecipeController(recipeManager: HttpRecipeManager())),
+          create: (context) => RecipeController(
+                  recipeManager: FirebaseRecipeManager(
+                FirebaseFirestore.instance,
+                userManager: userManager,
+              ))),
       ChangeNotifierProvider(
           create: (context) => LocalRecipeController(recipeTable: recipeTable)),
     ],

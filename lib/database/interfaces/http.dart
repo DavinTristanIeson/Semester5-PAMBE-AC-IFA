@@ -10,7 +10,7 @@ import 'package:path/path.dart';
 final Uri globalBaseUrl =
     Uri(scheme: 'https', host: "bewildered-jersey-lion.cyclic.app");
 
-mixin HttpControllerMixin {
+mixin HttpResourceManagerMixin {
   Uri get baseUrl => globalBaseUrl;
   Uri urlOf(String path, {Map<String, dynamic>? params}) {
     Uri resultUrl = baseUrl.replace(

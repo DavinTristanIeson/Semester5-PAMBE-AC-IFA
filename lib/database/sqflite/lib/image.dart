@@ -7,7 +7,7 @@ import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-class LocalFileImageManager implements IImageResourceManager {
+class LocalFileImageManager implements ILocalImageResourceManager {
   static String? _imageStoragePath;
   static FutureOr<String> getImageStoragePath() async {
     if (_imageStoragePath != null) return _imageStoragePath!;
@@ -42,10 +42,10 @@ class LocalFileImageManager implements IImageResourceManager {
 
   @override
   Future<File?> put(XFile? resource, {String? former}) async {
+    if (former != null) {
+      await remove(former);
+    }
     if (resource == null) {
-      if (former != null) {
-        remove(former);
-      }
       return null;
     }
 
@@ -62,10 +62,6 @@ class LocalFileImageManager implements IImageResourceManager {
       throw ApiError(ApiErrorType.storeFailure,
           message: "Failed to store image with path: ${resource.path}",
           inner: e);
-    }
-
-    if (former != null) {
-      await remove(former);
     }
     return result;
   }

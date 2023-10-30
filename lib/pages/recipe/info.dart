@@ -3,6 +3,7 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
+import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
 import 'package:pambe_ac_ifa/components/display/review_card.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
@@ -57,8 +58,10 @@ class RecipeInfoScreen extends StatelessWidget {
                               .copyWith(fontWeight: FontWeight.bold),
                         ),
                         if (recipe is RecipeLiteModel)
-                          Text("by ${(recipe as RecipeLiteModel).user.name}",
-                              style: AcTypography.importantDescription)
+                          ByUserText(
+                            user: (recipe as RecipeLiteModel).user,
+                            style: AcTypography.importantDescription,
+                          ),
                       ],
                     ),
                   ],
@@ -79,7 +82,7 @@ class RecipeInfoScreen extends StatelessWidget {
                 child: CircleAvatar(
                   radius: AcSizes.avatarRadius,
                   backgroundColor: Theme.of(context).colorScheme.tertiary,
-                  backgroundImage: (recipe as RecipeLiteModel).user.image,
+                  backgroundImage: (recipe as RecipeLiteModel).user?.image,
                 )),
           ),
       ],

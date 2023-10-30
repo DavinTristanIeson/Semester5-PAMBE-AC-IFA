@@ -10,12 +10,12 @@ LocalRecipeStepModel _$LocalRecipeStepModelFromJson(
         Map<String, dynamic> json) =>
     LocalRecipeStepModel(
       id: json['id'] as int,
-      imagePath: json['imagePath'] as String?,
       content: json['content'] as String,
       type: $enumDecodeNullable(_$RecipeStepVariantEnumMap, json['type']) ??
           RecipeStepVariant.regular,
       timer: _$JsonConverterFromJson<int, Duration>(
           json['timer'], const JsonDurationConverter().fromJson),
+      imagePath: json['imagePath'] as String?,
     );
 
 Map<String, dynamic> _$LocalRecipeStepModelToJson(
@@ -25,8 +25,8 @@ Map<String, dynamic> _$LocalRecipeStepModelToJson(
       'type': _$RecipeStepVariantEnumMap[instance.type]!,
       'timer': _$JsonConverterToJson<int, Duration>(
           instance.timer, const JsonDurationConverter().toJson),
-      'id': instance.id,
       'imagePath': instance.imagePath,
+      'id': instance.id,
     };
 
 const _$RecipeStepVariantEnumMap = {
@@ -50,12 +50,12 @@ Json? _$JsonConverterToJson<Json, Value>(
 RecipeStepModel _$RecipeStepModelFromJson(Map<String, dynamic> json) =>
     RecipeStepModel(
       id: json['id'] as String,
-      imagePath: json['imagePath'] as String?,
       content: json['content'] as String,
       type: $enumDecodeNullable(_$RecipeStepVariantEnumMap, json['type']) ??
           RecipeStepVariant.regular,
       timer: _$JsonConverterFromJson<int, Duration>(
           json['timer'], const JsonDurationConverter().fromJson),
+      imagePath: json['imagePath'] as String?,
     );
 
 Map<String, dynamic> _$RecipeStepModelToJson(RecipeStepModel instance) =>
@@ -64,6 +64,6 @@ Map<String, dynamic> _$RecipeStepModelToJson(RecipeStepModel instance) =>
       'type': _$RecipeStepVariantEnumMap[instance.type]!,
       'timer': _$JsonConverterToJson<int, Duration>(
           instance.timer, const JsonDurationConverter().toJson),
-      'id': instance.id,
       'imagePath': instance.imagePath,
+      'id': instance.id,
     };

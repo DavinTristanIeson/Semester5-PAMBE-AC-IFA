@@ -8,13 +8,12 @@ import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/editor/components/models.dart';
 
 class LocalRecipeImageManager {
-  IImageResourceManager imageManager;
+  ILocalImageResourceManager imageManager;
   LocalRecipeImageManager({required this.imageManager});
 
   Future<void> deleteUnusedImagesTask(
       {required List<String> databaseImagePaths}) async {
     final availableImages = (await imageManager.getAll()).toSet();
-    print(availableImages);
     for (final imagePath in databaseImagePaths) {
       if (availableImages.contains(imagePath)) {
         availableImages.remove(imagePath);
@@ -66,7 +65,7 @@ class LocalRecipeImageManager {
     if (newSteps.isNotEmpty) {
       final fileNames = await Future.wait(newSteps
           .where((e) => e.image != null)
-          .map((e) => imageManager.reserve(e.image!)));
+          .map((e) => Future.value(imageManager.reserve(e.image!))));
       modifiedStepFiles
           .addEntries(fileNames.map((e) => MapEntry(e.value.path, e.key)));
       reserved.addAll(fileNames);
@@ -74,7 +73,7 @@ class LocalRecipeImageManager {
     if (changedSteps.isNotEmpty) {
       final fileNames = await Future.wait(changedSteps
           .where((e) => e.image != null)
-          .map((e) => imageManager.reserve(e.image!)));
+          .map((e) => Future.value(imageManager.reserve(e.image!))));
       modifiedStepFiles
           .addEntries(fileNames.map((e) => MapEntry(e.value.path, e.key)));
       reserved.addAll(fileNames);

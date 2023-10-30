@@ -9,20 +9,25 @@ class RecipeController extends ChangeNotifier {
 
   Future<List<RecipeLiteModel>> getAll(
     RecipeSearchState searchState, {
-    int page = 0,
+    dynamic page,
   }) async {
-    return recipeManager.getAll(
-      page: page,
-      searchState: searchState,
-    );
+    return (await getAllWithPagination(searchState, page: page)).data;
   }
 
-  Future<RecipeModel> get(String id) async {
+  Future<PaginatedQueryResult<RecipeLiteModel>> getAllWithPagination(
+    RecipeSearchState searchState, {
+    dynamic page,
+  }) async {
+    return recipeManager.getAll(page: page, searchState: searchState);
+  }
+
+  Future<RecipeModel?> get(String id) async {
     return recipeManager.get(id);
   }
 
-  Future<RecipeModel> put(LocalRecipeModel recipe) async {
-    final result = await recipeManager.put(recipe);
+  Future<RecipeModel> put(LocalRecipeModel recipe,
+      {required String userId}) async {
+    final result = await recipeManager.put(recipe, userId: userId);
     notifyListeners();
     return result;
   }

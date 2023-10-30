@@ -4,8 +4,29 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
+import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/recipe/main.dart';
 import 'package:provider/provider.dart';
+
+class ByUserText extends StatelessWidget {
+  final UserModel? user;
+  final TextStyle? style;
+  const ByUserText({super.key, this.user, this.style});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+        TextSpan(children: [
+          const TextSpan(text: "by "),
+          TextSpan(
+              text: user?.name ?? '<Deleted User>',
+              style: TextStyle(
+                fontStyle: user == null ? FontStyle.italic : FontStyle.normal,
+              ))
+        ]),
+        style: context.texts.titleSmall);
+  }
+}
 
 class RecipeCard extends StatelessWidget {
   final AbstractRecipeLiteModel recipe;
@@ -23,8 +44,7 @@ class RecipeCard extends StatelessWidget {
       children: [
         Text(recipe.title, style: Theme.of(context).textTheme.titleMedium),
         if (recipe is RecipeLiteModel)
-          Text("by ${(recipe as RecipeLiteModel).user.name}",
-              style: Theme.of(context).textTheme.titleSmall),
+          ByUserText(user: (recipe as RecipeLiteModel).user),
         const SizedBox(height: AcSizes.lg),
         Text(recipe.description),
       ],
@@ -130,7 +150,8 @@ class RecipeCard extends StatelessWidget {
                   child: CircleAvatar(
                       radius: AcSizes.avatarRadius,
                       backgroundColor: Theme.of(context).colorScheme.tertiary,
-                      backgroundImage: (recipe as RecipeLiteModel).user.image)),
+                      backgroundImage:
+                          (recipe as RecipeLiteModel).user?.image)),
             )
         ],
       ),
@@ -159,14 +180,13 @@ class RecipeHorizontalCard extends StatelessWidget {
           leading: recipe is RecipeLiteModel
               ? CircleAvatar(
                   backgroundColor: context.colors.tertiary,
-                  backgroundImage: (recipe as RecipeLiteModel).user.image,
+                  backgroundImage: (recipe as RecipeLiteModel).user?.image,
                 )
               : null,
           title: Text(recipe.title,
               style: Theme.of(context).textTheme.titleMedium),
           subtitle: recipe is RecipeLiteModel
-              ? Text("by ${(recipe as RecipeLiteModel).user.name}",
-                  style: Theme.of(context).textTheme.titleSmall)
+              ? ByUserText(user: (recipe as RecipeLiteModel).user)
               : null,
           trailing: MaybeImage(
               image: recipe.image,

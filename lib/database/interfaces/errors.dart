@@ -26,6 +26,9 @@ enum ApiErrorType {
   deleteFailure(
       name: "Delete Failure",
       message: "An error occurred while deleting the resource"),
+  resourceNotFound(
+      name: "Resource Not Found",
+      message: "The resource you're looking for is not available"),
   cleanupFailure(
       name: "Cleanup Failure",
       message: "An error occurred during a scheduled cleanup task"),

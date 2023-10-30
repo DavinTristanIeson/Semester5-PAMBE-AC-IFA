@@ -7,7 +7,7 @@ import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:http/http.dart' as http;
 
 class HttpRecipeManager
-    with HttpControllerMixin
+    with HttpResourceManagerMixin
     implements IRecipeResourceManager {
   @override
   final Uri baseUrl = globalBaseUrl.replace(path: "api");
@@ -23,21 +23,22 @@ class HttpRecipeManager
   }
 
   @override
-  Future<List<RecipeLiteModel>> getAll(
-      {int? page, RecipeSearchState? searchState}) async {
-    final response = await makeNetworkCall(() => http
-        .get(urlOf("recipes", params: searchState?.getApiParams(page: page))));
+  Future<PaginatedQueryResult<RecipeLiteModel>> getAll(
+      {Object? page, RecipeSearchState? searchState}) async {
+    final response = await makeNetworkCall(() => http.get(urlOf("recipes",
+        params: searchState?.getApiParams(page: page as int?))));
     final ApiResult<List<RecipeLiteModel>> res = processHttpResponse(response,
         transform: (json) => (json as List)
                 .cast<Map<String, Object?>>()
                 .map<RecipeLiteModel>((map) {
               return RecipeLiteModel.fromJson(map);
             }).toList());
-    return res.data;
+    return (data: res.data, nextPage: (page as int? ?? 0) + 1);
   }
 
   @override
-  Future<RecipeModel> put(LocalRecipeModel recipe) async {
+  Future<RecipeModel> put(LocalRecipeModel recipe,
+      {required String? userId}) async {
     final response = await makeNetworkCall(() {
       final url = urlOf("recipes");
       final Map<String, String> headers = {

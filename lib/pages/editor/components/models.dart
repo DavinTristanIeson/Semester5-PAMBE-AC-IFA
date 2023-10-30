@@ -51,6 +51,7 @@ class RecipeStepFormType {
               if (value.toggle && value.value == null) {
                 return {AcValidationMessage.imageRequired: true};
               }
+              return null;
             })
           ]),
       RecipeStepFormKeys.timer.name: FormControl<InputToggle<Duration>>(

@@ -31,7 +31,5 @@ class AuthProvider extends ChangeNotifier {
     return userManager.register(payload);
   }
 
-  Future<void> initialize() async {
-    user = await userManager.getMe();
-  }
+  Future<void> initialize() async {}
 }

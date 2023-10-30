@@ -21,9 +21,7 @@ class LocalRecipeController extends ChangeNotifier {
   }
 
   Future<List<LocalRecipeLiteModel>> getAll(
-      {required UserModel user,
-      required RecipeSearchState searchState,
-      int page = 1}) async {
+      {required RecipeSearchState searchState, int page = 1}) async {
     return recipeTable.getAll(
         filter: searchState.filterBy,
         limit: searchState.limit,

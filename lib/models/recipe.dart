@@ -69,7 +69,7 @@ class LocalRecipeLiteModel extends AbstractRecipeLiteModel {
 @JsonSerializable(explicitToJson: true)
 class RecipeLiteModel extends AbstractRecipeLiteModel {
   String id;
-  UserModel user;
+  UserModel? user;
   @override
   ExternalImageSource get imageSource => ExternalImageSource.network;
 
@@ -163,7 +163,6 @@ enum RecipeSortBy {
 
 enum RecipeFilterByType {
   createdByUser,
-  createdByUserName,
   hasBeenViewedBy,
   hasBeenBookmarkedBy,
   local;
@@ -174,27 +173,23 @@ enum RecipeFilterByType {
 
 class RecipeFilterBy {
   String? userId;
-  String? userName;
   bool? viewed;
   RecipeFilterByType type;
   RecipeFilterBy._(this.type);
   RecipeFilterBy.createdByUser(this.userId)
       : type = RecipeFilterByType.createdByUser;
-  RecipeFilterBy.createdByUserName(this.userName)
-      : type = RecipeFilterByType.createdByUserName;
   RecipeFilterBy.viewedBy(this.userId, {this.viewed = true})
       : type = RecipeFilterByType.hasBeenViewedBy;
   RecipeFilterBy.bookmarkedBy(this.userId)
       : type = RecipeFilterByType.hasBeenBookmarkedBy;
   static RecipeFilterBy get local => RecipeFilterBy._(RecipeFilterByType.local);
-  Pair<String, String?> get apiParams {
+  MapEntry<String, String?> get apiParams {
     return switch (type) {
-      RecipeFilterByType.createdByUser => Pair(type.name, userId!),
-      RecipeFilterByType.createdByUserName => Pair(type.name, userName!),
+      RecipeFilterByType.createdByUser => MapEntry(type.name, userId!),
       RecipeFilterByType.hasBeenViewedBy =>
-        Pair(type.name, "${viewed! ? '' : '-'}$userId"),
-      RecipeFilterByType.hasBeenBookmarkedBy => Pair(type.name, userId!),
-      RecipeFilterByType.local => Pair(type.name, null),
+        MapEntry(type.name, "${viewed! ? '' : '-'}$userId"),
+      RecipeFilterByType.hasBeenBookmarkedBy => MapEntry(type.name, userId!),
+      RecipeFilterByType.local => MapEntry(type.name, null),
     };
   }
 }
@@ -237,9 +232,9 @@ class RecipeSearchState {
       params["search"] = search!;
     }
     if (filterBy != null) {
-      Pair<String, dynamic> filters = filterBy!.apiParams;
-      if (filters.second != null) {
-        params["filter[${filters.first}]"] = filters.second.toString();
+      MapEntry<String, dynamic> filters = filterBy!.apiParams;
+      if (filters.value != null) {
+        params["filter[${filters.key}]"] = filters.value.toString();
       }
     }
     return params;

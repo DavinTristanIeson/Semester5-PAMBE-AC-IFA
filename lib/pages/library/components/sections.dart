@@ -55,10 +55,8 @@ class LibraryLocalRecipesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<LocalRecipeController>();
-    final user = context.watch<AuthProvider>().user!;
     return AsyncApiSampleScrollSection(
         future: controller.getAll(
-            user: user,
             searchState: RecipeSearchState(
                 limit: 5, sortBy: SortBy.descending(RecipeSortBy.createdDate))),
         itemBuilder: (context, data) {

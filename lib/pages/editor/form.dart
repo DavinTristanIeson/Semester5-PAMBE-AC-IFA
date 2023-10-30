@@ -106,7 +106,6 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
       // ignore: use_build_context_synchronously
       sendSuccess(context, "$title has been saved locally.");
     } catch (e) {
-      print(e);
       // ignore: use_build_context_synchronously
       sendError(context, e.toString());
     }
@@ -128,8 +127,10 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
                     context.read<RecipeController>();
                 LocalRecipeController localController =
                     context.read<LocalRecipeController>();
+                final userId = context.read<AuthProvider>().user!.id;
                 try {
-                  final recipe = await remoteController.put(widget.recipe!);
+                  final recipe = await remoteController.put(widget.recipe!,
+                      userId: userId);
                   await localController.setRemoteId(
                       widget.recipe!.id, recipe.id);
                   widget.onChanged(widget.recipe!.withRemoteId(null));

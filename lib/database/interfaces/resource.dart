@@ -14,25 +14,38 @@ typedef RegisterPayload = ({
   XFile? image,
 });
 
-abstract class IImageResourceManager {
+abstract class ILocalImageResourceManager {
   Future<File?> get(String imagePath);
   Future<List<String>> getAll();
   Future<File?> put(XFile? resource, {String? former});
   Future<void> process(Map<String, XFile?> resources);
-  Future<MapEntry<String, XFile>> reserve(XFile resource);
+  FutureOr<MapEntry<String, XFile>> reserve(XFile resource);
+  Future<void> remove(String imagePath);
+}
+
+abstract class INetworkImageResourceManager {
+  Future<String?> put(XFile image, {String? former, required String userId});
+  Future<void> process(Map<String, XFile?> resources, {required String userId});
+  FutureOr<MapEntry<String, XFile>> reserve(XFile resource,
+      {required String userId});
   Future<void> remove(String imagePath);
 }
 
 abstract class IUserResourceManager {
   Future<UserModel> login(LoginPayload payload);
   Future<UserModel> register(RegisterPayload payload);
-  Future<UserModel> getMe();
+  Future<UserModel?> get(String id);
 }
 
+typedef PaginatedQueryResult<T> = ({List<T> data, dynamic nextPage});
+
 abstract class IRecipeResourceManager {
-  Future<List<RecipeLiteModel>> getAll(
-      {int? page, RecipeSearchState? searchState});
-  Future<RecipeModel> get(String id);
-  Future<RecipeModel> put(LocalRecipeModel recipe);
+  Future<PaginatedQueryResult<RecipeLiteModel>> getAll(
+      {Object? page, RecipeSearchState? searchState});
+  Future<RecipeModel?> get(String id);
+  Future<RecipeModel> put(
+    LocalRecipeModel recipe, {
+    required String userId,
+  });
   Future<void> remove(String id);
 }
