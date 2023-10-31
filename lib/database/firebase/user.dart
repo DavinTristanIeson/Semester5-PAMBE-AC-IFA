@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/interfaces/firebase.dart';
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
@@ -18,7 +19,8 @@ class FirebaseUserManager
     implements IUserResourceManager {
   static const String collectionPath = "users";
   FirebaseFirestore db;
-  FirebaseUserManager(this.db);
+  CacheClient cache;
+  FirebaseUserManager(this.db) : cache = CacheClient();
 
   @override
   Future<UserModel?> get(String id) async {
@@ -37,5 +39,10 @@ class FirebaseUserManager
   Future<UserModel> login(LoginPayload payload) {
     // TODO: implement login
     throw UnimplementedError();
+  }
+
+  @override
+  void dispose() {
+    cache.dispose();
   }
 }

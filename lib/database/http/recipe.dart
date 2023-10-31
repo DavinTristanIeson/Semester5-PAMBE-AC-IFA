@@ -63,4 +63,7 @@ class HttpRecipeManager
         await makeNetworkCall(() => http.delete(urlOf("recipes/$id")));
     processHttpResponse(response, transform: (json) => null);
   }
+
+  @override
+  void dispose() {}
 }

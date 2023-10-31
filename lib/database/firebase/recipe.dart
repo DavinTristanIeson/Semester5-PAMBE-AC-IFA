@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/firebase/user.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/firebase.dart';
@@ -22,17 +23,36 @@ class FirebaseRecipeManager
   static const String collectionPath = "recipes";
   FirebaseFirestore db;
   FirebaseUserManager userManager;
-  FirebaseRecipeManager(this.db, {required this.userManager});
+  CacheClient<RecipeModel> cache;
+  CacheClient<PaginatedQueryResult<RecipeLiteModel>> queryCache;
+  FirebaseRecipeManager(this.db, {required this.userManager})
+      : cache = CacheClient(),
+        queryCache = CacheClient(
+            cleanupInterval: const Duration(minutes: 1, seconds: 30),
+            staleTime: const Duration(minutes: 1),
+            cacheTime: const Duration(minutes: 2));
+
+  String keyOfRecipeQuery(
+      {QueryDocumentSnapshot? page, RecipeSearchState? searchState}) {
+    return "${searchState?.getApiParams() ?? ''};${page?.id ?? ''}";
+  }
 
   @override
   Future<RecipeModel?> get(String id) async {
-    return processDocumentSnapshot(
+    if (cache.has(id)) {
+      return Future.value(cache.get(id));
+    }
+    final result = await processDocumentSnapshot(
         () => db.collection(collectionPath).doc(id).get(),
         transform: (data) => RecipeModel.fromJson(data));
+    cache.put(id, result);
+    return result;
   }
 
   Future<PaginatedQueryResult<RecipeLiteModel>> getRegularRecipes(
       {QueryDocumentSnapshot? page, RecipeSearchState? searchState}) async {
+    final queryKey = keyOfRecipeQuery(page: page, searchState: searchState);
+
     var query = db.collection(collectionPath).limit(searchState?.limit ?? 15);
     if (page != null) {
       query = query.startAfter([page]);
@@ -61,12 +81,17 @@ class FirebaseRecipeManager
       }
     }
 
-    return processQuerySnapshot(() => query.get(), transform: (json) {
+    final result =
+        await processQuerySnapshot(() => query.get(), transform: (json) {
       return RecipeLiteModel.fromJson({
         ...json,
         "user": userManager.get(json[RecipeFirestoreKeys.userId.name]),
       });
     });
+
+    queryCache.put(queryKey, result);
+
+    return result;
   }
 
   @override
@@ -93,6 +118,8 @@ class FirebaseRecipeManager
     } catch (e) {
       throw ApiError(ApiErrorType.storeFailure, inner: e);
     }
+    queryCache.clear();
+    cache.markStale(key: id);
     return (await get(id))!;
   }
 
@@ -100,8 +127,16 @@ class FirebaseRecipeManager
   Future<void> remove(String id) async {
     try {
       await db.collection(collectionPath).doc(id).delete();
+      queryCache.clear();
+      cache.markStale(key: id);
     } catch (e) {
       throw ApiError(ApiErrorType.deleteFailure, inner: e);
     }
+  }
+
+  @override
+  void dispose() {
+    cache.dispose();
+    queryCache.dispose();
   }
 }

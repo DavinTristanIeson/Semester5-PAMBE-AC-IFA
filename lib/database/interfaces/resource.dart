@@ -35,6 +35,8 @@ abstract class IUserResourceManager {
   Future<UserModel> login(LoginPayload payload);
   Future<UserModel> register(RegisterPayload payload);
   Future<UserModel?> get(String id);
+
+  void dispose();
 }
 
 typedef PaginatedQueryResult<T> = ({List<T> data, dynamic nextPage});
@@ -48,4 +50,6 @@ abstract class IRecipeResourceManager {
     required String userId,
   });
   Future<void> remove(String id);
+
+  void dispose();
 }

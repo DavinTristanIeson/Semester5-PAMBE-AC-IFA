@@ -36,4 +36,10 @@ class RecipeController extends ChangeNotifier {
     await recipeManager.remove(id);
     notifyListeners();
   }
+
+  @override
+  void dispose() {
+    recipeManager.dispose();
+    super.dispose();
+  }
 }

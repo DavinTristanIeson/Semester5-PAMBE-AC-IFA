@@ -32,4 +32,10 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> initialize() async {}
+
+  @override
+  void dispose() {
+    userManager.dispose();
+    super.dispose();
+  }
 }
