@@ -5,7 +5,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
-import 'package:path/path.dart';
 
 const String globalFirebaseImageStoragePathRoot = "images";
 
@@ -14,12 +13,16 @@ class FirebaseImageManager implements INetworkImageResourceManager {
   final String storagePath;
   FirebaseImageManager(this.db, {required this.storagePath});
 
-  String getImageStoragePath() {
-    return join(globalFirebaseImageStoragePathRoot, storagePath);
+  Reference getImageStorageReference() {
+    return db
+        .ref()
+        .child(globalFirebaseImageStoragePathRoot)
+        .child(storagePath);
   }
 
-  String getFilename({required String name, required String userId}) {
-    return '${userId}_$name';
+  Reference getFilename({required String name, required String userId}) {
+    final fileName = '${userId}_$name';
+    return getImageStorageReference().child(fileName);
   }
 
   @override
@@ -38,13 +41,12 @@ class FirebaseImageManager implements INetworkImageResourceManager {
     if (resource == null) {
       return null;
     }
-    final resourceName = join(getImageStoragePath(),
-        getFilename(name: resource.name, userId: userId));
-    if (resourceName == former) {
-      return resourceName;
+    final firebaseResource = getFilename(name: resource.name, userId: userId);
+    if (firebaseResource.fullPath == former) {
+      return firebaseResource.fullPath;
     }
-    await db.ref().child(resourceName).putFile(File(resource.path));
-    return resourceName;
+    await firebaseResource.putFile(File(resource.path));
+    return firebaseResource.fullPath;
   }
 
   @override
@@ -60,8 +62,6 @@ class FirebaseImageManager implements INetworkImageResourceManager {
   FutureOr<MapEntry<String, XFile>> reserve(XFile resource,
       {required String userId}) {
     return MapEntry(
-        join(getImageStoragePath(),
-            getFilename(name: resource.name, userId: userId)),
-        resource);
+        getFilename(name: resource.name, userId: userId).fullPath, resource);
   }
 }

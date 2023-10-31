@@ -6,11 +6,23 @@ import 'package:pambe_ac_ifa/database/interfaces/firebase.dart';
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 
+enum RecipeStepFirestoreKeys {
+  content,
+  type,
+  timer,
+  imagePath;
+
+  @override
+  toString() => name;
+}
+
 enum RecipeFirestoreKeys {
   title,
   userId,
   createdAt,
+  imagePath,
   ratings,
+  steps,
   description;
 
   @override
@@ -42,25 +54,29 @@ class FirebaseRecipeManager
     if (cache.has(id)) {
       return Future.value(cache.get(id));
     }
-    final result = await processDocumentSnapshot(
+    final (:data, snapshot: _) = await processDocumentSnapshot(
         () => db.collection(collectionPath).doc(id).get(),
-        transform: (data) => RecipeModel.fromJson(data));
-    cache.put(id, result);
-    return result;
+        transform: (data, snapshot) async => RecipeModel.fromJson({
+              ...data,
+              "id": snapshot.id,
+              "user":
+                  await userManager.get(data[RecipeFirestoreKeys.userId.name])
+            }));
+    cache.put(id, data);
+    return data;
   }
 
   Future<PaginatedQueryResult<RecipeLiteModel>> getRegularRecipes(
       {QueryDocumentSnapshot? page, RecipeSearchState? searchState}) async {
     final queryKey = keyOfRecipeQuery(page: page, searchState: searchState);
+    if (queryCache.has(queryKey)) {
+      return Future.value(queryCache.get(queryKey));
+    }
 
     var query = db.collection(collectionPath).limit(searchState?.limit ?? 15);
-    if (page != null) {
-      query = query.startAfter([page]);
-    }
     if (searchState?.search != null) {
-      query = query.where(RecipeFirestoreKeys.title,
-          isLessThan: '${searchState!.search!}\uf8ff',
-          isGreaterThan: searchState.search!);
+      query = query.where(RecipeFirestoreKeys.title.name,
+          isEqualTo: searchState!.search);
     }
     if (searchState?.sortBy != null) {
       var sortBy = switch (searchState!.sortBy.factor) {
@@ -70,7 +86,12 @@ class FirebaseRecipeManager
       };
       if (sortBy != null) {
         query = query.orderBy(sortBy.name);
+      } else {
+        query = query.orderBy(FieldPath.documentId);
       }
+    }
+    if (page != null) {
+      query = query.startAfter([page.id]);
     }
     if (searchState?.filterBy != null) {
       switch (searchState!.filterBy!.type) {
@@ -81,13 +102,15 @@ class FirebaseRecipeManager
       }
     }
 
-    final result =
-        await processQuerySnapshot(() => query.get(), transform: (json) {
+    final (:data, :snapshot) = await processQuerySnapshot(() => query.get(),
+        transform: (json, snapshot) async {
       return RecipeLiteModel.fromJson({
         ...json,
-        "user": userManager.get(json[RecipeFirestoreKeys.userId.name]),
+        "id": snapshot.id,
+        "user": await userManager.get(json[RecipeFirestoreKeys.userId.name]),
       });
     });
+    final result = (data: data, nextPage: snapshot.docs.lastOrNull);
 
     queryCache.put(queryKey, result);
 
@@ -98,13 +121,14 @@ class FirebaseRecipeManager
   Future<PaginatedQueryResult<RecipeLiteModel>> getAll(
       {Object? page, RecipeSearchState? searchState}) async {
     return getRegularRecipes(
-        page: page as QueryDocumentSnapshot, searchState: searchState);
+        page: page as QueryDocumentSnapshot?, searchState: searchState);
   }
 
   @override
   Future<RecipeModel> put(LocalRecipeModel recipe,
       {required String userId}) async {
     final json = recipe.toJson();
+    json.remove("user");
     json[RecipeFirestoreKeys.userId.name] = userId;
     String id;
     try {

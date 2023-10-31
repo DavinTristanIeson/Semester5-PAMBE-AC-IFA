@@ -38,12 +38,12 @@ class LibraryBookmarkedRecipesSection extends StatelessWidget {
         },
         itemConstraints:
             BoxConstraints.tight(RecipeCard.getDefaultImageSize(context)),
-        header: Either.right("Recents"),
+        header: Either.right("Bookmarks"),
         viewMoreButton: Either.right(() {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => SearchScreen(
-                    sortBy: SortBy.descending(RecipeSortBy.lastViewed),
-                    filterBy: RecipeFilterBy.viewedBy(userId, viewed: true),
+                    sortBy: SortBy.descending(RecipeSortBy.bookmarkedDate),
+                    filterBy: RecipeFilterBy.bookmarkedBy(userId),
                   )));
         }));
   }

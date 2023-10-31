@@ -31,12 +31,10 @@ class RecipeInfoScreen extends StatelessWidget {
             ConstrainedBox(
                 constraints: BoxConstraints.tightFor(
                     width: double.maxFinite, height: imageHeight),
-                child: recipe.image == null
-                    ? null
-                    : AcImageContainer(
-                        borderRadius: const BorderRadius.only(
-                            topLeft: AcSizes.br, topRight: AcSizes.br),
-                        child: MaybeImage(image: recipe.image!))),
+                child: AcImageContainer(
+                    borderRadius: const BorderRadius.only(
+                        topLeft: AcSizes.br, topRight: AcSizes.br),
+                    child: MaybeImage(image: recipe.image))),
             Container(
                 decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primary,

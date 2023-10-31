@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
-import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 
 mixin FirebaseResourceManagerMixin {
-  Future<T> processDocumentSnapshot<T>(
-    Future<DocumentSnapshot<Map<String, dynamic>>> Function() query, {
-    required T Function(Map<String, dynamic> data) transform,
+  Future<({T data, DocumentSnapshot snapshot})> processDocumentSnapshot<T>(
+    Future<DocumentSnapshot> Function() query, {
+    required Future<T> Function(
+            Map<String, dynamic> data, DocumentSnapshot snapshot)
+        transform,
   }) async {
-    DocumentSnapshot<Map<String, dynamic>> snapshot;
+    DocumentSnapshot snapshot;
     try {
       snapshot = await query();
     } on FirebaseException catch (e) {
@@ -17,17 +18,23 @@ mixin FirebaseResourceManagerMixin {
       throw ApiError(ApiErrorType.resourceNotFound);
     }
     try {
-      return transform(snapshot.data()!);
+      return (
+        data:
+            await transform(snapshot.data() as Map<String, dynamic>, snapshot),
+        snapshot: snapshot
+      );
     } catch (e) {
       throw ApiError(ApiErrorType.shapeMismatch, inner: e);
     }
   }
 
-  Future<PaginatedQueryResult<T>> processQuerySnapshot<T>(
-    Future<QuerySnapshot<Map<String, dynamic>>> Function() query, {
-    required T Function(Map<String, dynamic> data) transform,
+  Future<({List<T> data, QuerySnapshot snapshot})> processQuerySnapshot<T>(
+    Future<QuerySnapshot> Function() query, {
+    required Future<T> Function(
+            Map<String, dynamic> data, QueryDocumentSnapshot snapshot)
+        transform,
   }) async {
-    QuerySnapshot<Map<String, dynamic>> snapshot;
+    QuerySnapshot snapshot;
     try {
       snapshot = await query();
     } on FirebaseException catch (e) {
@@ -35,18 +42,18 @@ mixin FirebaseResourceManagerMixin {
     }
     try {
       return (
-        data: snapshot.docs
-            .map((e) {
-              try {
-                return transform(e.data());
-              } catch (e) {
-                return null;
-              }
-            })
-            .where((e) => e != null)
-            .cast<T>()
+        data: (await Future.wait<T>(snapshot.docs
+                .map((doc) {
+                  try {
+                    return transform(doc.data() as Map<String, dynamic>, doc);
+                  } catch (e) {
+                    return null;
+                  }
+                })
+                .where((e) => e != null)
+                .cast<Future<T>>()))
             .toList(),
-        nextPage: snapshot.docs.lastOrNull
+        snapshot: snapshot,
       );
     } catch (e) {
       throw ApiError(ApiErrorType.shapeMismatch, inner: e);

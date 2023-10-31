@@ -78,12 +78,10 @@ class LocalRecipeStepModel extends AbstractRecipeStepModel
 @JsonSerializable(explicitToJson: true)
 class RecipeStepModel extends AbstractRecipeStepModel
     with SupportsLocalAndOnlineImagesMixin {
-  String id;
   @override
   ExternalImageSource? get imageSource => ExternalImageSource.network;
 
   RecipeStepModel({
-    required this.id,
     required super.content,
     super.type,
     super.timer,

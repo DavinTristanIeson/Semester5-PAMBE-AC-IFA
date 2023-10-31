@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
@@ -15,6 +16,30 @@ class _SearchScreenBody extends StatelessWidget {
   final PagingController<dynamic, AbstractRecipeLiteModel> controller;
   const _SearchScreenBody({required this.controller, required this.isLocal});
 
+  Widget buildError(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(AcSizes.space),
+      child: Column(
+        children: [
+          Text(controller.error.toString(),
+              textAlign: TextAlign.center,
+              style: context.texts.bodyMedium!
+                  .copyWith(color: context.colors.error)),
+          Text(
+            "An error has occured while fetching data. You can try again by pressing the button below.",
+            textAlign: TextAlign.center,
+            style: context.texts.bodyLarge!.copyWith(
+                fontWeight: FontWeight.bold, color: context.colors.primary),
+          ),
+          IconButton(
+              onPressed: controller.refresh,
+              color: context.colors.primary,
+              icon: const Icon(Icons.refresh))
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PagedListView<dynamic, AbstractRecipeLiteModel>(
@@ -25,6 +50,12 @@ class _SearchScreenBody extends StatelessWidget {
                 padding: const EdgeInsets.all(AcSizes.space),
                 child: EmptyView(content: Either.right("No recipes found")),
               );
+            },
+            newPageErrorIndicatorBuilder: (context) {
+              return buildError(context);
+            },
+            firstPageErrorIndicatorBuilder: (context) {
+              return buildError(context);
             },
             itemBuilder: (context, item, index) => Padding(
                 padding: const EdgeInsets.symmetric(
@@ -57,11 +88,15 @@ class _SearchScreenBodyState extends State<SearchScreenBody> {
                 ? 1
                 : null);
     _pagination.addPageRequestListener((pageKey) async {
-      final (:data, :nextPage) = await fetch(widget.searchState, pageKey);
-      if (nextPage == null) {
-        _pagination.appendLastPage(data);
-      } else {
-        _pagination.appendPage(data, nextPage);
+      try {
+        final (:data, :nextPage) = await fetch(widget.searchState, pageKey);
+        if (nextPage == null) {
+          _pagination.appendLastPage(data);
+        } else {
+          _pagination.appendPage(data, nextPage);
+        }
+      } catch (e) {
+        _pagination.error = e;
       }
     });
     super.initState();

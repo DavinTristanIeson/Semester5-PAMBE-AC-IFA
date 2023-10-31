@@ -40,7 +40,7 @@ class CacheClient<T> {
 
   void put(
     String key,
-    dynamic value, {
+    T value, {
     Duration? staleTime,
     Duration? cacheTime,
   }) {

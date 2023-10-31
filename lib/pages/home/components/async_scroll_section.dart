@@ -29,7 +29,7 @@ class AsyncApiSampleScrollSection<T> extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(future: future.catchError((error) {
-      sendError(context, error.toString());
+      sendError(context, error.toString(), override: true);
       return Future<List<T>>.value([]);
     }), builder: (context, snapshot) {
       final data = snapshot.data;

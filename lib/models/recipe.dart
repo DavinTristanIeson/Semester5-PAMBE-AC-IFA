@@ -66,9 +66,26 @@ class LocalRecipeLiteModel extends AbstractRecipeLiteModel {
   Map<String, dynamic> toJson() => _$LocalRecipeLiteModelToJson(this);
 }
 
+String? _$userPropertyToJson(dynamic json) {
+  return (json as UserModel?)?.id;
+}
+
+UserModel? _$userPropertyFromJson(dynamic json) {
+  if (json is UserModel || json == null) {
+    return json;
+  } else {
+    return UserModel.fromJson(json);
+  }
+}
+
 @JsonSerializable(explicitToJson: true)
 class RecipeLiteModel extends AbstractRecipeLiteModel {
+  @JsonKey(includeToJson: false)
   String id;
+  @JsonKey(
+    toJson: _$userPropertyToJson,
+    fromJson: _$userPropertyFromJson,
+  )
   UserModel? user;
   @override
   ExternalImageSource get imageSource => ExternalImageSource.network;

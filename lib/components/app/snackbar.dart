@@ -13,9 +13,12 @@ mixin SnackbarMessenger {
     });
   }
 
-  void sendError(BuildContext context, String message) {
+  void sendError(BuildContext context, String message, {bool? override}) {
     ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
     SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (override == true) {
+        messenger.clearSnackBars();
+      }
       messenger.showSnackBar(SnackBar(
         behavior: SnackBarBehavior.floating,
         content: Text(message,

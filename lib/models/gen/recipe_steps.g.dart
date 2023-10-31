@@ -49,7 +49,6 @@ Json? _$JsonConverterToJson<Json, Value>(
 
 RecipeStepModel _$RecipeStepModelFromJson(Map<String, dynamic> json) =>
     RecipeStepModel(
-      id: json['id'] as String,
       content: json['content'] as String,
       type: $enumDecodeNullable(_$RecipeStepVariantEnumMap, json['type']) ??
           RecipeStepVariant.regular,
@@ -65,5 +64,4 @@ Map<String, dynamic> _$RecipeStepModelToJson(RecipeStepModel instance) =>
       'timer': _$JsonConverterToJson<int, Duration>(
           instance.timer, const JsonDurationConverter().toJson),
       'imagePath': instance.imagePath,
-      'id': instance.id,
     };

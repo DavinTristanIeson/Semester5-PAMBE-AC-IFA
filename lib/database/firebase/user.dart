@@ -5,7 +5,6 @@ import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 
 enum UserFirestoreKeys {
-  id,
   name,
   email,
   imagePath;
@@ -19,14 +18,23 @@ class FirebaseUserManager
     implements IUserResourceManager {
   static const String collectionPath = "users";
   FirebaseFirestore db;
-  CacheClient cache;
+  CacheClient<UserModel> cache;
   FirebaseUserManager(this.db) : cache = CacheClient();
 
   @override
   Future<UserModel?> get(String id) async {
-    return processDocumentSnapshot(
+    final cachedItem = cache.get(id);
+    if (cachedItem != null) {
+      return cachedItem;
+    }
+    final (:data, snapshot: _) = await processDocumentSnapshot(
         () => db.collection(collectionPath).doc(id).get(),
-        transform: UserModel.fromJson);
+        transform: (json, snapshot) => Future.value(UserModel.fromJson({
+              ...json,
+              "id": snapshot.id,
+            })));
+    cache.put(data.id, data);
+    return data;
   }
 
   @override
