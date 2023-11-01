@@ -27,66 +27,60 @@ class LocalRecipeImageManager {
     }
   }
 
+  /// Mutates ``steps``.
   Future<
       ({
         Map<String, XFile?> reserved,
         String? image,
-        List<RecipeStepFormType> steps,
       })> markRecipeImagesForStorage({
     XFile? image,
     LocalRecipeModel? former,
     required List<RecipeStepFormType> steps,
   }) async {
-    List<MapEntry<String, XFile?>> reserved = [];
-    Map<String, String> modifiedStepFiles = {};
+    Map<String, XFile?> reserved = {};
+
     String? recipeImage;
-    if (image != null && image.path != former?.imagePath) {
-      final entry = await imageManager.reserve(image);
-      recipeImage = entry.key;
-      reserved.add(entry);
+    if (image?.path != former?.imagePath) {
+      if (image != null) {
+        final entry = await imageManager.reserve(image);
+        recipeImage = entry.key;
+        reserved.addEntry(entry);
+      }
       if (former?.imagePath != null) {
-        reserved.add(MapEntry(former!.imagePath!, null));
+        reserved[former!.imagePath!] = null;
       }
     }
 
-    final formerSteps = former?.steps ?? [];
-    final [newSteps, existingSteps] = steps.categorize((step) {
-      if (step.image == null) return null;
-      return step.id == null ? 0 : 1;
-    }, 2);
-
-    final changedSteps = existingSteps.where((existingStep) {
-      return formerSteps.exists((formerStep) {
-        if (formerStep.id != existingStep.id) return false;
-        return formerStep.imagePath != existingStep.image?.path;
-      });
-    });
-
-    if (newSteps.isNotEmpty) {
-      final fileNames = await Future.wait(newSteps
-          .where((e) => e.image != null)
-          .map((e) => Future.value(imageManager.reserve(e.image!))));
-      modifiedStepFiles
-          .addEntries(fileNames.map((e) => MapEntry(e.value.path, e.key)));
-      reserved.addAll(fileNames);
+    Map<int, RecipeStepFormType> stepsThatMightveChangedImages = {};
+    for (final step in steps) {
+      if (step.image == null) continue;
+      if (step.id == null) {
+        final entry = await imageManager.reserve(step.image!);
+        reserved.addEntry(entry);
+        step.image = XFile(entry.key);
+      } else {
+        stepsThatMightveChangedImages[step.id!] = step;
+      }
     }
-    if (changedSteps.isNotEmpty) {
-      final fileNames = await Future.wait(changedSteps
-          .where((e) => e.image != null)
-          .map((e) => Future.value(imageManager.reserve(e.image!))));
-      modifiedStepFiles
-          .addEntries(fileNames.map((e) => MapEntry(e.value.path, e.key)));
-      reserved.addAll(fileNames);
+    if (former != null) {
+      for (final step in former.steps) {
+        if (step.image == null ||
+            !stepsThatMightveChangedImages.containsKey(step.id)) {
+          continue;
+        }
+        final updatedStep = stepsThatMightveChangedImages[step.id];
+        if (updatedStep!.image!.path != step.imagePath) {
+          reserved[step.imagePath!] = null;
+          final entry = await imageManager
+              .reserve(stepsThatMightveChangedImages[step.id]!.image!);
+          reserved.addEntry(entry);
+          updatedStep.image = XFile(entry.key);
+        }
+      }
     }
     return (
-      reserved: Map.fromEntries(reserved),
+      reserved: reserved,
       image: recipeImage,
-      steps: steps.map((e) {
-        if (e.image != null && modifiedStepFiles.containsKey(e.image!.path)) {
-          e.image = XFile(modifiedStepFiles[e.image!.path]!);
-        }
-        return e;
-      }).toList(),
     );
   }
 

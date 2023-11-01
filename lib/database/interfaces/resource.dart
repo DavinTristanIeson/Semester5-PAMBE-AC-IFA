@@ -24,7 +24,8 @@ abstract class ILocalImageResourceManager {
 }
 
 abstract class INetworkImageResourceManager {
-  Future<String?> put(XFile image, {String? former, required String userId});
+  String getFilePath({required String userId, required String name});
+  Future<String?> put(XFile? image, {String? former, required String userId});
   Future<void> process(Map<String, XFile?> resources, {required String userId});
   FutureOr<MapEntry<String, XFile>> reserve(XFile resource,
       {required String userId});

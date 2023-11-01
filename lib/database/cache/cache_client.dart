@@ -63,7 +63,7 @@ class CacheClient<T> {
   /// Set includeStale to true to include stale data
   bool has(String key, {bool includeStale = false}) {
     CacheItem? cachedItem = _cache[key];
-    return cachedItem != null && (!cachedItem.isStale || includeStale);
+    return _cache.containsKey(key) && (!cachedItem!.isStale || includeStale);
   }
 
   /// If ``key`` exists, mark a specific item with that key as stale.
@@ -81,10 +81,7 @@ class CacheClient<T> {
       }
     }
     if (prefix != null) {
-      for (final MapEntry(:key) in _cache.entries
-          .where((element) => element.key.startsWith(prefix))) {
-        _cache.remove(key);
-      }
+      _cache.removeWhere((key, value) => key.startsWith(prefix));
     }
   }
 
@@ -93,10 +90,7 @@ class CacheClient<T> {
   }
 
   void cleanupCache() {
-    for (final MapEntry(:key)
-        in _cache.entries.where((entry) => entry.value.isStale)) {
-      _cache.remove(key);
-    }
+    _cache.removeWhere((key, value) => value.isStale);
   }
 
   void dispose() {

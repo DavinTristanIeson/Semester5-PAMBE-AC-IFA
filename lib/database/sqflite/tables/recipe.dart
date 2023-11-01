@@ -101,9 +101,8 @@ class RecipeTable {
     if (id != null) {
       former = await get(id);
     }
-    final (image: recipeImage, steps: recipeSteps, :reserved) =
-        await imageManager.markRecipeImagesForStorage(
-            steps: steps, former: former, image: image);
+    final (image: recipeImage, :reserved) = await imageManager
+        .markRecipeImagesForStorage(steps: steps, former: former, image: image);
     int lastId = await db.transaction((txn) async {
       int lastId;
       Map<String, dynamic> data = {
@@ -119,7 +118,7 @@ class RecipeTable {
             where: "${_RecipeColumns.id.name} = ?", whereArgs: [id]);
         lastId = id;
       }
-      await stepsController.putMany(txn, recipeId: lastId, steps: recipeSteps);
+      await stepsController.putMany(txn, recipeId: lastId, steps: steps);
       return lastId;
     });
     await imageManager.imageManager.process(reserved);

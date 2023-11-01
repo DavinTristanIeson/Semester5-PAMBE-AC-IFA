@@ -20,7 +20,7 @@ class FirebaseImageManager implements INetworkImageResourceManager {
         .child(storagePath);
   }
 
-  Reference getFilename({required String name, required String userId}) {
+  Reference getFileReference({required String name, required String userId}) {
     final fileName = '${userId}_$name';
     return getImageStorageReference().child(fileName);
   }
@@ -41,7 +41,8 @@ class FirebaseImageManager implements INetworkImageResourceManager {
     if (resource == null) {
       return null;
     }
-    final firebaseResource = getFilename(name: resource.name, userId: userId);
+    final firebaseResource =
+        getFileReference(name: resource.name, userId: userId);
     if (firebaseResource.fullPath == former) {
       return firebaseResource.fullPath;
     }
@@ -62,6 +63,12 @@ class FirebaseImageManager implements INetworkImageResourceManager {
   FutureOr<MapEntry<String, XFile>> reserve(XFile resource,
       {required String userId}) {
     return MapEntry(
-        getFilename(name: resource.name, userId: userId).fullPath, resource);
+        getFileReference(name: resource.name, userId: userId).fullPath,
+        resource);
+  }
+
+  @override
+  String getFilePath({required String userId, required String name}) {
+    return getFileReference(name: name, userId: userId).fullPath;
   }
 }

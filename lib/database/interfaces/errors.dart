@@ -23,6 +23,10 @@ enum ApiErrorType {
   storeFailure(
       name: "Store Failure",
       message: "An error occurred while storing the resource"),
+  imageManagementFailure(
+      name: "Image Management Failure",
+      message:
+          "An error occurred while storing/updating/deleting images on the server"),
   deleteFailure(
       name: "Delete Failure",
       message: "An error occurred while deleting the resource"),

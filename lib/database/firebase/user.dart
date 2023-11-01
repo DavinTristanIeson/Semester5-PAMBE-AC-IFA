@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
+import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/firebase.dart';
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
@@ -23,18 +24,25 @@ class FirebaseUserManager
 
   @override
   Future<UserModel?> get(String id) async {
-    final cachedItem = cache.get(id);
-    if (cachedItem != null) {
-      return cachedItem;
+    if (cache.has(id)) {
+      return cache.get(id);
     }
-    final (:data, snapshot: _) = await processDocumentSnapshot(
-        () => db.collection(collectionPath).doc(id).get(),
-        transform: (json, snapshot) => Future.value(UserModel.fromJson({
-              ...json,
-              "id": snapshot.id,
-            })));
-    cache.put(data.id, data);
-    return data;
+    try {
+      final (:data, snapshot: _) = await processDocumentSnapshot(
+          () => db.collection(collectionPath).doc(id).get(),
+          transform: (json, snapshot) => Future.value(UserModel.fromJson({
+                ...json,
+                "id": snapshot.id,
+              })));
+      cache.put(data.id, data);
+      return data;
+    } on ApiError catch (e) {
+      if (e.type == ApiErrorType.resourceNotFound) {
+        return null;
+      } else {
+        rethrow;
+      }
+    }
   }
 
   @override
