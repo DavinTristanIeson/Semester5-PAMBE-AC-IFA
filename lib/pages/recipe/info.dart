@@ -3,6 +3,7 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
+import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
 import 'package:pambe_ac_ifa/components/display/review_card.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
@@ -11,10 +12,14 @@ import 'package:pambe_ac_ifa/pages/recipe/viewer.dart';
 import 'package:pambe_ac_ifa/pages/reviews/main.dart';
 
 class RecipeInfoScreen extends StatelessWidget {
-  final RecipeModel recipe;
+  final AbstractRecipeLiteModel recipe;
+  final List<AbstractRecipeStepModel> steps;
   final List<ReviewModel> reviews;
   const RecipeInfoScreen(
-      {super.key, required this.recipe, required this.reviews});
+      {super.key,
+      required this.recipe,
+      required this.reviews,
+      required this.steps});
 
   Widget buildTitle(BuildContext context) {
     // info required to position user avatar
@@ -26,12 +31,10 @@ class RecipeInfoScreen extends StatelessWidget {
             ConstrainedBox(
                 constraints: BoxConstraints.tightFor(
                     width: double.maxFinite, height: imageHeight),
-                child: recipe.image == null
-                    ? null
-                    : AcImageContainer(
-                        borderRadius: const BorderRadius.only(
-                            topLeft: AcSizes.br, topRight: AcSizes.br),
-                        child: MaybeImage(image: recipe.image!))),
+                child: AcImageContainer(
+                    borderRadius: const BorderRadius.only(
+                        topLeft: AcSizes.br, topRight: AcSizes.br),
+                    child: MaybeImage(image: recipe.image))),
             Container(
                 decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primary,
@@ -52,30 +55,34 @@ class RecipeInfoScreen extends StatelessWidget {
                               .titleLarge!
                               .copyWith(fontWeight: FontWeight.bold),
                         ),
-                        Text("by ${recipe.user.name}",
-                            style: AcTypography.importantDescription)
+                        if (recipe is RecipeLiteModel)
+                          ByUserText(
+                            user: (recipe as RecipeLiteModel).user,
+                            style: AcTypography.importantDescription,
+                          ),
                       ],
                     ),
                   ],
                 )),
           ],
         ),
-        Positioned(
-          right: AcSizes.space,
-          top: imageHeight - AcSizes.avatarRadius,
-          child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                    color: Theme.of(context).colorScheme.primary,
-                    width: AcSizes.md),
-              ),
-              child: CircleAvatar(
-                radius: AcSizes.avatarRadius,
-                backgroundColor: Theme.of(context).colorScheme.tertiary,
-                backgroundImage: recipe.user.image,
-              )),
-        ),
+        if (recipe is RecipeLiteModel)
+          Positioned(
+            right: AcSizes.space,
+            top: imageHeight - AcSizes.avatarRadius,
+            child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: AcSizes.md),
+                ),
+                child: CircleAvatar(
+                  radius: AcSizes.avatarRadius,
+                  backgroundColor: Theme.of(context).colorScheme.tertiary,
+                  backgroundImage: (recipe as RecipeLiteModel).user?.image,
+                )),
+          ),
       ],
     );
   }
@@ -97,7 +104,7 @@ class RecipeInfoScreen extends StatelessWidget {
     );
   }
 
-  Row buildSeeReviewsButton(BuildContext context) {
+  Row buildSeeReviewsButton(BuildContext context, String recipeId) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -114,7 +121,7 @@ class RecipeInfoScreen extends StatelessWidget {
             onPressed: () {
               context.navigator.push(MaterialPageRoute(
                   builder: (context) => ReviewScreen(
-                        recipeId: recipe.id,
+                        recipeId: recipeId,
                       )));
             },
             iconSize: AcSizes.lg,
@@ -142,7 +149,8 @@ class RecipeInfoScreen extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => RecipeViewerScreen(recipe: recipe)));
+              builder: (context) =>
+                  RecipeViewerScreen(recipe: recipe, steps: steps)));
         },
         style: ElevatedButton.styleFrom(
             fixedSize: Size(MediaQuery.of(context).size.width / 2, AcSizes.lg),
@@ -155,6 +163,11 @@ class RecipeInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? recipeId = recipe is RecipeLiteModel
+        ? (recipe as RecipeLiteModel).id
+        : recipe is LocalRecipeLiteModel
+            ? (recipe as LocalRecipeLiteModel).remoteId
+            : null;
     return ListView(
         padding: const EdgeInsets.symmetric(horizontal: AcSizes.space),
         children: [
@@ -166,8 +179,8 @@ class RecipeInfoScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               NoticeComponent(
-                  child: Either.right(
-                      "This tutorial has ${recipe.steps.length} steps"),
+                  child:
+                      Either.right("This tutorial has ${steps.length} steps"),
                   type: NoticeType.tip)
             ],
           ),
@@ -176,7 +189,7 @@ class RecipeInfoScreen extends StatelessWidget {
               constraints: const BoxConstraints(maxHeight: 160.0),
               child: buildReviewList()),
           const SizedBox(height: AcSizes.md),
-          buildSeeReviewsButton(context),
+          if (recipeId != null) buildSeeReviewsButton(context, recipeId),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: AcSizes.lg),
             child: buildStartButton(context),

@@ -26,6 +26,7 @@ class LibraryBookmarkedRecipesSection extends StatelessWidget {
         itemBuilder: (context, data) {
           return RecipeCard(
             recipe: data,
+            recipeSource: RecipeSource.remote(data.id),
             secondaryAction: OutlinedButton.icon(
                 style: RecipeCard.getSecondaryActionButtonStyle(context),
                 onPressed: () {
@@ -37,12 +38,12 @@ class LibraryBookmarkedRecipesSection extends StatelessWidget {
         },
         itemConstraints:
             BoxConstraints.tight(RecipeCard.getDefaultImageSize(context)),
-        header: Either.right("Recents"),
+        header: Either.right("Bookmarks"),
         viewMoreButton: Either.right(() {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => SearchScreen(
-                    sortBy: SortBy.descending(RecipeSortBy.lastViewed),
-                    filterBy: RecipeFilterBy.viewedBy(userId, viewed: true),
+                    sortBy: SortBy.descending(RecipeSortBy.bookmarkedDate),
+                    filterBy: RecipeFilterBy.bookmarkedBy(userId),
                   )));
         }));
   }
@@ -54,20 +55,14 @@ class LibraryLocalRecipesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<LocalRecipeController>();
-    final user = context.watch<AuthProvider>().user!;
     return AsyncApiSampleScrollSection(
-        future: Future(() async {
-          final results = await controller.getAll(
-              user: user,
-              searchState: RecipeSearchState(
-                  limit: 5,
-                  sortBy: SortBy.descending(RecipeSortBy.createdDate)));
-          return ApiResult(message: 'Success', data: results);
-        }),
+        future: controller.getAll(
+            searchState: RecipeSearchState(
+                limit: 5, sortBy: SortBy.descending(RecipeSortBy.createdDate))),
         itemBuilder: (context, data) {
           return RecipeCard(
             recipe: data,
-            recipeSource: RecipeSource.local,
+            recipeSource: RecipeSource.local(data.id),
             secondaryAction: OutlinedButton.icon(
               style: RecipeCard.getSecondaryActionButtonStyle(context),
               onPressed: () {

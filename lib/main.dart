@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
@@ -6,33 +8,47 @@ import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/notification.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/database/firebase/lib/images.dart';
+import 'package:pambe_ac_ifa/database/firebase/recipe.dart';
 import 'package:pambe_ac_ifa/database/firebase/user.dart';
-import 'package:pambe_ac_ifa/database/sqflite/resource.dart';
+import 'package:pambe_ac_ifa/database/sqflite/lib/image.dart';
+import 'package:pambe_ac_ifa/database/sqflite/tables/recipe.dart';
+import 'package:pambe_ac_ifa/database/sqflite/tables/recipe_images.dart';
 import 'package:pambe_ac_ifa/init.dart';
 import 'package:pambe_ac_ifa/switch.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:sqflite/sqflite.dart';
 import 'firebase_options.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  WidgetsFlutterBinding.ensureInitialized();
-
   Database db = await initializeSqfliteDatabase(override: false);
+  final recipeTable = RecipeTable(
+    db,
+    imageManager:
+        LocalRecipeImageManager(imageManager: LocalFileImageManager()),
+  );
+  recipeTable.cleanupUnusedImages();
+
+  final userManager = FirebaseUserManager(FirebaseFirestore.instance);
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
-          create: (context) =>
-              AuthProvider(userManager: FirebaseUserManager())),
+          create: (context) => AuthProvider(userManager: userManager)),
       ChangeNotifierProvider(create: (context) => NotificationController()),
-      ChangeNotifierProvider(create: (context) => RecipeController()),
       ChangeNotifierProvider(
-          create: (context) =>
-              LocalRecipeController(db, resources: LocalImageController())),
+          create: (context) => RecipeController(
+              recipeManager: FirebaseRecipeManager(FirebaseFirestore.instance,
+                  userManager: userManager,
+                  imageManager: FirebaseImageManager(FirebaseStorage.instance,
+                      storagePath: "recipes")))),
+      ChangeNotifierProvider(
+          create: (context) => LocalRecipeController(recipeTable: recipeTable)),
     ],
     child: const AcReactiveFormConfig(child: RecipeLibApp()),
   ));

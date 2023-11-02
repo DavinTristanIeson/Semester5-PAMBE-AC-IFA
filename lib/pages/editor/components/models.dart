@@ -1,4 +1,5 @@
 import 'package:image_picker/image_picker.dart';
+import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/components/field/form_array.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -19,7 +20,7 @@ enum RecipeStepFormKeys {
 }
 
 class RecipeStepFormType {
-  String? id;
+  int? id;
   RecipeStepVariant type;
   String content;
   XFile? image;
@@ -30,9 +31,9 @@ class RecipeStepFormType {
       required this.content,
       this.image,
       this.timer});
-  static FormGroup toFormGroup({RecipeStepModel? value}) {
+  static FormGroup toFormGroup({LocalRecipeStepModel? value}) {
     return FormGroup({
-      RecipeStepFormKeys.id.name: FormControl<String?>(value: value?.id),
+      RecipeStepFormKeys.id.name: FormControl<int>(value: value?.id),
       RecipeStepFormKeys.type.name: FormControl<RecipeStepVariant>(
           value: value?.type ?? RecipeStepVariant.regular),
       RecipeStepFormKeys.content.name:
@@ -42,7 +43,17 @@ class RecipeStepFormType {
       RecipeStepFormKeys.image.name: FormControl<InputToggle<XFile>>(
           value: value?.imagePath == null
               ? InputToggle.off()
-              : InputToggle.on(XFile(value!.imagePath!))),
+              : InputToggle.on(XFile(value!.imagePath!)),
+          validators: [
+            Validators.delegate((control) {
+              final value = control.value as InputToggle<XFile>?;
+              if (value == null) return null;
+              if (value.toggle && value.value == null) {
+                return {AcValidationMessage.imageRequired: true};
+              }
+              return null;
+            })
+          ]),
       RecipeStepFormKeys.timer.name: FormControl<InputToggle<Duration>>(
           value: value?.timer == null
               ? InputToggle.off()
@@ -56,7 +67,7 @@ class RecipeStepFormType {
     final timerToggle =
         group[RecipeStepFormKeys.timer.name] as InputToggle<Duration>;
     return RecipeStepFormType(
-      id: group[RecipeStepFormKeys.id.name] as String?,
+      id: group[RecipeStepFormKeys.id.name] as int?,
       type: group[RecipeStepFormKeys.type.name] as RecipeStepVariant,
       content: (group[RecipeStepFormKeys.content.name] as String?) ?? '',
       image: thumbnailToggle.toggle ? thumbnailToggle.value : null,

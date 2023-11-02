@@ -4,13 +4,8 @@ import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 part 'gen/user.g.dart';
 
-String _parseUserId(Object value) {
-  return value.toString();
-}
-
 @JsonSerializable(explicitToJson: true)
 class UserModel {
-  @JsonKey(fromJson: _parseUserId)
   String id;
   String name;
   String email;

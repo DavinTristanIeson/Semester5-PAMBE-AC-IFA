@@ -3,13 +3,14 @@ import 'dart:io';
 
 import 'package:http/http.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
+import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:path/path.dart';
 
 /// CHANGE THIS TO THE URL OF THE SERVER BEFORE RUNNING
 final Uri globalBaseUrl =
     Uri(scheme: 'https', host: "bewildered-jersey-lion.cyclic.app");
 
-mixin HttpController {
+mixin HttpResourceManagerMixin {
   Uri get baseUrl => globalBaseUrl;
   Uri urlOf(String path, {Map<String, dynamic>? params}) {
     Uri resultUrl = baseUrl.replace(
@@ -17,7 +18,7 @@ mixin HttpController {
     return resultUrl;
   }
 
-  T processHttpResponse<T>(
+  ApiResult<T> processHttpResponse<T>(
     Response response, {
     required T Function(dynamic) transform,
     int expectedStatus = HttpStatus.ok,
@@ -42,10 +43,10 @@ mixin HttpController {
       }
     }
 
-    final T result;
-    print(rawJson);
+    final ApiResult<T> result;
+    // print(rawJson);
     try {
-      result = transform(rawJson);
+      result = ApiResult<T>.fromJson(rawJson, transform);
     } catch (e) {
       throw ApiError(ApiErrorType.shapeMismatch, inner: e);
     }

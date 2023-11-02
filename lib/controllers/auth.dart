@@ -3,14 +3,18 @@ import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 
 class AuthProvider extends ChangeNotifier {
-  IUserController userManager;
+  IUserResourceManager userManager;
 
   AuthProvider({
     required this.userManager,
   });
 
   // Placeholder methods until we implement firebase
-  UserModel? user;
+  UserModel? user = UserModel(
+      id: "1mBIe7ICAGtXKiMdZtfb",
+      name: "Test",
+      email: "test@recipelib.com",
+      imagePath: null);
   bool get isGuest {
     return user == null;
   }
@@ -27,7 +31,11 @@ class AuthProvider extends ChangeNotifier {
     return userManager.register(payload);
   }
 
-  Future<void> initialize() async {
-    user = await userManager.getMe();
+  Future<void> initialize() async {}
+
+  @override
+  void dispose() {
+    userManager.dispose();
+    super.dispose();
   }
 }

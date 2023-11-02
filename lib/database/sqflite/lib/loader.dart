@@ -1,10 +1,9 @@
 import 'dart:io';
 
-import 'package:pambe_ac_ifa/database/sqflite/migration.dart';
+import 'package:pambe_ac_ifa/database/sqflite/lib/migration.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-// Note: This is not tested yet. Use with caution.
 class SqfliteDatabaseLoader {
   MigrationManager migrationManager;
   SqfliteDatabaseLoader(this.migrationManager);

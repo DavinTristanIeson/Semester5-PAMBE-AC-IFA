@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 enum ApiErrorType {
   // Http-based server errors
   uncategorizedServerError(
@@ -23,6 +25,19 @@ enum ApiErrorType {
   storeFailure(
       name: "Store Failure",
       message: "An error occurred while storing the resource"),
+  imageManagementFailure(
+      name: "Image Management Failure",
+      message:
+          "An error occurred while storing/updating/deleting images on the server"),
+  deleteFailure(
+      name: "Delete Failure",
+      message: "An error occurred while deleting the resource"),
+  resourceNotFound(
+      name: "Resource Not Found",
+      message: "The resource you're looking for is not available"),
+  cleanupFailure(
+      name: "Cleanup Failure",
+      message: "An error occurred during a scheduled cleanup task"),
   fetchFailure(
       name: "Fetch Failure",
       message: "An error occurred while getting the resource");
@@ -42,12 +57,10 @@ class _ErrorWrappingError implements Exception {
   _ErrorWrappingError({Object? inner}) {
     if (inner is Error) {
       _innerError = inner;
-      // ignore: avoid_print
-      print("${_innerError.toString()}\n${_innerError!.stackTrace}");
+      debugPrint("${_innerError.toString()}\n${_innerError!.stackTrace}");
     } else if (inner is Exception) {
       _innerException = inner;
-      // ignore: avoid_print
-      print(_innerException.toString());
+      debugPrint(_innerException.toString());
     }
   }
   String? get errorMessage =>

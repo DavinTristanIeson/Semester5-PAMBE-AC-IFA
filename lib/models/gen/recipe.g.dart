@@ -6,101 +6,87 @@ part of '../recipe.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-RecipeStepModel _$RecipeStepModelFromJson(Map<String, dynamic> json) =>
-    RecipeStepModel(
-      id: _parseRecipeId(json['id'] as Object),
-      content: json['content'] as String,
-      type: $enumDecodeNullable(_$RecipeStepVariantEnumMap, json['type']) ??
-          RecipeStepVariant.regular,
-      imagePath: json['imagePath'] as String?,
-      imageSource: $enumDecodeNullable(
-              _$ExternalImageSourceEnumMap, json['imageSource']) ??
-          ExternalImageSource.local,
-      timer: _$JsonConverterFromJson<int, Duration>(
-          json['timer'], const JsonDurationConverter().fromJson),
-    );
-
-Map<String, dynamic> _$RecipeStepModelToJson(RecipeStepModel instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'content': instance.content,
-      'type': _$RecipeStepVariantEnumMap[instance.type]!,
-      'imagePath': instance.imagePath,
-      'timer': _$JsonConverterToJson<int, Duration>(
-          instance.timer, const JsonDurationConverter().toJson),
-    };
-
-const _$RecipeStepVariantEnumMap = {
-  RecipeStepVariant.regular: 'regular',
-  RecipeStepVariant.tip: 'tip',
-  RecipeStepVariant.warning: 'warning',
-};
-
-const _$ExternalImageSourceEnumMap = {
-  ExternalImageSource.network: 'network',
-  ExternalImageSource.local: 'local',
-};
-
-Value? _$JsonConverterFromJson<Json, Value>(
-  Object? json,
-  Value? Function(Json json) fromJson,
-) =>
-    json == null ? null : fromJson(json as Json);
-
-Json? _$JsonConverterToJson<Json, Value>(
-  Value? value,
-  Json? Function(Value value) toJson,
-) =>
-    value == null ? null : toJson(value);
-
-RecipeLiteModel _$RecipeLiteModelFromJson(Map<String, dynamic> json) =>
-    RecipeLiteModel(
-      id: _parseRecipeId(json['id'] as Object),
+LocalRecipeLiteModel _$LocalRecipeLiteModelFromJson(
+        Map<String, dynamic> json) =>
+    LocalRecipeLiteModel(
+      id: json['id'] as int,
+      remoteId: json['remoteId'] as String?,
       title: json['title'] as String,
       description: json['description'] as String,
       createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
       imagePath: json['imagePath'] as String?,
-      imageSource: $enumDecodeNullable(
-              _$ExternalImageSourceEnumMap, json['imageSource']) ??
-          ExternalImageSource.local,
-      user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
-      remoteId: _parseRemoteRecipeId(json['remoteId']),
+    );
+
+Map<String, dynamic> _$LocalRecipeLiteModelToJson(
+        LocalRecipeLiteModel instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'description': instance.description,
+      'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
+      'imagePath': instance.imagePath,
+      'id': instance.id,
+    };
+
+RecipeLiteModel _$RecipeLiteModelFromJson(Map<String, dynamic> json) =>
+    RecipeLiteModel(
+      id: json['id'] as String,
+      user: _$userPropertyFromJson(json['user']),
+      title: json['title'] as String,
+      description: json['description'] as String,
+      createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
+      imagePath: json['imagePath'] as String?,
     );
 
 Map<String, dynamic> _$RecipeLiteModelToJson(RecipeLiteModel instance) =>
     <String, dynamic>{
-      'id': instance.id,
       'title': instance.title,
       'description': instance.description,
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'imagePath': instance.imagePath,
-      'imageSource': _$ExternalImageSourceEnumMap[instance.imageSource],
-      'user': instance.user.toJson(),
+      'user': _$userPropertyToJson(instance.user),
     };
 
-RecipeModel _$RecipeModelFromJson(Map<String, dynamic> json) => RecipeModel(
-      id: _parseRecipeId(json['id'] as Object),
+LocalRecipeModel _$LocalRecipeModelFromJson(Map<String, dynamic> json) =>
+    LocalRecipeModel(
+      id: json['id'] as int,
       title: json['title'] as String,
       description: json['description'] as String,
       createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
       imagePath: json['imagePath'] as String?,
-      imageSource: $enumDecodeNullable(
-              _$ExternalImageSourceEnumMap, json['imageSource']) ??
-          ExternalImageSource.local,
-      user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
+      remoteId: json['remoteId'] as String?,
       steps: (json['steps'] as List<dynamic>)
-          .map((e) => RecipeStepModel.fromJson(e as Map<String, dynamic>))
+          .map((e) => LocalRecipeStepModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-    )..remoteId = _parseRemoteRecipeId(json['remoteId']);
+    );
 
-Map<String, dynamic> _$RecipeModelToJson(RecipeModel instance) =>
+Map<String, dynamic> _$LocalRecipeModelToJson(LocalRecipeModel instance) =>
     <String, dynamic>{
-      'id': instance.id,
       'title': instance.title,
       'description': instance.description,
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'imagePath': instance.imagePath,
-      'imageSource': _$ExternalImageSourceEnumMap[instance.imageSource],
-      'user': instance.user.toJson(),
+      'id': instance.id,
+      'steps': instance.steps.map((e) => e.toJson()).toList(),
+    };
+
+RecipeModel _$RecipeModelFromJson(Map<String, dynamic> json) => RecipeModel(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
+      imagePath: json['imagePath'] as String?,
+      user: _$userPropertyFromJson(json['user']),
+      steps: (json['steps'] as List<dynamic>)
+          .map((e) => RecipeStepModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$RecipeModelToJson(RecipeModel instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'description': instance.description,
+      'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
+      'imagePath': instance.imagePath,
+      'user': _$userPropertyToJson(instance.user),
       'steps': instance.steps.map((e) => e.toJson()).toList(),
     };

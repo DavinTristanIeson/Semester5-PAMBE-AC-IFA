@@ -3,7 +3,6 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
-import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
@@ -14,21 +13,18 @@ import 'package:pambe_ac_ifa/pages/recipe/info.dart';
 import 'package:provider/provider.dart';
 
 class RecipeScreen extends StatelessWidget with SnackbarMessenger {
-  final String id;
   final RecipeSource source;
-  const RecipeScreen(
-      {super.key, required this.id, this.source = RecipeSource.online});
+  const RecipeScreen({super.key, required this.source});
 
-  Future<RecipeModel?> getRecipe(BuildContext context) async {
+  Future<AbstractRecipeLiteModel?> getRecipe(BuildContext context) async {
     try {
-      if (source == RecipeSource.local) {
+      if (source.type == RecipeSourceType.local) {
         final controller = context.watch<LocalRecipeController>();
-        final user = context.watch<AuthProvider>().user!;
-        return controller.get(int.parse(id), user: user);
+        return controller.get(source.localId!);
       } else {
         final controller = context.watch<RecipeController>();
-        final result = await controller.get(id);
-        return result.data;
+        final result = await controller.get(source.remoteId!);
+        return result;
       }
     } catch (e) {
       sendError(context, e.toString());
@@ -48,11 +44,17 @@ class RecipeScreen extends StatelessWidget with SnackbarMessenger {
                 padding: const EdgeInsets.all(AcSizes.space),
                 child: EmptyView(
                     content: Either.right(
-                        "We were unable to find any recipe associated with ID: $id")),
+                        "We were unable to find any recipe associated with ID: ${source.localId ?? source.remoteId}")),
               );
             }
+            List<AbstractRecipeStepModel> steps = snapshot.data is RecipeModel
+                ? (snapshot.data as RecipeModel).steps
+                : (snapshot.data is LocalRecipeModel)
+                    ? (snapshot.data as LocalRecipeModel).steps
+                    : [];
             return RecipeInfoScreen(
                 recipe: snapshot.data!,
+                steps: steps,
                 reviews: List.generate(
                     5,
                     (i) => ReviewModel(

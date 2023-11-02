@@ -4,26 +4,47 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
+import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/recipe/main.dart';
 import 'package:provider/provider.dart';
 
+class ByUserText extends StatelessWidget {
+  final UserModel? user;
+  final TextStyle? style;
+  const ByUserText({super.key, this.user, this.style});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+        TextSpan(children: [
+          const TextSpan(text: "by "),
+          TextSpan(
+              text: user?.name ?? '<Deleted User>',
+              style: TextStyle(
+                fontStyle: user == null ? FontStyle.italic : FontStyle.normal,
+              ))
+        ]),
+        style: context.texts.titleSmall);
+  }
+}
+
 class RecipeCard extends StatelessWidget {
-  final RecipeLiteModel recipe;
+  final AbstractRecipeLiteModel recipe;
   final RecipeSource recipeSource;
   final Widget? secondaryAction;
   const RecipeCard(
       {super.key,
       required this.recipe,
       this.secondaryAction,
-      this.recipeSource = RecipeSource.online});
+      required this.recipeSource});
 
   Widget buildTitleAndDescription(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(recipe.title, style: Theme.of(context).textTheme.titleMedium),
-        Text("by ${recipe.user.name}",
-            style: Theme.of(context).textTheme.titleSmall),
+        if (recipe is RecipeLiteModel)
+          ByUserText(user: (recipe as RecipeLiteModel).user),
         const SizedBox(height: AcSizes.lg),
         Text(recipe.description),
       ],
@@ -58,7 +79,6 @@ class RecipeCard extends StatelessWidget {
             onPressed: () {
               context.navigator.push(MaterialPageRoute(
                   builder: (context) => RecipeScreen(
-                        id: recipe.id,
                         source: recipeSource,
                       )));
             },
@@ -116,21 +136,23 @@ class RecipeCard extends StatelessWidget {
               ),
             ],
           ),
-          Positioned(
-            top: imageHeight - AcSizes.avatarRadius,
-            right: AcSizes.xs,
-            child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                      color: Theme.of(context).colorScheme.surface,
-                      width: AcSizes.md),
-                ),
-                child: CircleAvatar(
-                    radius: AcSizes.avatarRadius,
-                    backgroundColor: Theme.of(context).colorScheme.tertiary,
-                    backgroundImage: recipe.user.image)),
-          )
+          if (recipe is RecipeLiteModel)
+            Positioned(
+              top: imageHeight - AcSizes.avatarRadius,
+              right: AcSizes.xs,
+              child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.surface,
+                        width: AcSizes.md),
+                  ),
+                  child: CircleAvatar(
+                      radius: AcSizes.avatarRadius,
+                      backgroundColor: Theme.of(context).colorScheme.tertiary,
+                      backgroundImage:
+                          (recipe as RecipeLiteModel).user?.image)),
+            )
         ],
       ),
     );
@@ -138,12 +160,10 @@ class RecipeCard extends StatelessWidget {
 }
 
 class RecipeHorizontalCard extends StatelessWidget {
-  final RecipeLiteModel recipe;
+  final AbstractRecipeLiteModel recipe;
   final RecipeSource recipeSource;
   const RecipeHorizontalCard(
-      {super.key,
-      required this.recipe,
-      this.recipeSource = RecipeSource.online});
+      {super.key, required this.recipe, required this.recipeSource});
 
   @override
   Widget build(BuildContext context) {
@@ -155,17 +175,19 @@ class RecipeHorizontalCard extends StatelessWidget {
           splashColor: context.colors.primary.withOpacity(0.3),
           onTap: () {
             context.navigator.push(MaterialPageRoute(
-                builder: (context) =>
-                    RecipeScreen(id: recipe.id, source: recipeSource)));
+                builder: (context) => RecipeScreen(source: recipeSource)));
           },
-          leading: CircleAvatar(
-            backgroundColor: context.colors.tertiary,
-            backgroundImage: recipe.user.image,
-          ),
+          leading: recipe is RecipeLiteModel
+              ? CircleAvatar(
+                  backgroundColor: context.colors.tertiary,
+                  backgroundImage: (recipe as RecipeLiteModel).user?.image,
+                )
+              : null,
           title: Text(recipe.title,
               style: Theme.of(context).textTheme.titleMedium),
-          subtitle: Text("by ${recipe.user.name}",
-              style: Theme.of(context).textTheme.titleSmall),
+          subtitle: recipe is RecipeLiteModel
+              ? ByUserText(user: (recipe as RecipeLiteModel).user)
+              : null,
           trailing: MaybeImage(
               image: recipe.image,
               width: context.relativeWidth(0.2, 60.0, 150.0)),
