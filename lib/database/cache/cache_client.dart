@@ -5,7 +5,7 @@ class CacheItem<T> {
   final DateTime cachedAt;
   Duration? _staleTime;
 
-  static Duration defaultStaleTime = const Duration(minutes: 1);
+  static Duration defaultStaleTime = const Duration(minutes: 2);
 
   CacheItem({
     required this.value,

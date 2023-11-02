@@ -19,7 +19,8 @@ class ImagePickerField extends StatelessWidget {
       this.error});
 
   void pickImage(BuildContext context) async {
-    XFile? result = await _picker.pickImage(source: ImageSource.gallery);
+    XFile? result = await _picker.pickImage(
+        source: ImageSource.gallery, maxHeight: 600.0, maxWidth: 800.0);
     onChanged(result);
   }
 

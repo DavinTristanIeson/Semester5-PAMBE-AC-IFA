@@ -133,10 +133,10 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
                       userId: userId);
                   await localController.setRemoteId(
                       widget.recipe!.id, recipe.id);
-                  widget.onChanged(widget.recipe!.withRemoteId(null));
                   // ignore: use_build_context_synchronously
                   sendSuccess(context,
                       "Changes to ${widget.recipe!.title} has been published");
+                  widget.onChanged(widget.recipe!.withRemoteId(recipe.id));
                 } on ApiError catch (e) {
                   // ignore: use_build_context_synchronously
                   sendError(context, e.message);
@@ -187,21 +187,29 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
     await showDialog(
         context: context,
         builder: (context) {
+          final LocalRecipeController localRecipeController =
+              context.read<LocalRecipeController>();
+          final RecipeController recipeController =
+              context.read<RecipeController>();
           return SimpleConfirmationDialog.delete(
               onConfirm: () async {
                 try {
-                  await context
-                      .read<LocalRecipeController>()
-                      .remove(widget.recipe!.id);
+                  await localRecipeController.remove(widget.recipe!.id);
+                  if (widget.recipe?.remoteId != null) {
+                    await recipeController.remove(widget.recipe!.remoteId!);
+                  }
                   close = true;
+                  // ignore: use_build_context_synchronously
+                  sendSuccess(context,
+                      "${widget.recipe!.title} has been successfully deleted");
                 } catch (e) {
                   // ignore: use_build_context_synchronously
                   sendError(context, e.toString());
                 }
               },
               positiveText: Either.right("Delete"),
-              message:
-                  Either.right("Are you sure you want to delete this recipe?"),
+              message: Either.right(
+                  "Are you sure you want to delete this recipe? Other people will also no longer be able to access your recipe if you have published it before."),
               context: context);
         });
     if (close) {

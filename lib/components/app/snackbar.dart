@@ -19,6 +19,7 @@ mixin SnackbarMessenger {
       if (override == true) {
         messenger.clearSnackBars();
       }
+      debugPrint("Sent error message: $message");
       messenger.showSnackBar(SnackBar(
         behavior: SnackBarBehavior.floating,
         content: Text(message,

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/components/function/future_caller.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 
 /// Default confirmation dialog. Used with showDialog
@@ -90,18 +91,39 @@ class SimpleConfirmationDialog extends StatelessWidget {
       content: message,
       backgroundColor: AcColors.white,
       actions: [
-        TextButton(
-            onPressed: () async {
-              if (onCancel != null) await onCancel!();
+        FutureProcedureCaller(process: () async {
+          if (onCancel != null) {
+            try {
+              await onCancel!();
               navigator.pop();
-            },
-            child: negativeText),
-        TextButton(
-            onPressed: () async {
+            } catch (e) {
+              navigator.pop();
+              rethrow;
+            }
+          } else {
+            navigator.pop();
+          }
+        }, builder: (context, snapshot, call) {
+          return TextButton(onPressed: call, child: negativeText);
+        }),
+        FutureProcedureCaller(
+          process: () async {
+            try {
               await onConfirm();
               navigator.pop();
-            },
-            child: positiveText),
+            } catch (e) {
+              navigator.pop();
+              rethrow;
+            }
+          },
+          builder: (context, snapshot, call) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const TextButton(
+                  onPressed: null, child: Text("Waiting..."));
+            }
+            return TextButton(onPressed: call, child: positiveText);
+          },
+        ),
       ],
     );
   }

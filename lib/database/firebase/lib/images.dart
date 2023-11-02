@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 
@@ -11,25 +13,35 @@ const String globalFirebaseImageStoragePathRoot = "images";
 class FirebaseImageManager implements INetworkImageResourceManager {
   FirebaseStorage db;
   final String storagePath;
-  FirebaseImageManager(this.db, {required this.storagePath});
+  CacheClient cache;
+  FirebaseImageManager(this.db, {required this.storagePath})
+      : cache = CacheClient(staleTime: const Duration(minutes: 5));
 
   Reference getImageStorageReference() {
-    return db
-        .ref()
-        .child(globalFirebaseImageStoragePathRoot)
-        .child(storagePath);
+    return db.ref().child(globalFirebaseImageStoragePathRoot);
   }
 
   Reference getFileReference({required String name, required String userId}) {
-    final fileName = '${userId}_$name';
-    return getImageStorageReference().child(fileName);
+    return getImageStorageReference()
+        .child(userId)
+        .child(storagePath)
+        .child(name);
   }
 
   @override
   Future<void> process(Map<String, XFile?> resources,
       {required String userId}) async {
-    await Future.wait(resources.entries.map(
-        (e) => e.value == null ? remove(e.key) : put(e.value, userId: userId)));
+    await Future.wait(resources.entries.map((e) async {
+      try {
+        if (e.value == null) {
+          await remove(e.key);
+        } else {
+          await db.ref(e.key).putFile(File(e.value!.path));
+        }
+      } catch (e) {
+        return Future.value();
+      }
+    }));
   }
 
   @override
@@ -53,7 +65,8 @@ class FirebaseImageManager implements INetworkImageResourceManager {
   @override
   Future<void> remove(String imagePath) async {
     try {
-      await db.ref().child(imagePath).delete();
+      await db.ref(imagePath).delete();
+      cache.markStale(key: imagePath);
     } catch (e) {
       throw ApiError(ApiErrorType.deleteFailure, inner: e);
     }
@@ -68,7 +81,22 @@ class FirebaseImageManager implements INetworkImageResourceManager {
   }
 
   @override
-  String getFilePath({required String userId, required String name}) {
+  String getPath({required String userId, required String name}) {
     return getFileReference(name: name, userId: userId).fullPath;
+  }
+
+  @override
+  Future<String?> urlof(String path) async {
+    if (cache.has(path)) {
+      return cache.get(path)!;
+    }
+    try {
+      final url = await db.ref(path).getDownloadURL();
+      cache.put(path, url);
+      return url;
+    } catch (e) {
+      debugPrint(e.toString());
+      return null;
+    }
   }
 }

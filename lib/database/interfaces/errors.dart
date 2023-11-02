@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 enum ApiErrorType {
   // Http-based server errors
   uncategorizedServerError(
@@ -55,12 +57,10 @@ class _ErrorWrappingError implements Exception {
   _ErrorWrappingError({Object? inner}) {
     if (inner is Error) {
       _innerError = inner;
-      // ignore: avoid_print
-      print("${_innerError.toString()}\n${_innerError!.stackTrace}");
+      debugPrint("${_innerError.toString()}\n${_innerError!.stackTrace}");
     } else if (inner is Exception) {
       _innerException = inner;
-      // ignore: avoid_print
-      print(_innerException.toString());
+      debugPrint(_innerException.toString());
     }
   }
   String? get errorMessage =>

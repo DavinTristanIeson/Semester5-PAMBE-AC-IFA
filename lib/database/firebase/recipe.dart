@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/firebase/recipe_images.dart';
 import 'package:pambe_ac_ifa/database/firebase/user.dart';
@@ -37,12 +36,15 @@ class FirebaseRecipeManager
   static const String collectionPath = "recipes";
   FirebaseFirestore db;
   FirebaseUserManager userManager;
-  RemoteRecipeImageManager imageManager;
+  INetworkImageResourceManager imageManager;
+  RemoteRecipeImageManager recipeImageHelper;
   CacheClient<RecipeModel> cache;
   CacheClient<PaginatedQueryResult<RecipeLiteModel>> queryCache;
   FirebaseRecipeManager(this.db,
       {required this.userManager, required this.imageManager})
       : cache = CacheClient(),
+        recipeImageHelper =
+            RemoteRecipeImageManager(imageManager: imageManager),
         queryCache = CacheClient(
             cleanupInterval: const Duration(minutes: 1, seconds: 30),
             staleTime: const Duration(minutes: 1),
@@ -53,6 +55,30 @@ class FirebaseRecipeManager
     return "${searchState?.getApiParams() ?? ''};${page?.id ?? ''}";
   }
 
+  Future<RecipeModel> _transformRecipe(
+      Map<String, Object?> json, DocumentSnapshot<Object?> snapshot) async {
+    final imagePath = json[RecipeFirestoreKeys.imagePath.name] as String?;
+    final steps = (json[RecipeFirestoreKeys.steps.name] as List)
+        .cast<Map<String, Object?>>();
+    return RecipeModel.fromJson({
+      ...json,
+      "id": snapshot.id,
+      "user": await userManager
+          .get(json[RecipeFirestoreKeys.userId.name] as String),
+      "imagePath":
+          imagePath == null ? null : await imageManager.urlof(imagePath),
+      "steps": await Future.wait(steps.map((step) async {
+        final imagePath =
+            step[RecipeStepFirestoreKeys.imagePath.name] as String?;
+        return {
+          ...step,
+          RecipeStepFirestoreKeys.imagePath.name:
+              imagePath == null ? null : await imageManager.urlof(imagePath)
+        };
+      }))
+    });
+  }
+
   @override
   Future<RecipeModel?> get(String id) async {
     if (cache.has(id)) {
@@ -61,12 +87,7 @@ class FirebaseRecipeManager
     try {
       final (:data, snapshot: _) = await processDocumentSnapshot(
           () => db.collection(collectionPath).doc(id).get(),
-          transform: (data, snapshot) async => RecipeModel.fromJson({
-                ...data,
-                "id": snapshot.id,
-                "user":
-                    await userManager.get(data[RecipeFirestoreKeys.userId.name])
-              }));
+          transform: _transformRecipe);
       cache.put(id, data);
       return data;
     } on ApiError catch (e) {
@@ -115,13 +136,7 @@ class FirebaseRecipeManager
     }
 
     final (:data, :snapshot) = await processQuerySnapshot(() => query.get(),
-        transform: (json, snapshot) async {
-      return RecipeLiteModel.fromJson({
-        ...json,
-        "id": snapshot.id,
-        "user": await userManager.get(json[RecipeFirestoreKeys.userId.name]),
-      });
-    });
+        transform: _transformRecipe);
     final result = (data: data, nextPage: snapshot.docs.lastOrNull);
 
     queryCache.put(queryKey, result);
@@ -139,15 +154,18 @@ class FirebaseRecipeManager
   @override
   Future<RecipeModel> put(LocalRecipeModel recipe,
       {required String userId}) async {
-    final json = recipe.toJson();
-    json.remove("user");
-    json.remove("id");
-    json[RecipeFirestoreKeys.userId.name] = userId;
-
-    final reserved = imageManager.markRecipeImagesForStorage(
+    final (
+      :reserved,
+      recipe: recipeCopy
+    ) = recipeImageHelper.markRecipeImagesForStorage(
         current: recipe,
         userId: userId,
         former: recipe.remoteId == null ? null : await get(recipe.remoteId!));
+
+    final json = recipeCopy.toJson();
+    json.remove("user");
+    json.remove("id");
+    json[RecipeFirestoreKeys.userId.name] = userId;
 
     String id;
     try {
@@ -162,7 +180,7 @@ class FirebaseRecipeManager
       throw ApiError(ApiErrorType.storeFailure, inner: e);
     }
     try {
-      await imageManager.imageManager.process(reserved, userId: userId);
+      await imageManager.process(reserved, userId: userId);
     } catch (e) {
       throw ApiError(ApiErrorType.imageManagementFailure, inner: e);
     }
@@ -178,12 +196,19 @@ class FirebaseRecipeManager
     if (prev == null) {
       return;
     }
+    final reserved = recipeImageHelper.markRecipeImagesForDeletion(
+        userId: prev.user!.id, recipe: prev);
     try {
       await db.collection(collectionPath).doc(id).delete();
       queryCache.clear();
       cache.markStale(key: id);
     } catch (e) {
       throw ApiError(ApiErrorType.deleteFailure, inner: e);
+    }
+    try {
+      await imageManager.process(reserved, userId: prev.user!.id);
+    } catch (e) {
+      throw ApiError(ApiErrorType.imageManagementFailure, inner: e);
     }
   }
 

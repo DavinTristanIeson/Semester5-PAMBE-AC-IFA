@@ -64,9 +64,11 @@ class LocalRecipeImageManager {
     }
     if (former != null) {
       for (final step in former.steps) {
-        if (step.image == null ||
-            !stepsThatMightveChangedImages.containsKey(step.id)) {
+        if (step.imagePath == null) {
           continue;
+        }
+        if (!stepsThatMightveChangedImages.containsKey(step.id)) {
+          reserved[step.imagePath!] = null;
         }
         final updatedStep = stepsThatMightveChangedImages[step.id];
         if (updatedStep!.image!.path != step.imagePath) {

@@ -46,10 +46,8 @@ void main() async {
           create: (context) => RecipeController(
               recipeManager: FirebaseRecipeManager(FirebaseFirestore.instance,
                   userManager: userManager,
-                  imageManager: RemoteRecipeImageManager(
-                      imageManager: FirebaseImageManager(
-                          FirebaseStorage.instance,
-                          storagePath: "recipes"))))),
+                  imageManager: FirebaseImageManager(FirebaseStorage.instance,
+                      storagePath: "recipes")))),
       ChangeNotifierProvider(
           create: (context) => LocalRecipeController(recipeTable: recipeTable)),
     ],
