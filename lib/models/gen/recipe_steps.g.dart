@@ -55,6 +55,7 @@ RecipeStepModel _$RecipeStepModelFromJson(Map<String, dynamic> json) =>
       timer: _$JsonConverterFromJson<int, Duration>(
           json['timer'], const JsonDurationConverter().fromJson),
       imagePath: json['imagePath'] as String?,
+      imageStoragePath: json['imageStoragePath'] as String?,
     );
 
 Map<String, dynamic> _$RecipeStepModelToJson(RecipeStepModel instance) =>

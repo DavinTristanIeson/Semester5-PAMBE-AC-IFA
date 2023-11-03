@@ -67,12 +67,14 @@ class FirebaseRecipeManager
           .get(json[RecipeFirestoreKeys.userId.name] as String),
       "imagePath":
           imagePath == null ? null : await imageManager.urlof(imagePath),
+      "imageStoragePath": imagePath,
       "steps": await Future.wait(steps.map((step) async {
         final imagePath =
             step[RecipeStepFirestoreKeys.imagePath.name] as String?;
         return {
           ...step,
-          RecipeStepFirestoreKeys.imagePath.name:
+          "imageStoragePath": imagePath,
+          "imagePath":
               imagePath == null ? null : await imageManager.urlof(imagePath)
         };
       }))

@@ -57,10 +57,11 @@ class _ErrorWrappingError implements Exception {
   _ErrorWrappingError({Object? inner}) {
     if (inner is Error) {
       _innerError = inner;
-      debugPrint("${_innerError.toString()}\n${_innerError!.stackTrace}");
+      debugPrint(
+          "API ERROR: ${_innerError.toString()}\n${_innerError!.stackTrace}");
     } else if (inner is Exception) {
       _innerException = inner;
-      debugPrint(_innerException.toString());
+      debugPrint("API ERROR: ${_innerException.toString()}");
     }
   }
   String? get errorMessage =>

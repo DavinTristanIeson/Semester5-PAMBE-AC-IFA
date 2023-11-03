@@ -107,7 +107,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
       sendSuccess(context, "$title has been saved locally.");
     } catch (e) {
       // ignore: use_build_context_synchronously
-      sendError(context, e.toString());
+      sendError(context, e);
     }
   }
 

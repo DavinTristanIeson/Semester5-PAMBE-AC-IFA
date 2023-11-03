@@ -81,11 +81,15 @@ class RecipeStepModel extends AbstractRecipeStepModel
   @override
   ExternalImageSource? get imageSource => ExternalImageSource.network;
 
+  @JsonKey(includeToJson: false)
+  String? imageStoragePath;
+
   RecipeStepModel({
     required super.content,
     super.type,
     super.timer,
     super.imagePath,
+    this.imageStoragePath,
   });
 
   factory RecipeStepModel.fromJson(Map<String, dynamic> json) {
@@ -95,5 +99,9 @@ class RecipeStepModel extends AbstractRecipeStepModel
       throw ApiError(ApiErrorType.shapeMismatch, inner: e);
     }
   }
-  Map<String, dynamic> toJson() => _$RecipeStepModelToJson(this);
+  Map<String, dynamic> toJson() {
+    final map = _$RecipeStepModelToJson(this);
+    map["imageStoragePath"] = imagePath;
+    return map;
+  }
 }
