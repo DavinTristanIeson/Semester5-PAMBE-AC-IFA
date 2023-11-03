@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/components/display/notice.dart';
+import 'package:pambe_ac_ifa/components/display/pagination.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/notification.dart';
+import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
+import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/notification.dart';
 import 'package:pambe_ac_ifa/pages/notification/components/notification_tile.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +16,16 @@ class NotificationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const NotificationScreenBody();
+    final controller = context.read<NotificationController>();
+    final user = context.watch<AuthProvider>().user!;
+    return FutureBuilder(future: Future.sync(() async {
+      await controller.readAll(userId: user.id);
+    }), builder: (context, snapshot) {
+      if (snapshot.hasError) {
+        return ErrorView(error: Either.right(snapshot.error!.toString()));
+      }
+      return const NotificationScreenBody();
+    });
   }
 }
 
@@ -24,27 +37,29 @@ class NotificationScreenBody extends StatefulWidget {
 }
 
 class _NotificationScreenBodyState extends State<NotificationScreenBody> {
-  final PagingController<int, NotificationModel> _pagination =
-      PagingController(firstPageKey: 0);
+  late final String userId;
+  final PagingController<DateTime?, NotificationModel> _pagination =
+      PagingController(firstPageKey: null);
 
   @override
   void initState() {
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      context.read<NotificationController>().readAll();
-    });
+    userId = context.read<AuthProvider>().user!.id;
     _pagination.addPageRequestListener((pageKey) async {
-      final notifications = await fetch(pageKey);
-      // if (notifications.length != 15) {
-      //   _pagination.appendLastPage(recipes);
-      // } else {
-      _pagination.appendPage(notifications, pageKey + 1);
-      // }
+      final (:data, :nextPage) = await fetch(pageKey);
+      if (nextPage == null) {
+        _pagination.appendLastPage(data);
+      } else {
+        _pagination.appendPage(data, nextPage);
+      }
     });
     super.initState();
   }
 
-  Future<List<NotificationModel>> fetch(int pageKey) async {
-    return context.read<NotificationController>().getNotifications();
+  Future<PaginatedQueryResult<NotificationModel>> fetch(
+      DateTime? pageKey) async {
+    return context
+        .read<NotificationController>()
+        .getAll(page: pageKey, userId: userId);
   }
 
   @override
@@ -55,12 +70,13 @@ class _NotificationScreenBodyState extends State<NotificationScreenBody> {
 
   @override
   Widget build(BuildContext context) {
-    return PagedListView<int, NotificationModel>(
-        pagingController: _pagination,
-        builderDelegate: PagedChildBuilderDelegate(
-            itemBuilder: (context, item, index) => Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: AcSizes.sm, horizontal: AcSizes.space),
-                child: NotificationTile(notification: item))));
+    return AcPagedListView(
+        controller: _pagination,
+        itemBuilder: (context, item, index) {
+          return Padding(
+              padding: const EdgeInsets.symmetric(
+                  vertical: AcSizes.sm, horizontal: AcSizes.space),
+              child: NotificationTile(notification: item));
+        });
   }
 }

@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 
 mixin FirebaseResourceManagerMixin {
   Future<({T data, DocumentSnapshot snapshot})> processDocumentSnapshot<T>(
     Future<DocumentSnapshot> Function() query, {
-    required Future<T> Function(
+    required FutureOr<T> Function(
             Map<String, dynamic> data, DocumentSnapshot snapshot)
         transform,
   }) async {
@@ -30,7 +32,7 @@ mixin FirebaseResourceManagerMixin {
 
   Future<({List<T> data, QuerySnapshot snapshot})> processQuerySnapshot<T>(
     Future<QuerySnapshot> Function() query, {
-    required Future<T> Function(
+    required FutureOr<T> Function(
             Map<String, dynamic> data, QueryDocumentSnapshot snapshot)
         transform,
   }) async {
@@ -45,7 +47,8 @@ mixin FirebaseResourceManagerMixin {
         data: (await Future.wait<T>(snapshot.docs
                 .map((doc) {
                   try {
-                    return transform(doc.data() as Map<String, dynamic>, doc);
+                    return Future.sync(() =>
+                        transform(doc.data() as Map<String, dynamic>, doc));
                   } catch (e) {
                     return null;
                   }

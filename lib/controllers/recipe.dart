@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
@@ -9,7 +10,7 @@ class RecipeController extends ChangeNotifier {
 
   Future<List<RecipeLiteModel>> getAll(
     RecipeSearchState searchState, {
-    dynamic page,
+    DocumentSnapshot<Map<String, Object?>>? page,
   }) async {
     return (await getAllWithPagination(searchState, page: page)).data;
   }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
+import 'package:pambe_ac_ifa/models/notification.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 
@@ -54,4 +55,11 @@ abstract class IRecipeResourceManager {
   Future<void> remove(String id);
 
   void dispose();
+}
+
+abstract class INotificationResourceManager {
+  Future<PaginatedQueryResult<NotificationModel>> getAll(
+      {dynamic page, required String userId});
+  Future<void> markAllRead({required String userId});
+  Future<bool> hasUnread({required String userId});
 }

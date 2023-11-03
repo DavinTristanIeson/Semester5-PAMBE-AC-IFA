@@ -30,8 +30,7 @@ class CacheClient<T> {
   late final Timer timer;
   Duration defaultStaleTime;
   static Duration defaultCleanupInterval = const Duration(minutes: 3);
-  CacheClient(
-      {Duration? staleTime, Duration? cacheTime, Duration? cleanupInterval})
+  CacheClient({Duration? staleTime, Duration? cleanupInterval})
       : defaultStaleTime = staleTime ?? CacheItem.defaultStaleTime {
     timer = Timer.periodic(cleanupInterval ?? defaultCleanupInterval, (timer) {
       cleanupCache();

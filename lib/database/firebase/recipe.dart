@@ -46,9 +46,9 @@ class FirebaseRecipeManager
         recipeImageHelper =
             RemoteRecipeImageManager(imageManager: imageManager),
         queryCache = CacheClient(
-            cleanupInterval: const Duration(minutes: 1, seconds: 30),
-            staleTime: const Duration(minutes: 1),
-            cacheTime: const Duration(minutes: 2));
+          cleanupInterval: const Duration(minutes: 1, seconds: 30),
+          staleTime: const Duration(minutes: 1),
+        );
 
   String keyOfRecipeQuery(
       {QueryDocumentSnapshot? page, RecipeSearchState? searchState}) {

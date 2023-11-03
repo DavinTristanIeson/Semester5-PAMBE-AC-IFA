@@ -9,6 +9,7 @@ import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/notification.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/database/firebase/lib/images.dart';
+import 'package:pambe_ac_ifa/database/firebase/notification.dart';
 import 'package:pambe_ac_ifa/database/firebase/recipe.dart';
 import 'package:pambe_ac_ifa/database/firebase/user.dart';
 import 'package:pambe_ac_ifa/database/sqflite/lib/image.dart';
@@ -40,7 +41,10 @@ void main() async {
     providers: [
       ChangeNotifierProvider(
           create: (context) => AuthProvider(userManager: userManager)),
-      ChangeNotifierProvider(create: (context) => NotificationController()),
+      ChangeNotifierProvider(
+          create: (context) => NotificationController(
+              notificationManager:
+                  FirebaseNotificationManager(FirebaseFirestore.instance))),
       ChangeNotifierProvider(
           create: (context) => RecipeController(
               recipeManager: FirebaseRecipeManager(FirebaseFirestore.instance,

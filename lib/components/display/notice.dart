@@ -88,3 +88,88 @@ class EmptyView extends StatelessWidget {
     );
   }
 }
+
+class ErrorView extends StatelessWidget {
+  late final Either<Widget, String> error;
+  ErrorView({super.key, Either<Widget, String>? error}) {
+    this.error =
+        error ?? Either.right("Sorry, an unexpected error has occurred");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(AcSizes.br),
+        color: Color.fromRGBO(0, 0, 0, 0.5),
+      ),
+      padding: const EdgeInsets.all(AcSizes.space),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.warning,
+            color: context.colors.error,
+            size: AcSizes.iconBig * 2,
+          ),
+          const SizedBox(
+            height: AcSizes.lg,
+          ),
+          error.leftOr((left) => Text(
+                left,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: context.colors.error,
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+}
+
+class ActionableErrorMessage extends StatelessWidget {
+  final Either<Widget, Object> error;
+  final Widget? action;
+  final Either<Widget, String> message;
+  ActionableErrorMessage(
+      {super.key,
+      required this.error,
+      this.action,
+      Either<Widget, String>? message})
+      : message = message ?? Either.right("An unexpected error has occurred");
+
+  ActionableErrorMessage.refresh({
+    super.key,
+    required this.error,
+    required void Function() onRefresh,
+    Either<Widget, String>? message,
+  })  : action = IconButton(
+            onPressed: onRefresh,
+            color: AcColors.primary,
+            icon: const Icon(Icons.refresh)),
+        message = message ?? Either.right("An unexpected error has occurred");
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(AcSizes.space),
+      child: Column(
+        children: [
+          Text(error.toString(),
+              textAlign: TextAlign.center,
+              style: context.texts.bodyMedium!
+                  .copyWith(color: context.colors.error)),
+          message.leftOr((right) => Text(
+                right,
+                textAlign: TextAlign.center,
+                style: context.texts.bodyLarge!.copyWith(
+                    fontWeight: FontWeight.bold, color: context.colors.primary),
+              )),
+          if (action != null) action!,
+        ],
+      ),
+    );
+  }
+}
