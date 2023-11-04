@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 
 /// Ini untuk resep yang disimpan online
 class RecipeController extends ChangeNotifier {
   IRecipeResourceManager recipeManager;
-  RecipeController({required this.recipeManager});
+  String? userId;
+  RecipeController({required this.recipeManager, required this.userId});
 
   Future<List<RecipeLiteModel>> getAll(
     RecipeSearchState searchState, {
@@ -19,16 +21,24 @@ class RecipeController extends ChangeNotifier {
     RecipeSearchState searchState, {
     dynamic page,
   }) async {
-    return recipeManager.getAll(page: page, searchState: searchState);
+    final (:data, :nextPage) =
+        await recipeManager.getAll(page: page, searchState: searchState);
+    return (
+      data: data,
+      nextPage: data.length < searchState.limit ? null : nextPage
+    );
   }
 
   Future<RecipeModel?> get(String id) async {
     return recipeManager.get(id);
   }
 
-  Future<RecipeModel> put(LocalRecipeModel recipe,
-      {required String userId}) async {
-    final result = await recipeManager.put(recipe, userId: userId);
+  Future<RecipeModel> put(LocalRecipeModel recipe) async {
+    if (userId == null) {
+      throw InvalidStateError(
+          "RecipeController.userId is expected to be non-null when put is called.");
+    }
+    final result = await recipeManager.put(recipe, userId: userId!);
     notifyListeners();
     return result;
   }

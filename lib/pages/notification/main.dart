@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/components/display/pagination.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
@@ -17,9 +16,8 @@ class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.read<NotificationController>();
-    final user = context.watch<AuthProvider>().user!;
     return FutureBuilder(future: Future.sync(() async {
-      await controller.readAll(userId: user.id);
+      await controller.readAll();
     }), builder: (context, snapshot) {
       if (snapshot.hasError) {
         return ErrorView(error: Either.right(snapshot.error!.toString()));
@@ -57,9 +55,7 @@ class _NotificationScreenBodyState extends State<NotificationScreenBody> {
 
   Future<PaginatedQueryResult<NotificationModel>> fetch(
       DateTime? pageKey) async {
-    return context
-        .read<NotificationController>()
-        .getAll(page: pageKey, userId: userId);
+    return context.read<NotificationController>().getAll(page: pageKey);
   }
 
   @override
@@ -73,10 +69,7 @@ class _NotificationScreenBodyState extends State<NotificationScreenBody> {
     return AcPagedListView(
         controller: _pagination,
         itemBuilder: (context, item, index) {
-          return Padding(
-              padding: const EdgeInsets.symmetric(
-                  vertical: AcSizes.sm, horizontal: AcSizes.space),
-              child: NotificationTile(notification: item));
+          return NotificationTile(notification: item);
         });
   }
 }

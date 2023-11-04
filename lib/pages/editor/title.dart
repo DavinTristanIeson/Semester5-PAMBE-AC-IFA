@@ -96,6 +96,7 @@ class RecipeDetailsEditor extends StatelessWidget {
                       topLeft: AcSizes.brInput, topRight: AcSizes.brInput),
                   onChanged: (image) {
                     control.value = image;
+                    control.markAsDirty();
                   });
             }),
         ReactiveValueListenableBuilder<String?>(
@@ -107,6 +108,7 @@ class RecipeDetailsEditor extends StatelessWidget {
                     .translateAny(control.errors),
                 onChanged: (value) {
                   control.value = value;
+                  control.markAsDirty();
                 });
           },
         )

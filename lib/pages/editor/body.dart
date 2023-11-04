@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/field/form_array.dart';
+import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/editor/components/models.dart';
 import 'package:pambe_ac_ifa/pages/editor/step_editor.dart';
 import 'package:pambe_ac_ifa/pages/editor/title.dart';
@@ -67,6 +68,17 @@ class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody> {
     final FormArray formArray =
         form.controls[RecipeFormKeys.steps.name] as FormArray;
     int length = formArray.controls.length + 2;
+    final stepNumbers = <int>[];
+    for (final step in formArray.value as List<Map<String, Object?>?>) {
+      if (step == null) {
+        stepNumbers.add(stepNumbers.lastOrNull ?? 0);
+        continue;
+      }
+      final variant = step[RecipeStepFormKeys.type.name] as RecipeStepVariant;
+      stepNumbers.add((stepNumbers.lastOrNull ?? 0) +
+          (variant == RecipeStepVariant.regular ? 1 : 0));
+    }
+
     return FormArrayController(
         mutate: handleMutate,
         child: ListView.builder(
@@ -83,6 +95,7 @@ class _RecipeEditorScreenBodyState extends State<RecipeEditorScreenBody> {
                 formGroup: formArray.controls[i - 1] as FormGroup,
                 child: RecipeStepEditor(
                   index: i - 1,
+                  stepNumber: stepNumbers[i - 1],
                 ),
               );
             }));

@@ -36,7 +36,9 @@ class _AcSearchBarState extends State<AcSearchBar> {
                   prefixIcon:
                       Icon(Icons.search, color: context.colors.tertiary)),
             ),
-            onSubmitted: widget.onSearch,
+            onSubmitted: (value) {
+              widget.onSearch(value.isEmpty ? null : value);
+            },
           ),
         ),
         // const SizedBox(width: AcSizes.space),

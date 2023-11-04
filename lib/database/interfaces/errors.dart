@@ -78,3 +78,8 @@ class ApiError extends _ErrorWrappingError {
   toString() =>
       "Error [Type: $type]: $message${_innerException == null ? '' : "\n$errorMessage"}";
 }
+
+class InvalidStateError implements Exception {
+  final String? message;
+  InvalidStateError(this.message);
+}

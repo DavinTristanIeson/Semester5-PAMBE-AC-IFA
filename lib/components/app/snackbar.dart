@@ -2,7 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 
-mixin SnackbarMessenger {
+class AcSnackbarMessenger {
+  ScaffoldMessengerState messenger;
+  AcSnackbarMessenger._({required this.messenger});
+
+  static AcSnackbarMessenger of(BuildContext context) {
+    return AcSnackbarMessenger._(
+      messenger: ScaffoldMessenger.of(context),
+    );
+  }
+
   void sendMessage(BuildContext context, String message) {
     ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
     SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -13,8 +22,7 @@ mixin SnackbarMessenger {
     });
   }
 
-  void sendError(BuildContext context, Object message, {bool? override}) {
-    ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+  void sendError(Object message, {bool? override}) {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       if (override == true) {
         messenger.clearSnackBars();
@@ -30,13 +38,12 @@ mixin SnackbarMessenger {
               color: Colors.black,
               fontWeight: FontWeight.bold,
             )),
-        backgroundColor: Theme.of(context).colorScheme.errorContainer,
+        backgroundColor: AcColors.danger,
       ));
     });
   }
 
-  void sendSuccess(BuildContext context, String message) {
-    ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+  void sendSuccess(String message) {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       messenger.showSnackBar(SnackBar(
         behavior: SnackBarBehavior.floating,

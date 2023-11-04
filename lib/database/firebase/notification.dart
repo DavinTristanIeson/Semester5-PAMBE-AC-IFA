@@ -11,13 +11,11 @@ enum NotificationFirestoreKeys {
   createdAt,
   isRead,
   reviewTargetId,
-  userId
 }
 
 class FirebaseNotificationManager
     with FirebaseResourceManagerMixin
     implements INotificationResourceManager {
-  static const String collectionPath = "notifications";
   FirebaseFirestore db;
   CacheClient<NotificationModel> cache;
   CacheClient<PaginatedQueryResult<NotificationModel>> queryCache;
@@ -29,17 +27,22 @@ class FirebaseNotificationManager
             staleTime: const Duration(minutes: 2),
             cleanupInterval: const Duration(minutes: 1, seconds: 30));
 
+  CollectionReference getCollection(String userId) {
+    return db.collection("users").doc(userId).collection("notifications");
+  }
+
   NotificationModel _transform(
       Map<String, dynamic> json, DocumentSnapshot<Object?> snapshot) {
     return NotificationModel.fromJson({...json, "id": snapshot.id});
   }
 
-  Future<NotificationModel> get(String id) async {
+  Future<NotificationModel> get(
+      {required String userId, required String id}) async {
     if (cache.has(id)) {
       return Future.value(cache.get(id));
     }
     final (:data, snapshot: _) = await processDocumentSnapshot(
-        () => db.collection(collectionPath).doc(id).get(),
+        () => getCollection(userId).doc(id).get(),
         transform: _transform);
     cache.put(id, data);
     return data;
@@ -53,11 +56,9 @@ class FirebaseNotificationManager
     if (queryCache.has(queryKey)) {
       return Future.value(queryCache.get(queryKey));
     }
-    var query = db
-        .collection(collectionPath)
+    var query = getCollection(userId)
         .limit(15)
-        .orderBy(NotificationFirestoreKeys.createdAt.name, descending: true)
-        .where(NotificationFirestoreKeys.userId.name, isEqualTo: userId);
+        .orderBy(NotificationFirestoreKeys.createdAt.name, descending: true);
     if (lastCreatedAt != null) {
       query = query.startAfter([lastCreatedAt.millisecondsSinceEpoch]);
     }
@@ -77,10 +78,8 @@ class FirebaseNotificationManager
 
   @override
   Future<bool> hasUnread({required String userId}) async {
-    final countUnread = await db
-        .collection(collectionPath)
+    final countUnread = await getCollection(userId)
         .where(NotificationFirestoreKeys.isRead.name, isEqualTo: false)
-        .where(NotificationFirestoreKeys.userId.name, isEqualTo: userId)
         .limit(1)
         .count()
         .get();
@@ -89,10 +88,8 @@ class FirebaseNotificationManager
 
   @override
   Future<void> markAllRead({required String userId}) async {
-    final result = await db
-        .collection(collectionPath)
+    final result = await getCollection(userId)
         .where(NotificationFirestoreKeys.isRead.name, isEqualTo: false)
-        .where(NotificationFirestoreKeys.userId.name, isEqualTo: userId)
         .get();
     final batch = db.batch();
     for (final doc in result.docs) {

@@ -13,26 +13,29 @@ class AcPagedListView<TKey, TValue> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PagedListView<TKey, TValue>(
-        pagingController: controller,
-        builderDelegate: PagedChildBuilderDelegate(
-            noItemsFoundIndicatorBuilder: (context) {
-              return Padding(
-                padding: const EdgeInsets.all(AcSizes.space),
-                child: EmptyView(content: Either.right("No items found")),
-              );
-            },
-            newPageErrorIndicatorBuilder: (context) {
-              return ActionableErrorMessage.refresh(
-                  error: controller.error, onRefresh: controller.refresh);
-            },
-            firstPageErrorIndicatorBuilder: (context) {
-              return ActionableErrorMessage.refresh(
-                  error: controller.error, onRefresh: controller.refresh);
-            },
-            itemBuilder: (context, item, index) => Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: AcSizes.sm, horizontal: AcSizes.space),
-                child: itemBuilder(context, item, index))));
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AcSizes.space),
+      child: PagedListView<TKey, TValue>(
+          pagingController: controller,
+          builderDelegate: PagedChildBuilderDelegate(
+              noItemsFoundIndicatorBuilder: (context) {
+                return Padding(
+                  padding: const EdgeInsets.all(AcSizes.space),
+                  child: EmptyView(content: Either.right("No items found")),
+                );
+              },
+              newPageErrorIndicatorBuilder: (context) {
+                return ActionableErrorMessage.refresh(
+                    error: controller.error, onRefresh: controller.refresh);
+              },
+              firstPageErrorIndicatorBuilder: (context) {
+                return ActionableErrorMessage.refresh(
+                    error: controller.error, onRefresh: controller.refresh);
+              },
+              itemBuilder: (context, item, index) => Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: AcSizes.sm, horizontal: AcSizes.space),
+                  child: itemBuilder(context, item, index)))),
+    );
   }
 }

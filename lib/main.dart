@@ -41,16 +41,28 @@ void main() async {
     providers: [
       ChangeNotifierProvider(
           create: (context) => AuthProvider(userManager: userManager)),
-      ChangeNotifierProvider(
+      ProxyProvider<AuthProvider, NotificationController>(
           create: (context) => NotificationController(
               notificationManager:
-                  FirebaseNotificationManager(FirebaseFirestore.instance))),
-      ChangeNotifierProvider(
+                  FirebaseNotificationManager(FirebaseFirestore.instance),
+              userId: null),
+          update: (context, authProvider, prev) {
+            final userId = authProvider.user?.id;
+            prev!.userId = userId;
+            return prev;
+          }),
+      ChangeNotifierProxyProvider<AuthProvider, RecipeController>(
           create: (context) => RecipeController(
               recipeManager: FirebaseRecipeManager(FirebaseFirestore.instance,
                   userManager: userManager,
                   imageManager: FirebaseImageManager(FirebaseStorage.instance,
-                      storagePath: "recipes")))),
+                      storagePath: "recipes")),
+              userId: null),
+          update: (context, authProvider, prev) {
+            final userId = authProvider.user?.id;
+            prev!.userId = userId;
+            return prev;
+          }),
       ChangeNotifierProvider(
           create: (context) => LocalRecipeController(recipeTable: recipeTable)),
     ],

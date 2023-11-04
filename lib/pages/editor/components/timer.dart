@@ -45,6 +45,9 @@ class _DigitFieldState extends State<DigitField> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: () {
+        widget.onChanged(min(widget.max, max(0, widget.value + 1)));
+      },
       onVerticalDragStart: (details) {
         setState(() {
           tempValue = widget.value.toDouble();

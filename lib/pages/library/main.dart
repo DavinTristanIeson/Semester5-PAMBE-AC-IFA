@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
-import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/pages/editor/main.dart';
 import 'package:pambe_ac_ifa/pages/library/components/sections.dart';
 
-class LibraryScreen extends StatelessWidget with SnackbarMessenger {
+class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
 
   @override

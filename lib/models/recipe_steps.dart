@@ -48,6 +48,15 @@ abstract class AbstractRecipeStepModel with SupportsLocalAndOnlineImagesMixin {
     this.timer,
     this.imagePath,
   });
+
+  static int countSteps(Iterable<AbstractRecipeStepModel> steps) {
+    if (steps.isEmpty) {
+      return 0;
+    }
+    return steps
+        .map((step) => (step.type == RecipeStepVariant.regular ? 1 : 0))
+        .reduce((value, element) => value + element);
+  }
 }
 
 @JsonSerializable(explicitToJson: true)
