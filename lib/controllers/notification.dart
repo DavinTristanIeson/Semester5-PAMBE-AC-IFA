@@ -1,26 +1,22 @@
-import 'package:flutter/material.dart';
+import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:pambe_ac_ifa/models/notification.dart';
 
-class NotificationController extends ChangeNotifier {
-  Future<List<NotificationModel>> getNotifications() async {
-    return [
-      NotificationModel(
-          type: NotificationType.general,
-          title: "Test General",
-          content: "Hello world",
-          createdAt: DateTime.now()),
-      NotificationModel(
-          type: NotificationType.system,
-          title: "Test System",
-          createdAt: DateTime.now()),
-      NotificationModel(
-          type: NotificationType.review,
-          title: "Test Review",
-          content: "Some bozo reviewed your recipe",
-          createdAt: DateTime.now(),
-          reviewTargetId: '0'),
-    ];
+class NotificationController {
+  String? userId;
+  INotificationResourceManager notificationManager;
+
+  NotificationController(
+      {required this.notificationManager, required this.userId});
+
+  Future<PaginatedQueryResult<NotificationModel>> getAll({DateTime? page}) {
+    return notificationManager.getAll(page: page, userId: userId!);
   }
 
-  Future<void> readAll() async {}
+  Future<void> readAll() {
+    return notificationManager.markAllRead(userId: userId!);
+  }
+
+  Future<bool> hasUnread() {
+    return notificationManager.hasUnread(userId: userId!);
+  }
 }

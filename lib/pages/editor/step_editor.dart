@@ -39,6 +39,7 @@ class _RecipeStepEditorInternal extends StatelessWidget {
                   multiline: true,
                   onChanged: (value) {
                     control.value = value;
+                    control.markAsDirty();
                   }),
               if (error != null)
                 Padding(
@@ -68,6 +69,7 @@ class _RecipeStepEditorInternal extends StatelessWidget {
                     ?.translateAny(control.errors),
                 onChanged: (XFile? value) {
                   control.value = control.value?.withValue(value);
+                  control.markAsDirty();
                 }),
           );
         });
@@ -86,6 +88,7 @@ class _RecipeStepEditorInternal extends StatelessWidget {
                 value: control.value?.value,
                 onChanged: (value) {
                   control.value = control.value?.withValue(value);
+                  control.markAsDirty();
                 }),
           );
         });
@@ -278,7 +281,9 @@ class _RecipeStepEditorFieldWrapper extends StatelessWidget {
 
 class RecipeStepEditor extends StatelessWidget {
   final int index;
-  const RecipeStepEditor({super.key, required this.index});
+  final int stepNumber;
+  const RecipeStepEditor(
+      {super.key, required this.index, required this.stepNumber});
 
   @override
   Widget build(BuildContext context) {
@@ -286,7 +291,7 @@ class RecipeStepEditor extends StatelessWidget {
         formControlName: RecipeStepFormKeys.type.name,
         builder: (context, control, child) {
           return RecipeStepWrapper(
-            index: index + 1,
+            index: stepNumber,
             variant: control.value ?? RecipeStepVariant.regular,
             padding: const EdgeInsets.only(
               left: AcSizes.lg,

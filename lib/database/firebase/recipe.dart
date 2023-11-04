@@ -46,9 +46,9 @@ class FirebaseRecipeManager
         recipeImageHelper =
             RemoteRecipeImageManager(imageManager: imageManager),
         queryCache = CacheClient(
-            cleanupInterval: const Duration(minutes: 1, seconds: 30),
-            staleTime: const Duration(minutes: 1),
-            cacheTime: const Duration(minutes: 2));
+          cleanupInterval: const Duration(minutes: 1, seconds: 30),
+          staleTime: const Duration(minutes: 1),
+        );
 
   String keyOfRecipeQuery(
       {QueryDocumentSnapshot? page, RecipeSearchState? searchState}) {
@@ -67,12 +67,14 @@ class FirebaseRecipeManager
           .get(json[RecipeFirestoreKeys.userId.name] as String),
       "imagePath":
           imagePath == null ? null : await imageManager.urlof(imagePath),
+      "imageStoragePath": imagePath,
       "steps": await Future.wait(steps.map((step) async {
         final imagePath =
             step[RecipeStepFirestoreKeys.imagePath.name] as String?;
         return {
           ...step,
-          RecipeStepFirestoreKeys.imagePath.name:
+          "imageStoragePath": imagePath,
+          "imagePath":
               imagePath == null ? null : await imageManager.urlof(imagePath)
         };
       }))

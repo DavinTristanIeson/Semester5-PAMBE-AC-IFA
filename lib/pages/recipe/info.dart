@@ -179,8 +179,8 @@ class RecipeInfoScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               NoticeComponent(
-                  child:
-                      Either.right("This tutorial has ${steps.length} steps"),
+                  child: Either.right(
+                      "This tutorial has ${AbstractRecipeStepModel.countSteps(steps)} steps"),
                   type: NoticeType.tip)
             ],
           ),

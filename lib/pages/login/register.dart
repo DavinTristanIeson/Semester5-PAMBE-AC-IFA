@@ -101,17 +101,17 @@ class _RegisterScreenFormState extends State<_RegisterScreenForm> {
   }
 }
 
-class RegisterScreen extends StatelessWidget with SnackbarMessenger {
+class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
   void _register(BuildContext context, RegisterPayload payload) async {
     final navigator = Navigator.of(context);
+    final messenger = AcSnackbarMessenger.of(context);
     try {
       await context.read<AuthProvider>().register(payload);
       navigator.pop();
     } catch (e) {
-      // ignore: use_build_context_synchronously
-      sendError(context, e.toString());
+      messenger.sendError(e);
     }
   }
 

@@ -25,13 +25,13 @@ class RemoteRecipeImageManager {
     copy.remoteId = current.remoteId;
     final Map<String, XFile?> reserved = {};
     final currentImagePath = getFilePath(userId: userId, name: copy.imagePath);
-    if (currentImagePath != former?.imagePath) {
+    if (currentImagePath != former?.imageStoragePath) {
       if (currentImagePath != null) {
-        reserved[currentImagePath] = XFile(current.imagePath!);
+        reserved[currentImagePath] = XFile(copy.imagePath!);
         copy.imagePath = currentImagePath;
       }
-      if (former?.imagePath != null) {
-        reserved[former!.imagePath!] = null;
+      if (former?.imageStoragePath != null) {
+        reserved[former!.imageStoragePath!] = null;
       }
     }
 
@@ -44,21 +44,24 @@ class RemoteRecipeImageManager {
     }
     if (former != null) {
       for (final step in former.steps) {
-        if (step.imagePath == null || reserved.containsKey(step.imagePath!)) {
+        if (step.imageStoragePath == null) {
           continue;
         }
-        reserved[step.imagePath!] = null;
+        if (reserved.containsKey(step.imageStoragePath!)) {
+          reserved.remove(step.imageStoragePath);
+          continue;
+        }
+        reserved[step.imageStoragePath!] = null;
       }
     }
-
     return (reserved: reserved, recipe: copy);
   }
 
   Map<String, XFile?> markRecipeImagesForDeletion(
       {required String userId, required RecipeModel recipe}) {
     Map<String, XFile?> reserved = {};
-    if (recipe.imagePath != null) {
-      reserved[recipe.imagePath!] = null;
+    if (recipe.imageStoragePath != null) {
+      reserved[recipe.imageStoragePath!] = null;
     }
     for (final step
         in recipe.steps.where((element) => element.imagePath != null)) {

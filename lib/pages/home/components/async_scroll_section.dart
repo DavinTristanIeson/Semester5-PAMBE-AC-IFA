@@ -2,13 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
-import 'package:pambe_ac_ifa/components/app/snackbar.dart';
+import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/components/display/skeleton.dart';
 import 'package:pambe_ac_ifa/components/display/some_items_scroll.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 
-class AsyncApiSampleScrollSection<T> extends StatelessWidget
-    with SnackbarMessenger {
+class AsyncApiSampleScrollSection<T> extends StatelessWidget {
   final Future<List<T>> future;
   final Widget Function(BuildContext context, T data) itemBuilder;
   final Either<Widget, String> header;
@@ -28,26 +27,28 @@ class AsyncApiSampleScrollSection<T> extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(future: future.catchError((error) {
-      sendError(context, error.toString(), override: true);
-      return Future<List<T>>.value([]);
-    }), builder: (context, snapshot) {
-      final data = snapshot.data;
-      return SampleScrollSection(
-        itemCount: snapshot.connectionState != ConnectionState.done
-            ? 5
-            : min(5, data?.length ?? 0),
-        itemBuilder: (context, index) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return Skeleton(
-              constraints: itemConstraints,
-            );
+    return FutureBuilder(
+        future: future,
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          if (snapshot.hasError) {
+            return ErrorView(error: Either.right(snapshot.error!.toString()));
           }
-          return itemBuilder(context, data![index]);
-        },
-        header: header,
-        viewMoreButton: viewMoreButton,
-      );
-    });
+          return SampleScrollSection(
+            itemCount: snapshot.connectionState != ConnectionState.done
+                ? 5
+                : min(5, data?.length ?? 0),
+            itemBuilder: (context, index) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return Skeleton(
+                  constraints: itemConstraints,
+                );
+              }
+              return itemBuilder(context, data![index]);
+            },
+            header: header,
+            viewMoreButton: viewMoreButton,
+          );
+        });
   }
 }

@@ -82,11 +82,16 @@ UserModel? _$userPropertyFromJson(dynamic json) {
 class RecipeLiteModel extends AbstractRecipeLiteModel {
   @JsonKey(includeToJson: false)
   String id;
+
   @JsonKey(
     toJson: _$userPropertyToJson,
     fromJson: _$userPropertyFromJson,
   )
   UserModel? user;
+
+  @JsonKey(includeToJson: false)
+  String? imageStoragePath;
+
   @override
   ExternalImageSource get imageSource => ExternalImageSource.network;
 
@@ -97,6 +102,7 @@ class RecipeLiteModel extends AbstractRecipeLiteModel {
     required super.description,
     required super.createdAt,
     super.imagePath,
+    this.imageStoragePath,
   });
 
   factory RecipeLiteModel.fromJson(Map<String, dynamic> json) {
@@ -106,7 +112,11 @@ class RecipeLiteModel extends AbstractRecipeLiteModel {
       throw ApiError(ApiErrorType.shapeMismatch, inner: e);
     }
   }
-  Map<String, dynamic> toJson() => _$RecipeLiteModelToJson(this);
+  Map<String, dynamic> toJson() {
+    final map = _$RecipeLiteModelToJson(this);
+    map["imagePath"] = imageStoragePath;
+    return map;
+  }
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -153,6 +163,7 @@ class RecipeModel extends RecipeLiteModel {
     required super.description,
     required super.createdAt,
     super.imagePath,
+    super.imageStoragePath,
     required super.user,
     required this.steps,
   });
@@ -165,7 +176,11 @@ class RecipeModel extends RecipeLiteModel {
     }
   }
   @override
-  Map<String, dynamic> toJson() => _$RecipeModelToJson(this);
+  Map<String, dynamic> toJson() {
+    final map = _$RecipeModelToJson(this);
+    map["imagePath"] = imageStoragePath;
+    return map;
+  }
 }
 
 enum RecipeSortBy {

@@ -64,17 +64,17 @@ class _LoginScreenFormState extends State<_LoginScreenForm> {
   }
 }
 
-class LoginScreen extends StatelessWidget with SnackbarMessenger {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   void _login(BuildContext context, LoginPayload payload) async {
     final navigator = Navigator.of(context);
+    final messenger = AcSnackbarMessenger.of(context);
     try {
       await context.read<AuthProvider>().login(payload);
       navigator.pop();
     } catch (e) {
-      // ignore: use_build_context_synchronously
-      sendError(context, e.toString());
+      messenger.sendError(e);
     }
   }
 

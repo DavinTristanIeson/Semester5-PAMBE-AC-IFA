@@ -48,6 +48,15 @@ abstract class AbstractRecipeStepModel with SupportsLocalAndOnlineImagesMixin {
     this.timer,
     this.imagePath,
   });
+
+  static int countSteps(Iterable<AbstractRecipeStepModel> steps) {
+    if (steps.isEmpty) {
+      return 0;
+    }
+    return steps
+        .map((step) => (step.type == RecipeStepVariant.regular ? 1 : 0))
+        .reduce((value, element) => value + element);
+  }
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -81,11 +90,15 @@ class RecipeStepModel extends AbstractRecipeStepModel
   @override
   ExternalImageSource? get imageSource => ExternalImageSource.network;
 
+  @JsonKey(includeToJson: false)
+  String? imageStoragePath;
+
   RecipeStepModel({
     required super.content,
     super.type,
     super.timer,
     super.imagePath,
+    this.imageStoragePath,
   });
 
   factory RecipeStepModel.fromJson(Map<String, dynamic> json) {
@@ -95,5 +108,9 @@ class RecipeStepModel extends AbstractRecipeStepModel
       throw ApiError(ApiErrorType.shapeMismatch, inner: e);
     }
   }
-  Map<String, dynamic> toJson() => _$RecipeStepModelToJson(this);
+  Map<String, dynamic> toJson() {
+    final map = _$RecipeStepModelToJson(this);
+    map["imageStoragePath"] = imagePath;
+    return map;
+  }
 }

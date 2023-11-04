@@ -24,7 +24,7 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
     searchState = RecipeSearchState(
         search: widget.search,
-        sortBy: widget.sortBy ?? SortBy.descending(RecipeSortBy.ratings),
+        sortBy: widget.sortBy ?? SortBy.descending(RecipeSortBy.createdDate),
         filterBy: widget.filterBy);
   }
 
@@ -36,9 +36,9 @@ class _SearchScreenState extends State<SearchScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.only(
-                  left: AcSizes.space,
-                  right: AcSizes.space,
-                  bottom: AcSizes.lg),
+                left: AcSizes.space,
+                right: AcSizes.space,
+              ),
               child: AcSearchBar(
                   value: searchState.search,
                   onSearch: (value) {

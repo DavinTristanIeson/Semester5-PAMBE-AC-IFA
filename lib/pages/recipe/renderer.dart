@@ -26,10 +26,6 @@ class _RecipeStepRendererState extends State<RecipeStepRenderer> {
   late final StreamSubscription _subscribe;
   final ScrollController _scroll = ScrollController();
   List<AbstractRecipeStepModel> steps = [];
-  // Cannot just use a single counter mutated by ListView.itemBuilder
-  // because itemBuilder will be called when an item that was out of view comes back into view
-  // Which means that Step 1 might become Step 6 when you scroll back up.
-  List<int> stepNumbers = [];
   bool isDone = false;
 
   Future<void> scrollToBottom({Duration? duration}) {
@@ -46,9 +42,6 @@ class _RecipeStepRendererState extends State<RecipeStepRenderer> {
     _subscribe = widget.stream.listen((data) async {
       setState(() {
         steps.add(data);
-        int prevNumber = stepNumbers.isEmpty ? 0 : stepNumbers.last;
-        stepNumbers
-            .add(prevNumber + (data.type == RecipeStepVariant.regular ? 1 : 0));
       });
       scrollToBottom();
     }, onDone: () {
@@ -67,6 +60,11 @@ class _RecipeStepRendererState extends State<RecipeStepRenderer> {
 
   @override
   Widget build(BuildContext context) {
+    final stepNumbers = <int>[];
+    for (final step in steps) {
+      stepNumbers.add((stepNumbers.lastOrNull ?? 0) +
+          (step.type == RecipeStepVariant.regular ? 1 : 0));
+    }
     return FutureProcedureCaller<void>(
         process: widget.next,
         builder: (context, snapshot, call) {

@@ -1,73 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
-import 'package:pambe_ac_ifa/common/extensions.dart';
-import 'package:pambe_ac_ifa/components/display/notice.dart';
+import 'package:pambe_ac_ifa/components/display/pagination.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
-import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:provider/provider.dart';
-
-class _SearchScreenBody extends StatelessWidget {
-  final bool isLocal;
-  final PagingController<dynamic, AbstractRecipeLiteModel> controller;
-  const _SearchScreenBody({required this.controller, required this.isLocal});
-
-  Widget buildError(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(AcSizes.space),
-      child: Column(
-        children: [
-          Text(controller.error.toString(),
-              textAlign: TextAlign.center,
-              style: context.texts.bodyMedium!
-                  .copyWith(color: context.colors.error)),
-          Text(
-            "An error has occured while fetching data. You can try again by pressing the button below.",
-            textAlign: TextAlign.center,
-            style: context.texts.bodyLarge!.copyWith(
-                fontWeight: FontWeight.bold, color: context.colors.primary),
-          ),
-          IconButton(
-              onPressed: controller.refresh,
-              color: context.colors.primary,
-              icon: const Icon(Icons.refresh))
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return PagedListView<dynamic, AbstractRecipeLiteModel>(
-        pagingController: controller,
-        builderDelegate: PagedChildBuilderDelegate(
-            noItemsFoundIndicatorBuilder: (context) {
-              return Padding(
-                padding: const EdgeInsets.all(AcSizes.space),
-                child: EmptyView(content: Either.right("No recipes found")),
-              );
-            },
-            newPageErrorIndicatorBuilder: (context) {
-              return buildError(context);
-            },
-            firstPageErrorIndicatorBuilder: (context) {
-              return buildError(context);
-            },
-            itemBuilder: (context, item, index) => Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: AcSizes.sm, horizontal: AcSizes.space),
-                child: RecipeHorizontalCard(
-                  recipe: item,
-                  recipeSource: isLocal
-                      ? RecipeSource.local((item as LocalRecipeLiteModel).id)
-                      : RecipeSource.remote((item as RecipeLiteModel).id),
-                ))));
-  }
-}
 
 class SearchScreenBody extends StatefulWidget {
   final RecipeSearchState searchState;
@@ -138,6 +78,16 @@ class _SearchScreenBodyState extends State<SearchScreenBody> {
 
   @override
   Widget build(BuildContext context) {
-    return _SearchScreenBody(controller: _pagination, isLocal: isLocal);
+    return AcPagedListView(
+        controller: _pagination,
+        itemBuilder: (context, item, index) => Padding(
+            padding: const EdgeInsets.symmetric(
+                vertical: AcSizes.sm, horizontal: AcSizes.space),
+            child: RecipeHorizontalCard(
+              recipe: item,
+              recipeSource: isLocal
+                  ? RecipeSource.local((item as LocalRecipeLiteModel).id)
+                  : RecipeSource.remote((item as RecipeLiteModel).id),
+            )));
   }
 }

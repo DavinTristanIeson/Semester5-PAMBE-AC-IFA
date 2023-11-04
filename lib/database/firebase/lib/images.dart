@@ -31,14 +31,16 @@ class FirebaseImageManager implements INetworkImageResourceManager {
   @override
   Future<void> process(Map<String, XFile?> resources,
       {required String userId}) async {
-    await Future.wait(resources.entries.map((e) async {
+    await Future.wait(resources.entries.map((resource) async {
       try {
-        if (e.value == null) {
-          await remove(e.key);
+        if (resource.value == null) {
+          await remove(resource.key);
         } else {
-          await db.ref(e.key).putFile(File(e.value!.path));
+          await db.ref(resource.key).putFile(File(resource.value!.path));
+          cache.markStale(key: resource.key);
         }
       } catch (e) {
+        debugPrint("ERROR WITH ${resource.key} - ${resource.value?.path}");
         return Future.value();
       }
     }));
@@ -59,6 +61,7 @@ class FirebaseImageManager implements INetworkImageResourceManager {
       return firebaseResource.fullPath;
     }
     await firebaseResource.putFile(File(resource.path));
+    cache.markStale(key: firebaseResource.fullPath);
     return firebaseResource.fullPath;
   }
 

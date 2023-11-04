@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
@@ -20,7 +21,7 @@ mixin SupportsLocalAndOnlineImagesMixin {
     if (imageSource == ExternalImageSource.local) {
       return FileImage(File(imagePath!));
     } else {
-      return NetworkImage(imagePath!);
+      return CachedNetworkImageProvider(imagePath!);
     }
   }
 }

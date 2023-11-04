@@ -26,8 +26,7 @@ class RecipeEditorScreenForm extends StatefulWidget {
   State<RecipeEditorScreenForm> createState() => _RecipeEditorScreenFormState();
 }
 
-class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
-    with SnackbarMessenger {
+class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
   late FormGroup form;
 
   @override
@@ -80,8 +79,9 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
   void save() async {
     final controller = context.read<LocalRecipeController>();
     final user = context.read<AuthProvider>().user!;
+    final messenger = AcSnackbarMessenger.of(context);
     if (form.invalid) {
-      sendError(context, "Please resolve all errors before saving!");
+      messenger.sendError("Please resolve all errors before saving!");
       return;
     }
 
@@ -103,17 +103,17 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
           id: widget.recipe?.id);
       form.markAsPristine();
       widget.onChanged(recipe);
-      // ignore: use_build_context_synchronously
-      sendSuccess(context, "$title has been saved locally.");
+      messenger.sendSuccess("$title has been saved locally.");
     } catch (e) {
-      // ignore: use_build_context_synchronously
-      sendError(context, e.toString());
+      messenger.sendError(e);
     }
   }
 
   void publish() async {
-    if (form.dirty || widget.recipe == null) {
-      sendError(context,
+    final messenger = AcSnackbarMessenger.of(context);
+
+    if (form.invalid || form.dirty || widget.recipe == null) {
+      messenger.sendError(
           "Changes to the recipe should be saved first before publishing!");
       return;
     }
@@ -127,19 +127,17 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
                     context.read<RecipeController>();
                 LocalRecipeController localController =
                     context.read<LocalRecipeController>();
-                final userId = context.read<AuthProvider>().user!.id;
                 try {
-                  final recipe = await remoteController.put(widget.recipe!,
-                      userId: userId);
+                  final recipe = await remoteController.put(
+                    widget.recipe!,
+                  );
                   await localController.setRemoteId(
                       widget.recipe!.id, recipe.id);
-                  // ignore: use_build_context_synchronously
-                  sendSuccess(context,
+                  messenger.sendSuccess(
                       "Changes to ${widget.recipe!.title} has been published");
                   widget.onChanged(widget.recipe!.withRemoteId(recipe.id));
                 } on ApiError catch (e) {
-                  // ignore: use_build_context_synchronously
-                  sendError(context, e.message);
+                  messenger.sendError(e.message);
                 }
               },
               context: context,
@@ -152,6 +150,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
 
   void unpublish() {
     if (widget.recipe == null) return;
+    final messenger = AcSnackbarMessenger.of(context);
     showDialog(
         context: context,
         builder: (context) {
@@ -164,13 +163,11 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
                     await remoteController.remove(widget.recipe!.remoteId!);
                   }
                   await localController.setRemoteId(widget.recipe!.id, null);
-                  // ignore: use_build_context_synchronously
-                  sendSuccess(context,
+                  messenger.sendSuccess(
                       "${widget.recipe!.title} is no longer available to the public");
                   widget.onChanged(widget.recipe!.withRemoteId(null));
                 } catch (e) {
-                  // ignore: use_build_context_synchronously
-                  sendError(context, e.toString());
+                  messenger.sendError(e);
                 }
               },
               positiveText: Either.right("Unpublish"),
@@ -184,6 +181,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
     if (widget.recipe == null) return;
     bool close = false;
     final navigator = Navigator.of(context);
+    final messenger = AcSnackbarMessenger.of(context);
     await showDialog(
         context: context,
         builder: (context) {
@@ -199,12 +197,10 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm>
                     await recipeController.remove(widget.recipe!.remoteId!);
                   }
                   close = true;
-                  // ignore: use_build_context_synchronously
-                  sendSuccess(context,
+                  messenger.sendSuccess(
                       "${widget.recipe!.title} has been successfully deleted");
                 } catch (e) {
-                  // ignore: use_build_context_synchronously
-                  sendError(context, e.toString());
+                  messenger.sendError(e);
                 }
               },
               positiveText: Either.right("Delete"),

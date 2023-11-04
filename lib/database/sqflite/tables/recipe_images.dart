@@ -49,6 +49,8 @@ class LocalRecipeImageManager {
       if (former?.imagePath != null) {
         reserved[former!.imagePath!] = null;
       }
+    } else {
+      recipeImage = image?.path;
     }
 
     Map<int, RecipeStepFormType> stepsThatMightveChangedImages = {};
@@ -69,9 +71,10 @@ class LocalRecipeImageManager {
         }
         if (!stepsThatMightveChangedImages.containsKey(step.id)) {
           reserved[step.imagePath!] = null;
+          continue;
         }
-        final updatedStep = stepsThatMightveChangedImages[step.id];
-        if (updatedStep!.image!.path != step.imagePath) {
+        final updatedStep = stepsThatMightveChangedImages[step.id]!;
+        if (updatedStep.image!.path != step.imagePath) {
           reserved[step.imagePath!] = null;
           final entry = await imageManager
               .reserve(stepsThatMightveChangedImages[step.id]!.image!);

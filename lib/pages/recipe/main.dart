@@ -12,11 +12,12 @@ import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/recipe/info.dart';
 import 'package:provider/provider.dart';
 
-class RecipeScreen extends StatelessWidget with SnackbarMessenger {
+class RecipeScreen extends StatelessWidget {
   final RecipeSource source;
   const RecipeScreen({super.key, required this.source});
 
   Future<AbstractRecipeLiteModel?> getRecipe(BuildContext context) async {
+    final messenger = AcSnackbarMessenger.of(context);
     try {
       if (source.type == RecipeSourceType.local) {
         final controller = context.watch<LocalRecipeController>();
@@ -27,7 +28,7 @@ class RecipeScreen extends StatelessWidget with SnackbarMessenger {
         return result;
       }
     } catch (e) {
-      sendError(context, e.toString());
+      messenger.sendError(e);
       rethrow;
     }
   }
@@ -39,6 +40,9 @@ class RecipeScreen extends StatelessWidget with SnackbarMessenger {
       body: FutureBuilder(
           future: getRecipe(context),
           builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
             if (!snapshot.hasData) {
               return Padding(
                 padding: const EdgeInsets.all(AcSizes.space),

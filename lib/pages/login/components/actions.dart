@@ -51,6 +51,7 @@ Widget buildGenericTextInput(
               value: control.value,
               onChanged: (value) {
                 control.value = value;
+                control.markAsDirty();
               },
               error:
                   ReactiveFormConfig.of(context)?.translateAny(control.errors),
