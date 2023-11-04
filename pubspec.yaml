@@ -48,6 +48,8 @@ dependencies:
   cloud_firestore: ^4.12.1
   firebase_storage: ^11.4.0
   cached_network_image: ^3.3.0
+  intl: ^0.18.1
+  calendar_date_picker2: ^0.5.2
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +78,7 @@ flutter:
   assets:
     - assets/images/image-not-available.jpg
     - assets/images/logo.png
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
