@@ -39,8 +39,12 @@ extension DateTimeUtilities on DateTime {
     return timePiece.toString().padLeft(2, '0');
   }
 
+  String toLocaleDateString() {
+    return "${_padZero(day)}/${_padZero(month)}/${_padZero(year)}";
+  }
+
   String toLocaleString() {
-    return "${_padZero(day)}/${_padZero(month)}/${_padZero(year)} ${_padZero(hour)}:${_padZero(minute)}";
+    return "${toLocaleDateString()} ${_padZero(hour)}:${_padZero(minute)}";
   }
 }
 

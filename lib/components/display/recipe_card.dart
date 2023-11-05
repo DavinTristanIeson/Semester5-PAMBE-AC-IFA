@@ -63,9 +63,6 @@ class RecipeCard extends StatelessWidget {
       children: [
         if (secondaryAction == null && isLoggedIn)
           OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                  foregroundColor: context.colors.secondary,
-                  side: BorderSide(color: context.colors.secondary)),
               onPressed: () {
                 // TODO: Bookmark
               },

@@ -1,297 +1,139 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:pambe_ac_ifa/pages/profile/model/profile_data.dart';
+import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/components/display/image.dart';
+import 'package:pambe_ac_ifa/models/user.dart';
+import 'package:pambe_ac_ifa/pages/profile/components/text.dart';
+import 'package:pambe_ac_ifa/pages/profile/screens/change_auth_screen.dart';
 import 'package:pambe_ac_ifa/pages/profile/screens/edit_profile_screen.dart';
+import 'package:pambe_ac_ifa/pages/profile/components/user_recipes_section.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+class ProfileScreenBody extends StatefulWidget {
+  final UserModel user;
+  final bool? editable;
+  const ProfileScreenBody({super.key, required this.user, this.editable});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<ProfileScreenBody> createState() => _ProfileScreenBodyState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
-  final images = [
-    'assets/images/Rectangle 4.png',
-    'assets/images/Rectangle 5.png',
-    'assets/images/Rectangle 6.png',
-    'assets/images/Rectangle 4.png',
-    'assets/images/Rectangle 4.png',
-    'assets/images/Rectangle 5.png',
-    'assets/images/Rectangle 6.png',
-    'assets/images/Rectangle 4.png',
-    'assets/images/Rectangle 5.png',
-    'assets/images/Rectangle 6.png'
-  ];
-  ProfileData data = ProfileData('assets/images/Ellipse 2.jpg', 'recipe Lib',
-      'recipelib@gmail.com', 'hotpot123', DateTime(2023, 8, 8), 'indonesia');
-  File? imageFile;
-
-  void _onImageAdded(File image) {
-    setState(() {
-      imageFile = image;
-    });
+class _ProfileScreenBodyState extends State<ProfileScreenBody> {
+  Widget buildProfileOnboard() {
+    final imagePath = widget.user.imagePath;
+    return Padding(
+      padding: const EdgeInsets.only(top: AcSizes.space, bottom: AcSizes.xl),
+      child: Center(
+        child: CircleAvatar(
+          radius: context.relativeWidth(0.25, 60.0, 120.0),
+          foregroundImage: (imagePath != null
+                  ? NetworkImage(imagePath)
+                  : const AssetImage(MaybeImage.userFallbackImagePath))
+              as ImageProvider,
+        ),
+      ),
+    );
   }
 
-  void _onProfileDataUpdate(ProfileData newData) {
-    setState(() {
-      data = newData;
-    });
+  Widget buildLocation() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(
+          Icons.pin_drop,
+          color: Color.fromARGB(255, 255, 159, 42),
+        ),
+        const SizedBox(
+          width: 5,
+        ),
+        Text(
+          widget.user.country!,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: Color.fromARGB(255, 255, 159, 42),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildActions(BuildContext context) {
+    final buttonStyle = OutlinedButton.styleFrom(
+        foregroundColor: context.colors.primary,
+        side: BorderSide(color: context.colors.primary));
+    return Column(
+      children: [
+        OutlinedButton.icon(
+            style: buttonStyle,
+            onPressed: () {
+              context.navigator.push(
+                MaterialPageRoute(
+                    builder: (context) => EditProfileScreen(
+                          data: widget.user,
+                        )),
+              );
+            },
+            icon: const Icon(Icons.edit),
+            label: const Text("Edit Profile")),
+        const SizedBox(
+          height: AcSizes.md,
+        ),
+        OutlinedButton.icon(
+            style: buttonStyle,
+            onPressed: () {
+              context.navigator.push(
+                MaterialPageRoute(
+                    builder: (context) => const ChangeAuthScreen()),
+              );
+            },
+            icon: const Icon(Icons.email_outlined),
+            label: const Text("Edit Credentials")),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // bottomNavigationBar: BottomNav(),
-      body: Column(
+    final editable = widget.editable != null && widget.editable!;
+    return SingleChildScrollView(
+      child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 50),
-            child: Stack(
-              alignment: Alignment.bottomCenter,
-              clipBehavior: Clip.none,
-              children: [
-                Image.asset(
-                  'assets/images/profile_background.png',
-                ),
-                Positioned(
-                  bottom: -50,
-                  child: Center(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(90.0),
-                      child: imageFile == null
-                          ? Image.asset(
-                              data.image ?? "none",
-                              fit: BoxFit.fill,
-                              height: 115,
-                              width: 115,
-                            )
-                          : Image.file(
-                              imageFile!,
-                              fit: BoxFit.fill,
-                              height: 115,
-                              width: 115,
-                            ),
-                    ),
-                  ),
-                ),
-              ],
+          buildProfileOnboard(),
+          Text(
+            widget.user.name,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: context.colors.primary,
             ),
           ),
           Text(
-            data.name,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Color.fromARGB(255, 255, 159, 42),
-            ),
-          ),
-          const Text(
-            'recipe-lib',
+            widget.user.email,
             style: TextStyle(
               fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: Color.fromARGB(255, 255, 159, 42),
+              fontWeight: FontWeight.w400,
+              color: context.colors.primary,
             ),
           ),
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.pin_drop,
-                  color: Color.fromARGB(255, 255, 159, 42),
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  data.country,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: Color.fromARGB(255, 255, 159, 42),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextItem(firstText: "122", secondText: "followers"),
-              SizedBox(
-                width: 30,
-              ),
-              TextItem(firstText: "67", secondText: "following"),
-              SizedBox(
-                width: 30,
-              ),
-              TextItem(firstText: "37K", secondText: "likes"),
-            ],
-          ),
+          if (widget.user.country != null) buildLocation(),
+          if (widget.user.birthdate != null)
+            TextItem(
+                firstText: "Date of Birth",
+                secondText: widget.user.birthdate!.toLocaleString()),
           const SizedBox(
-            height: 10,
+            height: AcSizes.space,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (context) => EditProfileScreen(
-                              data: data,
-                              onImageChanged: _onImageAdded,
-                              onProfileDataUpdate: _onProfileDataUpdate)),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(11)),
-                    backgroundColor: const Color.fromARGB(255, 255, 159, 42),
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('Edit Profile')),
-              const SizedBox(
-                width: 5,
-              ),
-              ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(11)),
-                    backgroundColor: const Color.fromARGB(255, 255, 159, 42),
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('Add Friends')),
-            ],
-          ),
+          if (editable) buildActions(context),
           const SizedBox(
-            height: 5,
+            height: AcSizes.xl,
           ),
-          // TabBarSection(
-          //   images: images,
-          // ),
+          Padding(
+              padding: const EdgeInsets.all(AcSizes.space),
+              child: editable
+                  ? const LocalUserRecipesSection()
+                  : const UserRecipesSection()),
         ],
       ),
     );
   }
 }
-
-class TextItem extends StatelessWidget {
-  final String firstText;
-  final String secondText;
-
-  const TextItem(
-      {super.key, required this.firstText, required this.secondText});
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          firstText,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w500,
-            color: Color.fromARGB(255, 255, 159, 42),
-          ),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        Text(secondText),
-      ],
-    );
-  }
-}
-
-// class TabBarSection extends StatefulWidget {
-//   const TabBarSection({super.key, required this.images});
-//   final List<String> images;
-//   @override
-//   State<StatefulWidget> createState() => _TabSectionState();
-// }
-
-// // class _TabSectionState extends State<TabBarSection>
-// //     with TickerProviderStateMixin {
-// //   late TabController _tabController;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _tabController = TabController(length: 2, vsync: this);
-//   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Expanded(
-  //     child: Column(children: [
-  //       TabBar(
-  //         controller: _tabController,
-  //         unselectedLabelStyle: const TextStyle(
-  //             color: Color.fromARGB(255, 255, 159, 42),
-  //             fontWeight: FontWeight.w400,
-  //             fontSize: 14),
-  //         labelStyle: const TextStyle(
-  //             color: Color.fromARGB(255, 255, 159, 42),
-  //             fontWeight: FontWeight.w600,
-  //             fontSize: 14),
-  //       //   tabs: const [
-        //     Tab(
-        //       text: 'Photos',
-        //     ),
-        //     Tab(
-        //       text: 'Likes',
-        //     ),
-        //   ],
-        // ),
-        // Expanded(
-        //   child: TabBarView(controller: _tabController, children: [
-        //     GridView.builder(
-        //         physics: const NeverScrollableScrollPhysics(),
-        //         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        //             maxCrossAxisExtent: 150,
-        //             childAspectRatio: 0.75,
-        //             crossAxisSpacing: 5,
-        //             mainAxisSpacing: 5),
-        //         itemCount: widget.images.length,
-        //         itemBuilder: (BuildContext ctx, index) {
-        //           return Container(
-        //             alignment: Alignment.center,
-        //             decoration:
-        //                 BoxDecoration(borderRadius: BorderRadius.circular(15)),
-        //             child: Image.asset(
-        //               widget.images[index],
-        //               fit: BoxFit.fill,
-        //             ),
-        //           );
-        //         }),
-        //     const Center(child: Text('No Likes for now')),
-        //   ]),
-        // ),
-      // ]),
-      // );
-  // }
-// }
-
-// class BottomNav extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return BottomNavigationBar(
-//       unselectedItemColor: const Color(0XFFC7C6C5),
-//       selectedItemColor: const Color(0xFF242760),
-//       onTap: (index) {},
-//       currentIndex: 3,
-//       items: const [
-//         BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: "Home"),
-//         BottomNavigationBarItem(
-//             icon: Icon(Icons.message_outlined), label: "Messages"),
-//         BottomNavigationBarItem(
-//             icon: Icon(Icons.settings_outlined), label: "Settings"),
-//         BottomNavigationBarItem(
-//             icon: Icon(Icons.person_outline), label: "Profle"),
-//       ],
-//     );
-  // }
-// }

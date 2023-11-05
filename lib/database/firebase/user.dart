@@ -61,4 +61,23 @@ class FirebaseUserManager
   void dispose() {
     cache.dispose();
   }
+
+  @override
+  Future<UserModel?> put(String id, UserEditPayload payload) {
+    // TODO: implement put
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UserModel?> updateAuth(String id,
+      {required UpdateAuthPayload payload, required LoginPayload credentials}) {
+    // TODO: implement updateAuth
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UserModel?> remove(String id, {required LoginPayload credentials}) {
+    // TODO: implement remove
+    throw UnimplementedError();
+  }
 }

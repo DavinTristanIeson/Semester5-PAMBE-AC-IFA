@@ -45,6 +45,7 @@ class LocalRecipeLiteModel extends AbstractRecipeLiteModel {
   @JsonKey(includeToJson: false)
   String? remoteId;
   @override
+  @JsonKey(includeToJson: false)
   ExternalImageSource get imageSource => ExternalImageSource.local;
 
   LocalRecipeLiteModel({
@@ -93,6 +94,7 @@ class RecipeLiteModel extends AbstractRecipeLiteModel {
   String? imageStoragePath;
 
   @override
+  @JsonKey(includeToJson: false)
   ExternalImageSource get imageSource => ExternalImageSource.network;
 
   RecipeLiteModel({

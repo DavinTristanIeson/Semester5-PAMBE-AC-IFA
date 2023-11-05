@@ -7,12 +7,20 @@ import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 
 typedef LoginPayload = ({String email, String password});
+typedef UpdateAuthPayload = ({String? email, String? password});
 typedef RegisterPayload = ({
   String email,
   String password,
   String name,
   String? bio,
   XFile? image,
+});
+typedef UserEditPayload = ({
+  String name,
+  String? bio,
+  XFile? image,
+  DateTime? birthdate,
+  String? country,
 });
 
 abstract class ILocalImageResourceManager {
@@ -38,6 +46,10 @@ abstract class IUserResourceManager {
   Future<UserModel> login(LoginPayload payload);
   Future<UserModel> register(RegisterPayload payload);
   Future<UserModel?> get(String id);
+  Future<UserModel?> put(String id, UserEditPayload payload);
+  Future<UserModel?> remove(String id, {required LoginPayload credentials});
+  Future<UserModel?> updateAuth(String id,
+      {required UpdateAuthPayload payload, required LoginPayload credentials});
 
   void dispose();
 }

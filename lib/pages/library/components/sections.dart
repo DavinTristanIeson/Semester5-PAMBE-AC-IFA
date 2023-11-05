@@ -19,16 +19,12 @@ class LibraryBookmarkedRecipesSection extends StatelessWidget {
     final controller = context.watch<RecipeController>();
     final userId = context.watch<AuthProvider>().user!.id;
     return AsyncApiSampleScrollSection(
-        future: controller.getAll(RecipeSearchState(
-            limit: 5,
-            sortBy: SortBy.descending(RecipeSortBy.lastViewed),
-            filterBy: RecipeFilterBy.bookmarkedBy(userId))),
+        future: controller.getBookmarkedRecipes(),
         itemBuilder: (context, data) {
           return RecipeCard(
             recipe: data,
             recipeSource: RecipeSource.remote(data.id),
             secondaryAction: OutlinedButton.icon(
-                style: RecipeCard.getSecondaryActionButtonStyle(context),
                 onPressed: () {
                   // TODO: Unbookmark
                 },
@@ -64,7 +60,6 @@ class LibraryLocalRecipesSection extends StatelessWidget {
             recipe: data,
             recipeSource: RecipeSource.local(data.id),
             secondaryAction: OutlinedButton.icon(
-              style: RecipeCard.getSecondaryActionButtonStyle(context),
               onPressed: () {
                 context.navigator.push(MaterialPageRoute(
                     builder: (context) => RecipeEditorScreen(

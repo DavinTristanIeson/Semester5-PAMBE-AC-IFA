@@ -40,11 +40,13 @@ Widget buildGenericTextInput(
     bool? required,
     bool? obscureText,
     bool? multiline,
-    String? placeholder}) {
+    String? placeholder,
+    EdgeInsets? padding}) {
   return Padding(
-    padding: const EdgeInsets.symmetric(
-        vertical: AcSizes.md, horizontal: AcSizes.space),
-    child: ReactiveValueListenableBuilder<String>(
+    padding: padding ??
+        const EdgeInsets.symmetric(
+            vertical: AcSizes.md, horizontal: AcSizes.space),
+    child: ReactiveValueListenableBuilder<String?>(
         formControlName: name,
         builder: (context, control, child) {
           return AcTextInput(

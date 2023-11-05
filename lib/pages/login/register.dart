@@ -11,6 +11,15 @@ import 'package:pambe_ac_ifa/pages/startup/components.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
+enum _RegisterFormKeys {
+  image,
+  email,
+  password,
+  passwordConfirmation,
+  name,
+  bio,
+}
+
 class _RegisterScreenForm extends StatefulWidget {
   final void Function(RegisterPayload payload) onSubmit;
   const _RegisterScreenForm({required this.onSubmit});
@@ -30,11 +39,12 @@ class _RegisterScreenFormState extends State<_RegisterScreenForm> {
       Validators.minLength(8),
     ]);
     form = FormGroup({
-      "image": FormControl<XFile?>(),
-      "email": FormControl<String>(
+      _RegisterFormKeys.image.name: FormControl<XFile?>(),
+      _RegisterFormKeys.email.name: FormControl<String>(
           validators: [Validators.required, Validators.email]),
-      "password": passwordControl,
-      "passwordConfirmation": FormControl<String>(validators: [
+      _RegisterFormKeys.password.name: passwordControl,
+      _RegisterFormKeys.passwordConfirmation.name:
+          FormControl<String>(validators: [
         Validators.required,
         Validators.delegate((control) {
           final passwordValue = passwordControl.value;
@@ -45,9 +55,9 @@ class _RegisterScreenFormState extends State<_RegisterScreenForm> {
               : null;
         })
       ]),
-      "name": FormControl<String>(
+      _RegisterFormKeys.name.name: FormControl<String>(
           validators: [Validators.minLength(5), AcValidators.acceptedChars]),
-      "bio": FormControl<String>(),
+      _RegisterFormKeys.bio.name: FormControl<String>(),
     });
   }
 
@@ -58,40 +68,41 @@ class _RegisterScreenFormState extends State<_RegisterScreenForm> {
       child: Column(
         children: [
           buildGenericTextInput(
-              name: "email",
+              name: _RegisterFormKeys.email.name,
               label: "Email",
               required: true,
               placeholder: "Enter your email"),
           buildGenericTextInput(
-              name: "password",
+              name: _RegisterFormKeys.password.name,
               label: "Password",
               required: true,
               obscureText: true,
               placeholder: "Enter password (min. 8 characters)"),
           buildGenericTextInput(
-              name: "passwordConfirmation",
+              name: _RegisterFormKeys.passwordConfirmation.name,
               label: "Confirm Password",
               required: true,
               obscureText: true,
               placeholder: "Enter your password again"),
           buildGenericTextInput(
-              name: "name",
+              name: _RegisterFormKeys.name.name,
               label: "Name",
               required: true,
               placeholder: "Enter your name"),
           buildGenericTextInput(
-              name: "bio",
+              name: _RegisterFormKeys.bio.name,
               label: "About Me",
               multiline: true,
               placeholder: "Tell us about you!"),
           LoginSubmitButton(
               onPressed: () {
                 widget.onSubmit((
-                  email: form.value["email"] as String,
-                  password: form.value["password"] as String,
-                  name: form.value["name"] as String,
-                  bio: form.value["bio"] as String?,
-                  image: form.value["image"] as XFile?,
+                  email: form.value[_RegisterFormKeys.email.name] as String,
+                  password:
+                      form.value[_RegisterFormKeys.password.name] as String,
+                  name: form.value[_RegisterFormKeys.name.name] as String,
+                  bio: form.value[_RegisterFormKeys.bio.name] as String?,
+                  image: form.value[_RegisterFormKeys.image.name] as XFile?,
                 ));
               },
               label: "Register")

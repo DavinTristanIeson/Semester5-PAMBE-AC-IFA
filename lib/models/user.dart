@@ -1,28 +1,37 @@
-import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:pambe_ac_ifa/common/json.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 part 'gen/user.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-class UserModel {
+class UserModel with SupportsLocalAndOnlineImagesMixin {
   String id;
   String name;
   String email;
+  String? bio;
+
+  @override
   String? imagePath;
+
+  @JsonEpochConverter()
+  DateTime? birthdate;
+
+  String? country;
+
+  @override
+  @JsonKey(includeToJson: false)
+  ExternalImageSource? get imageSource => ExternalImageSource.network;
+
   UserModel({
     required this.id,
     required this.name,
     required this.email,
     required this.imagePath,
+    this.bio,
+    this.country,
+    this.birthdate,
   });
-
-  ImageProvider get image {
-    if (imagePath == null) {
-      return const AssetImage(MaybeImage.fallbackImagePath);
-    }
-    return NetworkImage(imagePath!);
-  }
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     try {

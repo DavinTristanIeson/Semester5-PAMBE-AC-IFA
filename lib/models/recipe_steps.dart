@@ -64,6 +64,7 @@ class LocalRecipeStepModel extends AbstractRecipeStepModel
     with SupportsLocalAndOnlineImagesMixin {
   int id;
   @override
+  @JsonKey(includeToJson: false)
   ExternalImageSource? get imageSource => ExternalImageSource.local;
 
   LocalRecipeStepModel({
@@ -88,6 +89,7 @@ class LocalRecipeStepModel extends AbstractRecipeStepModel
 class RecipeStepModel extends AbstractRecipeStepModel
     with SupportsLocalAndOnlineImagesMixin {
   @override
+  @JsonKey(includeToJson: false)
   ExternalImageSource? get imageSource => ExternalImageSource.network;
 
   @JsonKey(includeToJson: false)

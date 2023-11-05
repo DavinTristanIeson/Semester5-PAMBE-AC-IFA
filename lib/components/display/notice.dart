@@ -90,10 +90,11 @@ class EmptyView extends StatelessWidget {
 }
 
 class ErrorView extends StatelessWidget {
-  late final Either<Widget, String> error;
-  ErrorView({super.key, Either<Widget, String>? error}) {
-    this.error =
-        error ?? Either.right("Sorry, an unexpected error has occurred");
+  final Either<Widget, String> error;
+  late final Either<Widget, String> message;
+  ErrorView({super.key, required this.error, Either<Widget, String>? message}) {
+    this.message =
+        message ?? Either.right("Sorry, an unexpected error has occurred");
   }
 
   @override
@@ -115,11 +116,20 @@ class ErrorView extends StatelessWidget {
           const SizedBox(
             height: AcSizes.lg,
           ),
-          error.leftOr((left) => Text(
+          message.leftOr((left) => Text(
                 left,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
+                  fontSize: AcSizes.fontLarge,
+                  color: context.colors.error,
+                ),
+              )),
+          error.leftOr((left) => Text(
+                left,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w400,
                   color: context.colors.error,
                 ),
               )),

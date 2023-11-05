@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/pages/startup/components.dart';
 
 class StartupGetStartedScreen extends StatelessWidget {
@@ -32,6 +33,9 @@ class StartupGetStartedScreen extends StatelessWidget {
                         "Give feedback to the cooks whose recipes you tried out"),
                 const SizedBox(height: AcSizes.lg),
                 OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                      foregroundColor: context.colors.primary,
+                      side: BorderSide(color: context.colors.primary)),
                   onPressed: next,
                   icon: const Icon(Icons.arrow_right_alt),
                   label: const Text(

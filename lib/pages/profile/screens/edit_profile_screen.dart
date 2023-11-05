@@ -1,428 +1,282 @@
 import 'dart:io';
-import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
+import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/common/validation.dart';
+import 'package:pambe_ac_ifa/components/app/app_bar.dart';
+import 'package:pambe_ac_ifa/components/app/snackbar.dart';
+import 'package:pambe_ac_ifa/components/display/image.dart';
+import 'package:pambe_ac_ifa/components/field/field_wrapper.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
+import 'package:pambe_ac_ifa/models/user.dart';
+import 'package:pambe_ac_ifa/pages/login/components/actions.dart';
+import 'package:pambe_ac_ifa/pages/profile/components/country_select.dart';
+import 'package:provider/provider.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
-import '../model/profile_data.dart';
+enum _EditProfileFormKeys {
+  image,
+  name,
+  bio,
+  country,
+  birthdate,
+}
 
 class EditProfileScreen extends StatefulWidget {
-  EditProfileScreen(
-      {super.key,
-      required this.data,
-      required this.onProfileDataUpdate,
-      required this.onImageChanged});
-  ProfileData data;
-  final void Function(File image) onImageChanged;
-  final void Function(ProfileData data) onProfileDataUpdate;
+  const EditProfileScreen({
+    super.key,
+    required this.data,
+  });
+  final UserModel data;
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  File? imageFile;
-  final List<String> countries = [
-    'Nigeria',
-    'Pakistan',
-    'India',
-    'US',
-    'Canada',
-    'indonesia',
-    'malaysia',
-    'singapura',
-  ];
-  final ImagePicker _picker = ImagePicker();
-  TextEditingController? _nameController;
-  TextEditingController? _emailController;
-  TextEditingController? _passwordController;
-  TextEditingController? _dobController;
-  TextEditingController? _countryController;
-  String? _image;
-  List<DateTime?> _dates = [];
-  var _emailValidate = true;
-  var _passwordValidate = true;
-  var _nameValidate = true;
+  late final FormGroup form;
+
   @override
   void initState() {
     super.initState();
-    _dates.add(widget.data.dob);
-    _image = widget.data.image;
-    _nameController = TextEditingController();
-    _emailController = TextEditingController();
-    _passwordController = TextEditingController();
-    _dobController = TextEditingController();
-    _countryController = TextEditingController();
-    _nameController?.text = widget.data.name;
-    _emailController?.text = widget.data.email;
-    _passwordController?.text = widget.data.password;
-    _dobController?.text = DateFormat('yyyy-MM-dd').format(widget.data.dob);
-    _countryController?.text = widget.data.country;
+    form = FormGroup({
+      _EditProfileFormKeys.image.name: FormControl<XFile?>(
+        value: widget.data.imagePath == null
+            ? null
+            : XFile(widget.data.imagePath!),
+      ),
+      _EditProfileFormKeys.name.name: FormControl<String>(
+          value: widget.data.name,
+          validators: [Validators.minLength(5), AcValidators.acceptedChars]),
+      _EditProfileFormKeys.bio.name: FormControl<String?>(
+        value: widget.data.bio,
+      ),
+      _EditProfileFormKeys.birthdate.name: FormControl<DateTime?>(
+        value: widget.data.birthdate,
+      ),
+      _EditProfileFormKeys.country.name: FormControl<String?>(
+        value: widget.data.country,
+      ),
+    });
   }
 
   @override
   void dispose() {
-    _nameController?.dispose();
-    _countryController?.dispose();
-    _dobController?.dispose();
-    _passwordController?.dispose();
-    _emailController?.dispose();
+    form.dispose();
     super.dispose();
   }
 
-  Future<void> _dialogBuilder(BuildContext context) {
-    return showDialog<void>(
+  void save() async {
+    final messenger = AcSnackbarMessenger.of(context);
+    if (form.invalid) {
+      messenger.sendError("Please resolve all errors before saving!");
+      return;
+    }
+    final userController = context.read<AuthProvider>();
+    try {
+      final value = form.value;
+      await userController.updateProfile((
+        name: value[_EditProfileFormKeys.name.name] as String,
+        image: value[_EditProfileFormKeys.image.name] as XFile?,
+        country: value[_EditProfileFormKeys.country.name] as String?,
+        birthdate: value[_EditProfileFormKeys.birthdate.name] as DateTime?,
+        bio: value[_EditProfileFormKeys.bio.name] as String?,
+      ));
+      messenger.sendSuccess("Your profile has been successfully updated");
+    } catch (e) {
+      messenger.sendError(e);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: const OnlyReturnAppBar(),
+        body: ReactiveForm(
+          formGroup: form,
+          child: EditProfileScreenBody(
+            onSave: save,
+          ),
+        ));
+  }
+}
+
+class EditProfileScreenBody extends StatelessWidget {
+  final ImagePicker _picker = ImagePicker();
+  final void Function() onSave;
+  EditProfileScreenBody({super.key, required this.onSave});
+
+  Widget buildBirthdateInput() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          vertical: AcSizes.md, horizontal: AcSizes.space),
+      child: ReactiveValueListenableBuilder(
+          formControlName: _EditProfileFormKeys.birthdate.name,
+          builder: (context, control, child) {
+            final value = control.value as DateTime?;
+            return AcFieldWrapper(
+                label: "Date of Birth",
+                error: ReactiveFormConfig.of(context)
+                    ?.translateAny(control.errors),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                          onPressed: () async {
+                            control.value = await showCalender(context, value);
+                          },
+                          icon: const Icon(Icons.calendar_month),
+                          label: Text(
+                            value == null
+                                ? 'No birthdate'
+                                : value.toLocaleDateString(),
+                            style: TextStyle(
+                              fontStyle:
+                                  value == null ? null : FontStyle.italic,
+                            ),
+                          )),
+                    ),
+                  ],
+                ));
+          }),
+    );
+  }
+
+  Widget buildCountrySelect() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          vertical: AcSizes.md, horizontal: AcSizes.space),
+      child: ReactiveValueListenableBuilder(
+          formControlName: _EditProfileFormKeys.country.name,
+          builder: (context, control, child) {
+            return CountrySelect(
+              error:
+                  ReactiveFormConfig.of(context)?.translateAny(control.errors),
+              label: "Country/Region",
+              value: control.value as String?,
+              onChanged: (value) {
+                control.value = value;
+              },
+            );
+          }),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        ReactiveValueListenableBuilder<XFile?>(
+            formControlName: _EditProfileFormKeys.image.name,
+            builder: (context, control, child) {
+              return GestureDetector(
+                onTap: () async {
+                  control.value = await _dialogBuilder(context);
+                },
+                child: Center(
+                  child: CircleAvatar(
+                    radius: context.relativeWidth(0.25, 60.0, 120.0),
+                    foregroundImage: (control.value == null
+                            ? const AssetImage(MaybeImage.userFallbackImagePath)
+                            : FileImage(File(control.value!.path)))
+                        as ImageProvider,
+                    child: control.value == null
+                        ? const Icon(Icons.camera_alt)
+                        : null,
+                  ),
+                ),
+              );
+            }),
+        const SizedBox(
+          height: AcSizes.space,
+        ),
+        buildGenericTextInput(
+            name: _EditProfileFormKeys.name.name,
+            label: "Name",
+            required: true,
+            placeholder: "Enter your name"),
+        buildGenericTextInput(
+            name: _EditProfileFormKeys.bio.name,
+            label: "Tell us about yourself",
+            multiline: true),
+        buildBirthdateInput(),
+        buildCountrySelect(),
+        Center(
+          child: Padding(
+            padding:
+                const EdgeInsets.only(top: AcSizes.space, bottom: AcSizes.lg),
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.save),
+              onPressed: onSave,
+              label: const Text(
+                "Save Changes",
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<XFile?> _dialogBuilder(BuildContext context) async {
+    XFile? image;
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          title: Text("Select Picture Source", style: context.texts.titleLarge),
           content: const Text(
-            'Select where You want your picture taken from',
+            'Select where you want your picture taken from',
           ),
+          backgroundColor: AcColors.white,
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
+                foregroundColor: context.colors.secondary,
               ),
-              child: const Text('Camera'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
-                _getImage(ImageSource.camera);
               },
             ),
             TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
+              child: const Text('Camera'),
+              onPressed: () async {
+                final navigator = Navigator.of(context);
+                image = await _getImage(ImageSource.camera);
+                navigator.pop();
+              },
+            ),
+            TextButton(
               child: const Text('Gallery'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                _getImage(ImageSource.gallery);
+              onPressed: () async {
+                final navigator = Navigator.of(context);
+                image = await _getImage(ImageSource.gallery);
+                navigator.pop();
               },
             ),
           ],
         );
       },
     );
+    return image;
   }
 
-  _getImage(ImageSource source) async {
-    XFile? file = await _picker.pickImage(
+  Future<XFile?> _getImage(ImageSource source) async {
+    return await _picker.pickImage(
       source: source,
-      maxWidth: 1800,
-      maxHeight: 1800,
+      maxWidth: 800,
+      maxHeight: 800,
     );
-    setState(() {
-      if (file != null) {
-        imageFile = File(file.path);
-      }
-    });
   }
 
-  Future<void> showCalender(BuildContext ctx) async {
-    var results = await showCalendarDatePicker2Dialog(
+  Future<DateTime?> showCalender(BuildContext ctx, DateTime? date) async {
+    final now = DateTime.now();
+    return showDatePicker(
       context: ctx,
-      config: CalendarDatePicker2WithActionButtonsConfig(
-        lastDate: DateTime.now(),
-      ),
-      dialogSize: const Size(325, 400),
-      value: _dates,
-      borderRadius: BorderRadius.circular(15),
-    );
-    setState(() {
-      _dates = results ?? [DateTime.now()];
-      widget.data.dob = _dates[0] ?? DateTime.now();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Profile'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                  alignment: Alignment.bottomCenter,
-                  clipBehavior: Clip.none,
-                  children: [
-                    Center(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(90.0),
-                        child: imageFile == null
-                            ? Image.asset(
-                                _image ?? "none",
-                                fit: BoxFit.fill,
-                                height: 170,
-                                width: 170,
-                              )
-                            : Image.file(
-                                imageFile!,
-                                fit: BoxFit.fill,
-                                height: 170,
-                                width: 170,
-                              ),
-                      ),
-                    ),
-                    //     CircleAvatar(radius: 120,child:imageFile == null
-                    //       ? Image.asset(_image ?? "none",)
-                    //       : Image.file(imageFile!,fit: BoxFit.cover ),),
-                    // ),),
-                    Positioned(
-                        right: 100,
-                        bottom: -10,
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.camera_alt_rounded,
-                            size: 26,
-                            color: Color.fromARGB(255, 255, 159, 42),
-                          ),
-                          onPressed: () {
-                            _dialogBuilder(context);
-                          },
-                        ))
-                  ]),
-              const SizedBox(
-                height: 10,
-              ),
-              const Text(
-                'Name',
-                style: TextStyle(
-                    fontSize: 16,
-                    color: Color.fromARGB(255, 255, 159, 42),
-                    fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextField(
-                style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color.fromARGB(255, 255, 159, 42)),
-                controller: _nameController ?? TextEditingController(),
-                decoration: InputDecoration(
-                  errorText: _nameValidate ? null : 'Enter Valid Name',
-                  border: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(255, 255, 159, 42),
-                          width: 1.0)),
-                ),
-                onSubmitted: (value) {
-                  setState(() {
-                    if (value.isEmpty) {
-                      _nameValidate = false;
-                    } else {
-                      _nameValidate = true;
-                    }
-                    widget.data.name = _nameController?.text ?? "";
-                  });
-                },
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const Text(
-                'Email',
-                style: TextStyle(
-                    fontSize: 16,
-                    color: Color.fromARGB(255, 255, 159, 42),
-                    fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextField(
-                style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color.fromARGB(255, 255, 159, 42)),
-                controller: _emailController ?? TextEditingController(),
-                decoration: InputDecoration(
-                  errorText: _emailValidate ? null : 'Enter Valid Email',
-                  border: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(255, 255, 159, 42),
-                          width: 1.0)),
-                ),
-                onSubmitted: (value) {
-                  setState(() {
-                    if (value.isEmpty ||
-                        !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(value)) {
-                      _emailValidate = false;
-                    } else {
-                      _emailValidate = true;
-                    }
-                    widget.data.email = _emailController?.text ?? "";
-                  });
-                },
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const Text(
-                'Password',
-                style: TextStyle(
-                    fontSize: 16,
-                    color: Color.fromARGB(255, 255, 159, 42),
-                    fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextField(
-                obscureText: true,
-                style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color.fromARGB(255, 255, 159, 42)),
-                controller: _passwordController ?? TextEditingController(),
-                decoration: InputDecoration(
-                  errorText: _passwordValidate
-                      ? null
-                      : 'Enter Valid Password with least 8 character length,1 lower,1 Capital and a number',
-                  border: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Color.fromARGB(255, 255, 159, 42),
-                          width: 1.0)),
-                ),
-                onSubmitted: (value) {
-                  setState(() {
-                    if (value.isEmpty ||
-                        !RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$')
-                            .hasMatch(value)) {
-                      _passwordValidate = false;
-                    } else {
-                      _passwordValidate = true;
-                    }
-                    widget.data.password = _passwordController?.text ?? "";
-                  });
-                },
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const Text(
-                'Date of Birth',
-                style: TextStyle(
-                    fontSize: 16,
-                    color: Color.fromARGB(255, 255, 159, 42),
-                    fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              InkWell(
-                onTap: () {
-                  showCalender(context);
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                          width: 1,
-                          color: const Color.fromARGB(255, 255, 159, 42))),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          DateFormat('yyyy-MM-dd').format(widget.data.dob),
-                          style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Color.fromARGB(255, 255, 159, 42)),
-                        ),
-                        const Spacer(),
-                        const Icon(Icons.arrow_drop_down),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const Text(
-                'Country/Region',
-                style: TextStyle(
-                    fontSize: 16,
-                    color: Color.fromARGB(255, 255, 159, 42),
-                    fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                        width: 1, color: Color.fromARGB(255, 255, 159, 42))),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        widget.data.country,
-                        style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Color.fromARGB(255, 255, 159, 42)),
-                      ),
-                      const Spacer(),
-                      DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          icon: const Icon(Icons.arrow_downward),
-                          elevation: 16,
-                          style: const TextStyle(
-                              color: Color.fromARGB(255, 255, 159, 42)),
-                          onChanged: (String? value) {
-                            // This is called when the user selects an item.
-                            setState(() {
-                              widget.data.country = value ?? "indonesia";
-                            });
-                          },
-                          items: countries
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_emailValidate && _nameValidate && _passwordValidate) {
-                      widget.onImageChanged(imageFile!);
-                      widget.onProfileDataUpdate(widget.data);
-                      Navigator.of(context).pop();
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 255, 159, 42),
-                      foregroundColor: Colors.white),
-                  child: const Text(
-                    "Save Changes",
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      initialDate: date ?? now,
+      lastDate: now,
+      firstDate: now.copyWith(year: now.year - 99),
     );
   }
 }

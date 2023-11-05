@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/pages/home/body.dart';
 import 'package:pambe_ac_ifa/pages/library/main.dart';
 import 'package:pambe_ac_ifa/pages/notification/main.dart';
 import 'package:pambe_ac_ifa/pages/profile/main.dart';
 import 'package:pambe_ac_ifa/pages/search/main.dart';
+import 'package:provider/provider.dart';
 
 enum RecipeLibTabs {
   home,
@@ -28,7 +30,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       RecipeLibTabs.home => const HomePageBody(),
       RecipeLibTabs.library => const LibraryScreen(),
       RecipeLibTabs.notifications => const NotificationScreen(),
-      RecipeLibTabs.profile => const ProfilePage()
+      RecipeLibTabs.profile => const ProfileScreen()
     };
   }
 
@@ -38,12 +40,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       appBar: AppBar(
         title: const Text("Recipe.Lib"),
         actions: [
-          IconButton(
-              onPressed: () {
-                context.navigator.push(MaterialPageRoute(
-                    builder: (context) => const SearchScreen()));
-              },
-              icon: const Icon(Icons.search))
+          if (tab == RecipeLibTabs.home)
+            IconButton(
+                onPressed: () {
+                  context.navigator.push(MaterialPageRoute(
+                      builder: (context) => const SearchScreen()));
+                },
+                icon: const Icon(Icons.search)),
+          if (tab == RecipeLibTabs.profile)
+            IconButton(
+                onPressed: () {
+                  context.read<AuthProvider>().logout();
+                },
+                icon: const Icon(Icons.logout)),
         ],
       ),
       body: buildBody(),

@@ -121,6 +121,10 @@ class RecipeLibApp extends StatelessWidget {
           focusColor: AcColors.hoverColor,
         ),
         elevatedButtonTheme: buildElevatedButtonTheme(),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+            style: OutlinedButton.styleFrom(
+                foregroundColor: AcColors.secondary,
+                side: const BorderSide(color: AcColors.secondary))),
         textTheme: Typography.material2021().black,
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(

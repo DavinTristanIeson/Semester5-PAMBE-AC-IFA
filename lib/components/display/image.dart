@@ -71,6 +71,8 @@ class MaybeImage extends StatelessWidget {
       this.fit = BoxFit.cover});
   static const String fallbackImagePath =
       "assets/images/image-not-available.jpg";
+  static const String userFallbackImagePath =
+      "assets/images/user-image-not-available.jpg";
 
   @override
   Widget build(BuildContext context) {

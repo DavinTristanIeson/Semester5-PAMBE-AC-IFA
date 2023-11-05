@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
+import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 
 /// Ini untuk resep yang disimpan online
@@ -15,6 +16,34 @@ class RecipeController extends ChangeNotifier {
     DocumentSnapshot<Map<String, Object?>>? page,
   }) async {
     return (await getAllWithPagination(searchState, page: page)).data;
+  }
+
+  Future<List<RecipeLiteModel>> getRecentRecipes() async {
+    return getAll(RecipeSearchState(
+        limit: 5,
+        sortBy: SortBy.descending(RecipeSortBy.lastViewed),
+        filterBy: RecipeFilterBy.viewedBy(userId, viewed: true)));
+  }
+
+  Future<List<RecipeLiteModel>> getTrendingRecipes() async {
+    return getAll(RecipeSearchState(
+        limit: 5,
+        sortBy: SortBy.descending(RecipeSortBy.ratings),
+        filterBy: RecipeFilterBy.viewedBy(userId, viewed: false)));
+  }
+
+  Future<List<RecipeLiteModel>> getBookmarkedRecipes() async {
+    return getAll(RecipeSearchState(
+        limit: 5,
+        sortBy: SortBy.descending(RecipeSortBy.bookmarkedDate),
+        filterBy: RecipeFilterBy.bookmarkedBy(userId)));
+  }
+
+  Future<List<RecipeLiteModel>> getRecipesByUser(String userId) async {
+    return getAll(RecipeSearchState(
+        limit: 5,
+        sortBy: SortBy.descending(RecipeSortBy.createdDate),
+        filterBy: RecipeFilterBy.createdByUser(userId)));
   }
 
   Future<PaginatedQueryResult<RecipeLiteModel>> getAllWithPagination(
