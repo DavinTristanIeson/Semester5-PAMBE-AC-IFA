@@ -22,21 +22,21 @@ class RecipeController extends ChangeNotifier {
     return getAll(RecipeSearchState(
         limit: 5,
         sortBy: SortBy.descending(RecipeSortBy.lastViewed),
-        filterBy: RecipeFilterBy.viewedBy(userId, viewed: true)));
+        filterBy: RecipeFilterBy.viewedBy(userId!, viewed: true)));
   }
 
   Future<List<RecipeLiteModel>> getTrendingRecipes() async {
     return getAll(RecipeSearchState(
         limit: 5,
         sortBy: SortBy.descending(RecipeSortBy.ratings),
-        filterBy: RecipeFilterBy.viewedBy(userId, viewed: false)));
+        filterBy: RecipeFilterBy.viewedBy(userId!, viewed: false)));
   }
 
   Future<List<RecipeLiteModel>> getBookmarkedRecipes() async {
     return getAll(RecipeSearchState(
         limit: 5,
         sortBy: SortBy.descending(RecipeSortBy.bookmarkedDate),
-        filterBy: RecipeFilterBy.bookmarkedBy(userId)));
+        filterBy: RecipeFilterBy.bookmarkedBy(userId!)));
   }
 
   Future<List<RecipeLiteModel>> getRecipesByUser(String userId) async {

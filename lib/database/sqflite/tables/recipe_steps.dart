@@ -31,7 +31,7 @@ class RecipeStepsTable {
             ${RecipeStepColumns.timer} INTEGER, 
             ${RecipeStepColumns.imagePath} TEXT, 
             ${RecipeStepColumns.createdAt} INTEGER NOT NULL,
-            FOREIGN KEY (${RecipeStepColumns.recipeId}) REFERENCES ${RecipeTable.tableName}(id)
+            FOREIGN KEY (${RecipeStepColumns.recipeId}) REFERENCES ${RecipeTable.tableName}(id) ON DELETE CASCADE ON UPDATE CASCADE
           );
       ''');
   }

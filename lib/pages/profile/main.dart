@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
@@ -12,24 +13,27 @@ class OtherUserProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.read<AuthProvider>();
-    return FutureBuilder(
-        future: controller.get(userId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (snapshot.hasError) {
-            return ErrorView(error: Either.right(snapshot.error.toString()));
-          }
-          if (!snapshot.hasData) {
-            return EmptyView(
-              content: Either.right("Cannot find user with ID $userId"),
-            );
-          }
-          return ProfileScreenBody(user: snapshot.data!, editable: false);
-        });
+    return Scaffold(
+      appBar: const OnlyReturnAppBar(),
+      body: FutureBuilder(
+          future: controller.get(userId),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if (snapshot.hasError) {
+              return ErrorView(error: Either.right(snapshot.error.toString()));
+            }
+            if (!snapshot.hasData) {
+              return EmptyView(
+                content: Either.right("Cannot find user with ID $userId"),
+              );
+            }
+            return ProfileScreenBody(user: snapshot.data!, editable: false);
+          }),
+    );
   }
 }
 

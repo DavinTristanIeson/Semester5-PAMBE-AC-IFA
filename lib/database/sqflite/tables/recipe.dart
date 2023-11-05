@@ -9,6 +9,7 @@ import 'package:sqflite/sqflite.dart';
 enum _RecipeColumns {
   id,
   remoteId,
+  userId,
   title,
   description,
   createdAt,
@@ -33,6 +34,7 @@ class RecipeTable {
         CREATE TABLE $tableName (
             ${_RecipeColumns.id} INTEGER PRIMARY KEY AUTOINCREMENT, 
             ${_RecipeColumns.remoteId} TEXT, 
+            ${_RecipeColumns.userId} TEXT NOT NULL, 
             ${_RecipeColumns.title} VARCHAR(255) NOT NULL,
             ${_RecipeColumns.description} TEXT, 
             ${_RecipeColumns.createdAt} INTEGER NOT NULL,
@@ -77,11 +79,20 @@ class RecipeTable {
     SortBy<RecipeSortBy>? sort,
     RecipeFilterBy? filter,
   }) async {
+    String query = "";
+    List<Object?>? queryArgs = [];
+    if (search != null) {
+      query +=
+          "${_RecipeColumns.title.name} LIKE ? OR ${_RecipeColumns.description.name} LIKE ?";
+      queryArgs.addAll([search, search]);
+    }
+    if (filter != null && filter.type == RecipeFilterByType.createdByUser) {
+      query += "${_RecipeColumns.userId.name} = ?";
+      queryArgs.add(filter.userId!);
+    }
     final results = await db.query(tableName,
-        where: search == null
-            ? null
-            : "${_RecipeColumns.title.name} LIKE ? OR ${_RecipeColumns.description.name} LIKE ?",
-        whereArgs: search == null ? null : [search, search],
+        where: query.isNotEmpty ? query : null,
+        whereArgs: query.isNotEmpty ? queryArgs : null,
         limit: limit,
         offset: page == null ? null : (limit ?? 15) * (page - 1),
         orderBy: "${_RecipeColumns.createdAt.name} DESC");
@@ -96,7 +107,8 @@ class RecipeTable {
       String? description,
       required List<RecipeStepFormType> steps,
       XFile? image,
-      int? id}) async {
+      int? id,
+      required String userId}) async {
     LocalRecipeModel? former;
     if (id != null) {
       former = await get(id);
@@ -108,6 +120,7 @@ class RecipeTable {
       Map<String, dynamic> data = {
         _RecipeColumns.title.name: title,
         _RecipeColumns.description.name: description,
+        _RecipeColumns.userId.name: userId,
         _RecipeColumns.createdAt.name: DateTime.now().millisecondsSinceEpoch,
         _RecipeColumns.imagePath.name: recipeImage,
       };

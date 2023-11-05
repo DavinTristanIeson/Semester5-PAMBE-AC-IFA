@@ -63,8 +63,13 @@ void main() async {
             prev!.userId = userId;
             return prev;
           }),
-      ChangeNotifierProvider(
-          create: (context) => LocalRecipeController(recipeTable: recipeTable)),
+      ChangeNotifierProxyProvider<AuthProvider, LocalRecipeController>(
+          create: (context) => LocalRecipeController(recipeTable: recipeTable),
+          update: (context, authProvider, prev) {
+            final userId = authProvider.user?.id;
+            prev!.userId = userId;
+            return prev;
+          }),
     ],
     child: const AcReactiveFormConfig(child: RecipeLibApp()),
   ));

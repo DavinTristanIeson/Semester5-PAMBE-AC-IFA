@@ -47,7 +47,7 @@ class AuthProvider extends ChangeNotifier {
   Future<void> updateProfile(UserEditPayload payload) async {
     if (user == null) {
       throw InvalidStateError(
-          "User is expected to be initialized when the .updateProfile method is called!");
+          "AuthProvider.user is expected to be initialized when the updateProfile method is called!");
     }
     user = await userManager.put(user!.id, payload);
     notifyListeners();
@@ -56,7 +56,7 @@ class AuthProvider extends ChangeNotifier {
   Future<void> deleteAccount(LoginPayload credentials) async {
     if (user == null) {
       throw InvalidStateError(
-          "User is expected to be initialized when the .deleteAccount method is called!");
+          "AuthProvider.user is expected to be initialized when the deleteAccount method is called!");
     }
     await userManager.remove(user!.id, credentials: credentials);
     notifyListeners();

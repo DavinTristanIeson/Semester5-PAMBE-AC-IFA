@@ -131,7 +131,7 @@ class FirebaseRecipeManager
     if (searchState?.filterBy != null) {
       switch (searchState!.filterBy!.type) {
         case RecipeFilterByType.createdByUser:
-          query = query.where(RecipeFirestoreKeys.userId,
+          query = query.where(RecipeFirestoreKeys.userId.name,
               isEqualTo: searchState.filterBy!.userId);
         default:
       }

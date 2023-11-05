@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/sqflite/tables/recipe.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
-import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/editor/components/models.dart';
 
 enum AcSharedPrefKeys {
@@ -14,6 +14,7 @@ enum AcSharedPrefKeys {
 
 class LocalRecipeController extends ChangeNotifier {
   RecipeTable recipeTable;
+  String? userId;
   LocalRecipeController({required this.recipeTable});
 
   Future<LocalRecipeModel?> get(int id) async {
@@ -22,8 +23,12 @@ class LocalRecipeController extends ChangeNotifier {
 
   Future<List<LocalRecipeLiteModel>> getAll(
       {required RecipeSearchState searchState, int page = 1}) async {
+    if (userId == null) {
+      throw InvalidStateError(
+          "LocalRecipeController.userId is expected to be non-null when getAll is called.");
+    }
     return recipeTable.getAll(
-        filter: searchState.filterBy,
+        filter: RecipeFilterBy.createdByUser(userId!),
         limit: searchState.limit,
         page: page,
         search: searchState.search,
@@ -35,13 +40,17 @@ class LocalRecipeController extends ChangeNotifier {
       String? description,
       required List<RecipeStepFormType> steps,
       XFile? image,
-      required UserModel user,
       int? id}) async {
+    if (userId == null) {
+      throw InvalidStateError(
+          "LocalRecipeController.userId is expected to be non-null when put is called.");
+    }
     final result = await recipeTable.put(
         title: title,
         description: description,
         steps: steps,
         image: image,
+        userId: userId!,
         id: id);
     notifyListeners();
     return result;

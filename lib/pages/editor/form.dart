@@ -4,7 +4,6 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
-import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
@@ -78,7 +77,6 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
 
   void save() async {
     final controller = context.read<LocalRecipeController>();
-    final user = context.read<AuthProvider>().user!;
     final messenger = AcSnackbarMessenger.of(context);
     if (form.invalid) {
       messenger.sendError("Please resolve all errors before saving!");
@@ -98,7 +96,6 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
           title: title,
           description: description,
           steps: steps,
-          user: user,
           image: image,
           id: widget.recipe?.id);
       form.markAsPristine();

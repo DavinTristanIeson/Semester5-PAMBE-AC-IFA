@@ -210,12 +210,18 @@ class RecipeFilterBy {
   bool? viewed;
   RecipeFilterByType type;
   RecipeFilterBy._(this.type);
-  RecipeFilterBy.createdByUser(this.userId)
-      : type = RecipeFilterByType.createdByUser;
-  RecipeFilterBy.viewedBy(this.userId, {this.viewed = true})
-      : type = RecipeFilterByType.hasBeenViewedBy;
-  RecipeFilterBy.bookmarkedBy(this.userId)
-      : type = RecipeFilterByType.hasBeenBookmarkedBy;
+  RecipeFilterBy.createdByUser(String userId)
+      : type = RecipeFilterByType.createdByUser,
+        // ignore: prefer_initializing_formals
+        userId = userId;
+  RecipeFilterBy.viewedBy(String userId, {this.viewed = true})
+      : type = RecipeFilterByType.hasBeenViewedBy,
+        // ignore: prefer_initializing_formals
+        userId = userId;
+  RecipeFilterBy.bookmarkedBy(String userId)
+      : type = RecipeFilterByType.hasBeenBookmarkedBy,
+        // ignore: prefer_initializing_formals
+        userId = userId;
   static RecipeFilterBy get local => RecipeFilterBy._(RecipeFilterByType.local);
   MapEntry<String, String?> get apiParams {
     return switch (type) {

@@ -8,6 +8,7 @@ import 'package:pambe_ac_ifa/components/display/review_card.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
+import 'package:pambe_ac_ifa/pages/profile/main.dart';
 import 'package:pambe_ac_ifa/pages/recipe/viewer.dart';
 import 'package:pambe_ac_ifa/pages/reviews/main.dart';
 
@@ -66,22 +67,31 @@ class RecipeInfoScreen extends StatelessWidget {
                 )),
           ],
         ),
-        if (recipe is RecipeLiteModel)
+        if (recipe is RecipeLiteModel &&
+            (recipe as RecipeLiteModel).user != null)
           Positioned(
             right: AcSizes.space,
             top: imageHeight - AcSizes.avatarRadius,
-            child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: AcSizes.md),
-                ),
-                child: CircleAvatar(
-                  radius: AcSizes.avatarRadius,
-                  backgroundColor: Theme.of(context).colorScheme.tertiary,
-                  backgroundImage: (recipe as RecipeLiteModel).user?.image,
-                )),
+            child: GestureDetector(
+              onTap: () {
+                final user = (recipe as RecipeLiteModel).user;
+                context.navigator.push(MaterialPageRoute(builder: (context) {
+                  return OtherUserProfileScreen(userId: user!.id);
+                }));
+              },
+              child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: AcSizes.md),
+                  ),
+                  child: CircleAvatar(
+                    radius: AcSizes.avatarRadius,
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
+                    backgroundImage: (recipe as RecipeLiteModel).user?.image,
+                  )),
+            ),
           ),
       ],
     );
