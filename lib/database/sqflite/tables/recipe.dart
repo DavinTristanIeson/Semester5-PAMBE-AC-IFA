@@ -151,6 +151,22 @@ class RecipeTable {
     await imageManager.imageManager.process(reserved);
   }
 
+  Future<void> removeAllByUser(String userId) async {
+    final Map<String, XFile?> reserved = {};
+    await db.transaction((txn) async {
+      final allLocalRecipes = await txn.query(tableName,
+          where: "${_RecipeColumns.userId.name} = ?", whereArgs: [userId]);
+      for (final rawRecipe in allLocalRecipes) {
+        final recipe = LocalRecipeModel.fromJson(rawRecipe);
+        reserved.addAll(imageManager.markRecipeImagesForRemoval(recipe));
+        await stepsController.removeAll(txn, recipe.id);
+      }
+      await txn.delete(tableName,
+          where: "${_RecipeColumns.userId.name} = ?", whereArgs: [userId]);
+    });
+    await imageManager.imageManager.process(reserved);
+  }
+
   Future<void> setRemoteId(int localId, String? remoteId) async {
     await db.update(
         tableName,

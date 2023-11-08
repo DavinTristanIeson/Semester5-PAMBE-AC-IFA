@@ -3,7 +3,8 @@ import 'package:pambe_ac_ifa/auth.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
-import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
+import 'package:pambe_ac_ifa/database/interfaces/user.dart';
+import 'package:pambe_ac_ifa/pages/home/main.dart';
 import 'package:pambe_ac_ifa/pages/login/components/actions.dart';
 import 'package:pambe_ac_ifa/pages/startup/components.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -73,7 +74,9 @@ class LoginScreen extends StatelessWidget {
     final messenger = AcSnackbarMessenger.of(context);
     try {
       await auth.login(payload.email, payload.password);
-      navigator.pop();
+      navigator.pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (route) => false);
     } catch (e) {
       messenger.sendError(e);
     }

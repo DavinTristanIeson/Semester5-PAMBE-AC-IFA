@@ -43,6 +43,61 @@ class Pair<T1, T2> {
   }
 }
 
+/// Represents if a value exists or not. This is useful for cases where null is a valid value.
+class Optional<T> {
+  final bool _hasValue;
+  final T? value;
+  Optional.some(this.value) : _hasValue = true;
+  Optional.none()
+      : _hasValue = false,
+        value = null;
+  get hasValue => _hasValue;
+  T or(T Function() fn) {
+    return hasValue ? value! : fn();
+  }
+
+  Optional<T2> encase<T2>(T2 Function(T value) transform) {
+    return hasValue ? Optional.some(transform(value as T)) : Optional.none();
+  }
+
+  static T valueOf<T>(Optional<T>? optionalValue,
+      {required T Function() otherwise}) {
+    return optionalValue != null && optionalValue.hasValue
+        ? optionalValue.value!
+        : otherwise();
+  }
+
+  static TResult? runIfExist<TOptional, TResult>(
+    Optional<TOptional>? optionalValue, {
+    required TResult Function(TOptional value) then,
+  }) {
+    if (optionalValue != null && optionalValue.hasValue) {
+      return then(optionalValue.value as TOptional);
+    } else {
+      return null;
+    }
+  }
+
+  static Iterable<TResult> allWithValue<TOptional, TResult>(
+    Iterable<Optional<TOptional>?> optionalValues, {
+    required TResult Function(TOptional value) then,
+    TResult Function()? otherwise,
+  }) {
+    return optionalValues
+        .map((e) {
+          if (e != null && e.hasValue) {
+            return then(e.value as TOptional);
+          } else if (otherwise != null) {
+            return otherwise();
+          } else {
+            return null;
+          }
+        })
+        .where((element) => element != null)
+        .cast<TResult>();
+  }
+}
+
 class SortBy<T> {
   T factor;
   late bool isAscending;

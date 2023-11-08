@@ -1,28 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/models/notification.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
-import 'package:pambe_ac_ifa/models/user.dart';
-
-typedef LoginPayload = ({String email, String password});
-typedef UpdateAuthPayload = ({String? email, String? password});
-typedef RegisterPayload = ({
-  String email,
-  String password,
-  String name,
-  String? bio,
-  XFile? image,
-});
-typedef UserEditPayload = ({
-  String name,
-  String? bio,
-  XFile? image,
-  DateTime? birthdate,
-  String? country,
-});
 
 abstract class ILocalImageResourceManager {
   Future<File?> get(String imagePath);
@@ -36,23 +16,10 @@ abstract class ILocalImageResourceManager {
 abstract class INetworkImageResourceManager {
   String getPath({required String userId, required String name});
   Future<String?> urlof(String path);
-  Future<String?> put(XFile? image, {String? former, required String userId});
   Future<void> process(Map<String, XFile?> resources, {required String userId});
   FutureOr<MapEntry<String, XFile>> reserve(XFile resource,
       {required String userId});
   Future<void> remove(String imagePath);
-}
-
-abstract class IUserResourceManager {
-  Future<UserCredential> login(LoginPayload payload);
-  Future<UserCredential> register(RegisterPayload payload);
-  Future<UserCredential?> get(String id);
-  Future<UserModel?> put(String id, UserEditPayload payload);
-  Future<UserModel?> remove(String id, {required LoginPayload credentials});
-  Future<UserModel?> updateAuth(String id,
-      {required UpdateAuthPayload payload, required LoginPayload credentials});
-
-  void dispose();
 }
 
 typedef PaginatedQueryResult<T> = ({List<T> data, dynamic nextPage});

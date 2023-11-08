@@ -131,7 +131,7 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> {
               padding: const EdgeInsets.all(AcSizes.space),
               child: editable
                   ? const LocalUserRecipesSection()
-                  : const UserRecipesSection()),
+                  : UserRecipesSection(userId: widget.user.id)),
         ],
       ),
     );

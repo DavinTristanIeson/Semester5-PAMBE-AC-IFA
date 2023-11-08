@@ -8,7 +8,7 @@ import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/field/field_wrapper.dart';
-import 'package:pambe_ac_ifa/controllers/auth.dart';
+import 'package:pambe_ac_ifa/controllers/user.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/login/components/actions.dart';
 import 'package:pambe_ac_ifa/pages/profile/components/country_select.dart';
@@ -72,10 +72,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       messenger.sendError("Please resolve all errors before saving!");
       return;
     }
-    final userController = context.read<AuthProvider>();
+    final userController = context.read<UserController>();
     try {
       final value = form.value;
-      await userController.updateProfile((
+      await userController.put((
         name: value[_EditProfileFormKeys.name.name] as String,
         image: value[_EditProfileFormKeys.image.name] as XFile?,
         country: value[_EditProfileFormKeys.country.name] as String?,

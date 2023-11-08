@@ -32,6 +32,17 @@ extension IterableUtilities<T> on Iterable<T> {
     });
     return categories;
   }
+
+  Iterable<List<T>> chunks(int chunkSize) {
+    final it = iterator;
+    return Iterable.generate((length / chunkSize).ceil(), (int idx) {
+      List<T> part = [];
+      while (part.length < chunkSize && it.moveNext()) {
+        part.add(it.current);
+      }
+      return part;
+    });
+  }
 }
 
 extension DateTimeUtilities on DateTime {

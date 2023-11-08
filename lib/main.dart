@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
@@ -8,6 +7,7 @@ import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/notification.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/database/firebase/auth.dart';
 import 'package:pambe_ac_ifa/database/firebase/lib/images.dart';
 import 'package:pambe_ac_ifa/database/firebase/notification.dart';
 import 'package:pambe_ac_ifa/database/firebase/recipe.dart';
@@ -36,18 +36,18 @@ void main() async {
   );
   recipeTable.cleanupUnusedImages();
 
-  final userManager = FirebaseUserManager(FirebaseFirestore.instance);
+  final userManager = FirebaseUserManager(
+      imageManager: FirebaseImageManager(storagePath: 'user'));
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
-          create: (context) => AuthProvider(userManager: userManager)),
+          create: (context) =>
+              AuthProvider(authManager: FirebaseAuthManager())),
       ProxyProvider<AuthProvider, NotificationController>(
           create: (context) => NotificationController(
-              notificationManager:
-                  FirebaseNotificationManager(FirebaseFirestore.instance),
-              userId: null),
+              notificationManager: FirebaseNotificationManager(), userId: null),
           update: (context, authProvider, prev) {
-            final userId = authProvider.user?.id;
+            final userId = authProvider.user?.uid;
             prev!.userId = userId;
             return prev;
           }),
@@ -55,18 +55,17 @@ void main() async {
           create: (context) => RecipeController(
               recipeManager: FirebaseRecipeManager(FirebaseFirestore.instance,
                   userManager: userManager,
-                  imageManager: FirebaseImageManager(FirebaseStorage.instance,
-                      storagePath: "recipes")),
+                  imageManager: FirebaseImageManager(storagePath: "recipes")),
               userId: null),
           update: (context, authProvider, prev) {
-            final userId = authProvider.user?.id;
+            final userId = authProvider.user?.uid;
             prev!.userId = userId;
             return prev;
           }),
       ChangeNotifierProxyProvider<AuthProvider, LocalRecipeController>(
           create: (context) => LocalRecipeController(recipeTable: recipeTable),
           update: (context, authProvider, prev) {
-            final userId = authProvider.user?.id;
+            final userId = authProvider.user?.uid;
             prev!.userId = userId;
             return prev;
           }),

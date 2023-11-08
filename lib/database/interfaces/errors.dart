@@ -21,6 +21,11 @@ enum ApiErrorType {
       name: "Server-Sent Error",
       message: "The server has returned an error response."),
 
+  // Auth errors
+  authenticationError(
+      name: "Authentication Error",
+      message: "An error has occurred while authenticating user."),
+
   // Resource errors
   storeFailure(
       name: "Store Failure",

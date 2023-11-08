@@ -41,7 +41,7 @@ class _NotificationScreenBodyState extends State<NotificationScreenBody> {
 
   @override
   void initState() {
-    userId = context.read<AuthProvider>().user!.id;
+    userId = context.read<AuthProvider>().user!.uid;
     _pagination.addPageRequestListener((pageKey) async {
       final (:data, :nextPage) = await fetch(pageKey);
       if (nextPage == null) {

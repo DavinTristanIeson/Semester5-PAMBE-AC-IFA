@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
@@ -15,8 +14,13 @@ enum AcSharedPrefKeys {
 
 class LocalRecipeController extends ChangeNotifier {
   RecipeTable recipeTable;
-  String? userId;
+  String? _userId;
   LocalRecipeController({required this.recipeTable});
+
+  set userId(String? userId) {
+    _userId = userId;
+    notifyListeners();
+  }
 
   Future<LocalRecipeModel?> get(int id) async {
     return recipeTable.get(id);
@@ -24,12 +28,12 @@ class LocalRecipeController extends ChangeNotifier {
 
   Future<List<LocalRecipeLiteModel>> getAll(
       {required RecipeSearchState searchState, int page = 1}) async {
-    if (userId == null) {
+    if (_userId == null) {
       throw InvalidStateError(
           "LocalRecipeController.userId is expected to be non-null when getAll is called.");
     }
     return recipeTable.getAll(
-        filter: RecipeFilterBy.createdByUser(userId!),
+        filter: RecipeFilterBy.createdByUser(_userId!),
         limit: searchState.limit,
         page: page,
         search: searchState.search,
@@ -42,7 +46,7 @@ class LocalRecipeController extends ChangeNotifier {
       required List<RecipeStepFormType> steps,
       XFile? image,
       int? id}) async {
-    if (userId == null) {
+    if (_userId == null) {
       throw InvalidStateError(
           "LocalRecipeController.userId is expected to be non-null when put is called.");
     }
@@ -51,7 +55,7 @@ class LocalRecipeController extends ChangeNotifier {
         description: description,
         steps: steps,
         image: image,
-        userId: userId!,
+        userId: _userId!,
         id: id);
     notifyListeners();
     return result;
@@ -59,6 +63,15 @@ class LocalRecipeController extends ChangeNotifier {
 
   Future<void> remove(int id) async {
     await recipeTable.remove(id);
+    notifyListeners();
+  }
+
+  Future<void> removeAll() async {
+    if (_userId == null) {
+      throw InvalidStateError(
+          "LocalRecipeController.userId is expected to be non-null when removeAll is called.");
+    }
+    await recipeTable.removeAllByUser(_userId!);
     notifyListeners();
   }
 

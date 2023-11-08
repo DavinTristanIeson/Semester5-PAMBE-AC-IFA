@@ -5,7 +5,10 @@ import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
-import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
+import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
+import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/controllers/user.dart';
+import 'package:pambe_ac_ifa/database/interfaces/user.dart';
 import 'package:pambe_ac_ifa/pages/login/components/actions.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -90,7 +93,8 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
       return;
     }
 
-    final userController = context.read<AuthProvider>();
+    final authController = context.read<AuthProvider>();
+    final userController = context.read<UserController>();
     final navigator = context.navigator;
 
     LoginPayload? credentials;
@@ -109,10 +113,13 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
     }
 
     try {
-      await userController.updateAuth((
+      await authController.updateAuth(payload: (
         email: email,
         password: password,
       ), credentials: credentials!);
+      if (email != null) {
+        await userController.updateEmail(email);
+      }
       messenger.sendSuccess("Your credentials has been updated successfully");
       navigator.pop();
     } catch (e) {
@@ -133,6 +140,10 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
               onPressed: () async {
                 final auth = context.read<AuthProvider>();
                 final messenger = AcSnackbarMessenger.of(context);
+                final localRecipeController =
+                    context.read<LocalRecipeController>();
+                final recipeController = context.read<RecipeController>();
+                final userController = context.read<UserController>();
                 LoginPayload? credentials;
                 await showDialog(
                     context: context,
@@ -148,18 +159,20 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
                   return;
                 }
                 try {
-                  await auth.deleteAccount(credentials!);
+                  await auth.deleteAccount(credentials: credentials!);
+                  await userController.remove(credentials: credentials!);
                 } catch (e) {
                   messenger.sendError(e);
                 }
                 try {
-                  // TODO: Recipe cleanup
+                  await localRecipeController.removeAll();
+                  await recipeController.removeAll();
                 } catch (e) {
                   messenger.sendError(e);
                 }
               },
-              icon: Icon(Icons.delete),
-              label: Text("Delete Account"))
+              icon: const Icon(Icons.delete),
+              label: const Text("Delete Account"))
         ],
       ),
       body: ReactiveForm(

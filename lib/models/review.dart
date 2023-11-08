@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:pambe_ac_ifa/common/json.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
@@ -14,7 +13,7 @@ class ReviewModel {
   DateTime reviewedAt;
   double rating;
 
-  User reviewer;
+  UserModel reviewer;
   ReviewModel(
       {this.content,
       required this.reviewedAt,

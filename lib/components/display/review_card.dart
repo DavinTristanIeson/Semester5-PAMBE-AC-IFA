@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
@@ -55,7 +54,7 @@ class StarRating extends StatelessWidget {
 class ReviewCard extends StatelessWidget {
   final double rating;
   final Either<Widget, String>? content;
-  final User reviewer;
+  final UserModel? reviewer;
   final DateTime reviewedAt;
   final MinimalModel? reviewFor;
   const ReviewCard(
@@ -106,8 +105,11 @@ class ReviewCard extends StatelessWidget {
   }
 
   Widget buildUserAndRating(BuildContext context) {
-    Widget reviewerNameWidget = Text(reviewer.displayName!,
-        style: context.texts.titleMedium, overflow: TextOverflow.ellipsis);
+    Widget reviewerNameWidget = Text(reviewer?.name ?? "Deleted User",
+        style: reviewer == null
+            ? context.texts.titleMedium!.copyWith(fontStyle: FontStyle.italic)
+            : null,
+        overflow: TextOverflow.ellipsis);
     Widget starRatingWidget =
         StarRating(rating: rating, type: StarRatingType.compact);
 

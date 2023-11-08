@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
-import 'package:pambe_ac_ifa/controllers/auth.dart';
+import 'package:pambe_ac_ifa/controllers/user.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/pages/profile/screens/profile_screens.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +12,7 @@ class OtherUserProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.read<AuthProvider>();
+    final controller = context.read<UserController>();
     return Scaffold(
       appBar: const OnlyReturnAppBar(),
       body: FutureBuilder(
@@ -42,7 +42,25 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().user!;
-    return ProfileScreenBody(user: user, editable: true);
+    final userController = context.watch<UserController>();
+    return FutureBuilder(
+        future: userController.getMe(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (snapshot.hasError) {
+            return ErrorView(error: Either.right(snapshot.error.toString()));
+          }
+          if (!snapshot.hasData) {
+            return EmptyView(
+              content:
+                  Either.right("Sorry, we cannot find any user matching you!"),
+            );
+          }
+          return ProfileScreenBody(user: snapshot.data!, editable: true);
+        });
   }
 }

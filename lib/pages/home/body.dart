@@ -3,16 +3,13 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/review_card.dart';
 import 'package:pambe_ac_ifa/components/display/some_items_scroll.dart';
-import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/pages/home/components/sections.dart';
-import 'package:provider/provider.dart';
 
 class HomePageBody extends StatelessWidget {
   const HomePageBody({super.key});
 
   Widget buildLatestReviews(BuildContext context) {
-    final user = context.watch<AuthProvider>().user!;
     return SampleScrollSection(
         itemCount: 5,
         constraints: BoxConstraints.tight(
@@ -20,7 +17,7 @@ class HomePageBody extends StatelessWidget {
         itemBuilder: (context, index) {
           return ReviewCard(
             rating: 3.5,
-            reviewer: user,
+            reviewer: null,
             reviewedAt: DateTime.now(),
             content: Either.right("Review"),
             reviewFor: MinimalModel(id: '0', name: "Recipe Review"),

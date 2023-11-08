@@ -19,10 +19,11 @@ class FirebaseNotificationManager
   FirebaseFirestore db;
   CacheClient<NotificationModel> cache;
   CacheClient<PaginatedQueryResult<NotificationModel>> queryCache;
-  FirebaseNotificationManager(this.db)
+  FirebaseNotificationManager()
       : cache = CacheClient(
             staleTime: const Duration(minutes: 15),
             cleanupInterval: const Duration(minutes: 10)),
+        db = FirebaseFirestore.instance,
         queryCache = CacheClient(
             staleTime: const Duration(minutes: 2),
             cleanupInterval: const Duration(minutes: 1, seconds: 30));

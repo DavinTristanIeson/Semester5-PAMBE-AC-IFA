@@ -14,8 +14,9 @@ class FirebaseImageManager implements INetworkImageResourceManager {
   FirebaseStorage db;
   final String storagePath;
   CacheClient cache;
-  FirebaseImageManager(this.db, {required this.storagePath})
-      : cache = CacheClient(staleTime: const Duration(minutes: 5));
+  FirebaseImageManager({required this.storagePath})
+      : cache = CacheClient(staleTime: const Duration(minutes: 5)),
+        db = FirebaseStorage.instance;
 
   Reference getImageStorageReference() {
     return db.ref().child(globalFirebaseImageStoragePathRoot);
@@ -44,25 +45,6 @@ class FirebaseImageManager implements INetworkImageResourceManager {
         return Future.value();
       }
     }));
-  }
-
-  @override
-  Future<String?> put(XFile? resource,
-      {String? former, required String userId}) async {
-    if (former != null) {
-      await remove(former);
-    }
-    if (resource == null) {
-      return null;
-    }
-    final firebaseResource =
-        getFileReference(name: resource.name, userId: userId);
-    if (firebaseResource.fullPath == former) {
-      return firebaseResource.fullPath;
-    }
-    await firebaseResource.putFile(File(resource.path));
-    cache.markStale(key: firebaseResource.fullPath);
-    return firebaseResource.fullPath;
   }
 
   @override
