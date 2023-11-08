@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 
@@ -19,7 +20,7 @@ abstract class IImageResourceManager {
 }
 
 abstract class IUserResourceManager {
-  Future<UserModel> login(LoginPayload payload);
-  Future<UserModel> register(RegisterPayload payload);
-  Future<UserModel> getMe();
+  Future<UserCredential> login(LoginPayload payload);
+  Future<UserCredential> register(RegisterPayload payload);
+  Future<UserCredential> getMe();
 }

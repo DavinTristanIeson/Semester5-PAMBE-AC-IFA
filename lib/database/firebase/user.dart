@@ -1,25 +1,34 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
-import 'package:pambe_ac_ifa/models/user.dart';
 
 class FirebaseUserManager implements IUserResourceManager {
   @override
-  Future<UserModel> getMe() async {
-    return UserModel(
-        id: "0",
-        name: "User",
-        email: "placeholder@email.com",
-        imagePath: "https://www.google.com");
+  Future<UserCredential> getMe() async {
+    final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: 'a',
+      password: 'b',
+    );
+
+    return credential;
   }
 
   @override
-  Future<UserModel> register(RegisterPayload payload) {
-    // TODO: implement register
-    throw UnimplementedError();
+  Future<UserCredential> register(RegisterPayload payload) async {
+    final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: payload.email,
+      password: payload.password,
+    );
+
+    return credential;
   }
 
   @override
-  Future<UserModel> login(LoginPayload payload) {
-    // TODO: implement login
-    throw UnimplementedError();
+  Future<UserCredential> login(LoginPayload payload) async {
+    final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: payload.email,
+      password: payload.password,
+    );
+
+    return credential;
   }
 }

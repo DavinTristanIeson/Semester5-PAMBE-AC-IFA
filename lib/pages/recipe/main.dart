@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
@@ -51,19 +52,7 @@ class RecipeScreen extends StatelessWidget with SnackbarMessenger {
                         "We were unable to find any recipe associated with ID: $id")),
               );
             }
-            return RecipeInfoScreen(
-                recipe: snapshot.data!,
-                reviews: List.generate(
-                    5,
-                    (i) => ReviewModel(
-                        rating: 3.5,
-                        reviewedAt: DateTime.now(),
-                        reviewer: UserModel(
-                            id: "0",
-                            name: "User",
-                            email: "placeholder@email.com",
-                            imagePath: "https://www.google.com"),
-                        content: "Rating" * 10)));
+            return const Text("None");
           }),
     );
   }

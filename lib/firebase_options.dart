@@ -23,7 +23,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        return ios;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for ios - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
@@ -45,34 +48,25 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyBPUuHt9zbWtqmFOKmxfiH5wsYh5IdA0_w',
-    appId: '1:409850017205:web:6223cfd12b4c8e588455fc',
+    appId: '1:409850017205:web:3379b4ae17ecef748455fc',
     messagingSenderId: '409850017205',
     projectId: 'recipelib-18e85',
     authDomain: 'recipelib-18e85.firebaseapp.com',
     storageBucket: 'recipelib-18e85.appspot.com',
-    measurementId: 'G-BSVNXR24VX',
+    measurementId: 'G-XDYRHCJX71',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCBG8hRynwzTIRChSbK1SvpHoEq2Tz-UA8',
-    appId: '1:409850017205:android:e7fbc8b7322775548455fc',
+    appId: '1:409850017205:android:a8d8524fdbb193878455fc',
     messagingSenderId: '409850017205',
     projectId: 'recipelib-18e85',
     storageBucket: 'recipelib-18e85.appspot.com',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDyAWpwUUaNve3dw_agKUOgkWD3YQ7ElUI',
-    appId: '1:409850017205:ios:c5e312b2c10ece7b8455fc',
-    messagingSenderId: '409850017205',
-    projectId: 'recipelib-18e85',
-    storageBucket: 'recipelib-18e85.appspot.com',
-    iosBundleId: 'com.example.pambeAcIfa',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDyAWpwUUaNve3dw_agKUOgkWD3YQ7ElUI',
-    appId: '1:409850017205:ios:4cd139b9cbc7dba78455fc',
+    appId: '1:409850017205:ios:28f655b56a6765b58455fc',
     messagingSenderId: '409850017205',
     projectId: 'recipelib-18e85',
     storageBucket: 'recipelib-18e85.appspot.com',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pambe_ac_ifa/auth.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
@@ -7,6 +8,7 @@ import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:pambe_ac_ifa/pages/login/components/actions.dart';
+import 'package:pambe_ac_ifa/pages/login/login.dart';
 import 'package:pambe_ac_ifa/pages/startup/components.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -106,9 +108,12 @@ class RegisterScreen extends StatelessWidget with SnackbarMessenger {
 
   void _register(BuildContext context, RegisterPayload payload) async {
     final navigator = Navigator.of(context);
+    final _auth = Auth();
     try {
       await context.read<AuthProvider>().register(payload);
       navigator.pop();
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => const LoginScreen()));
     } catch (e) {
       // ignore: use_build_context_synchronously
       sendError(context, e.toString());

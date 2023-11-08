@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
@@ -161,7 +162,7 @@ class LocalRecipeController extends ChangeNotifier {
     ''');
   }
 
-  Future<RecipeModel?> get(int id, {required UserModel user}) async {
+  Future<RecipeModel?> get(int id, {required User user}) async {
     final data = (await db.query(
       tableName,
       where: "${LocalRecipeColumns.id} = ?",
@@ -176,7 +177,7 @@ class LocalRecipeController extends ChangeNotifier {
   }
 
   Future<List<RecipeLiteModel>> getAll(
-      {required UserModel user,
+      {required User user,
       required RecipeSearchState searchState,
       int page = 1}) async {
     final results = await db.query(tableName,
@@ -200,7 +201,7 @@ class LocalRecipeController extends ChangeNotifier {
       String? description,
       required List<RecipeStepFormType> steps,
       XFile? image,
-      required UserModel user,
+      required User user,
       RecipeModel? former}) async {
     int lastId = await db.transaction((txn) async {
       int lastId;
@@ -209,7 +210,7 @@ class LocalRecipeController extends ChangeNotifier {
         LocalRecipeColumns.description.name: description,
         LocalRecipeColumns.createdAt.name:
             DateTime.now().millisecondsSinceEpoch,
-        LocalRecipeColumns.userId.name: user.id,
+        LocalRecipeColumns.userId.name: user.uid,
         LocalRecipeColumns.imagePath.name: image?.path,
       };
       if (former == null) {

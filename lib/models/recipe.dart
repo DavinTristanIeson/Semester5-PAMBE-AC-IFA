@@ -1,3 +1,6 @@
+import 'dart:js_interop';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/json.dart';
@@ -117,10 +120,10 @@ class RecipeLiteModel with SupportsLocalAndOnlineImagesMixin {
       throw ApiError(ApiErrorType.shapeMismatch, inner: e);
     }
   }
-  factory RecipeLiteModel.fromLocal(Map<String, dynamic> json, UserModel user) {
+  factory RecipeLiteModel.fromLocal(Map<String, dynamic> json, User user) {
     try {
       final jsonCopy = Map<String, dynamic>.from(json);
-      jsonCopy["user"] = user.toJson();
+      jsonCopy["user"] = user.jsify();
       if (jsonCopy.containsKey("imagePath") && jsonCopy["imagePath"] != null) {
         jsonCopy["imageSource"] = ExternalImageSource.local.name;
       }
@@ -155,11 +158,11 @@ class RecipeModel extends RecipeLiteModel
       throw ApiError(ApiErrorType.shapeMismatch, inner: e);
     }
   }
-  factory RecipeModel.fromLocal(Map<String, dynamic> json, UserModel user,
-      List<Map<String, Object?>> steps) {
+  factory RecipeModel.fromLocal(
+      Map<String, dynamic> json, User user, List<Map<String, Object?>> steps) {
     try {
       final jsonCopy = Map<String, dynamic>.from(json);
-      jsonCopy["user"] = user.toJson();
+      jsonCopy["user"] = user.jsify();
       jsonCopy["steps"] = steps;
       if (jsonCopy.containsKey("imagePath") && jsonCopy["imagePath"] != null) {
         jsonCopy["imageSource"] = ExternalImageSource.local.name;
