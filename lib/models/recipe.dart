@@ -1,3 +1,6 @@
+import 'dart:js_interop';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:pambe_ac_ifa/common/json.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
@@ -54,7 +55,7 @@ class StarRating extends StatelessWidget {
 class ReviewCard extends StatelessWidget {
   final double rating;
   final Either<Widget, String>? content;
-  final UserModel reviewer;
+  final User reviewer;
   final DateTime reviewedAt;
   final MinimalModel? reviewFor;
   const ReviewCard(
@@ -105,7 +106,7 @@ class ReviewCard extends StatelessWidget {
   }
 
   Widget buildUserAndRating(BuildContext context) {
-    Widget reviewerNameWidget = Text(reviewer.name,
+    Widget reviewerNameWidget = Text(reviewer.displayName!,
         style: context.texts.titleMedium, overflow: TextOverflow.ellipsis);
     Widget starRatingWidget =
         StarRating(rating: rating, type: StarRatingType.compact);
@@ -116,7 +117,7 @@ class ReviewCard extends StatelessWidget {
         CircleAvatar(
           radius: AcSizes.lg + AcSizes.md,
           backgroundColor: Theme.of(context).colorScheme.tertiary,
-          backgroundImage: reviewer.image,
+          backgroundImage: null,
         ),
         const SizedBox(width: AcSizes.md),
         Column(

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:pambe_ac_ifa/auth.dart';
+import 'package:pambe_ac_ifa/database/firebase/user.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthProvider extends ChangeNotifier {
   IUserResourceManager userManager;
@@ -11,11 +14,7 @@ class AuthProvider extends ChangeNotifier {
   });
 
   // Placeholder methods until we implement firebase
-  UserModel? user = UserModel(
-      id: "1mBIe7ICAGtXKiMdZtfb",
-      name: "Test",
-      email: "test@recipelib.com",
-      imagePath: null);
+  User? user;
   bool get isGuest {
     return user == null;
   }
@@ -24,60 +23,40 @@ class AuthProvider extends ChangeNotifier {
     return user != null;
   }
 
-  Future<UserModel> login(LoginPayload payload) async {
-    final result = await userManager.login(payload);
-    notifyListeners();
-    return result;
-  }
-
-  Future<void> logout() async {
-    notifyListeners();
-  }
-
-  Future<UserModel> register(RegisterPayload payload) async {
-    return userManager.register(payload);
-  }
-
-  Future<void> initialize() async {}
-
-  Future<UserModel?> get(String userId) {
-    return userManager.get(userId);
-  }
-
-  Future<void> updateProfile(UserEditPayload payload) async {
-    if (user == null) {
-      throw InvalidStateError(
-          "AuthProvider.user is expected to be initialized when the updateProfile method is called!");
+  Future<bool> login(LoginPayload payload) async {
+    try {
+      await FirebaseUserManager().login(payload);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        throw 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        throw 'Wrong password provided for that user.';
+      } else {
+        throw e.message.toString();
+      }
     }
-    user = await userManager.put(user!.id, payload);
-    notifyListeners();
+
+    return true;
   }
 
-  Future<void> deleteAccount(LoginPayload credentials) async {
-    if (user == null) {
-      throw InvalidStateError(
-          "AuthProvider.user is expected to be initialized when the deleteAccount method is called!");
+  Future<bool> register(RegisterPayload payload) async {
+    try {
+      await FirebaseUserManager().register(payload);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        throw 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        throw 'Wrong password provided for that user.';
+      } else {
+        throw e.message.toString();
+      }
     }
-    await userManager.remove(user!.id, credentials: credentials);
-    notifyListeners();
+
+    return true;
   }
 
-  Future<void> updateAuth(
-    UpdateAuthPayload payload, {
-    required LoginPayload credentials,
-  }) async {
-    if (user == null) {
-      throw InvalidStateError(
-          "User is expected to be initialized when the .updateAuth method is called!");
-    }
-    user = await userManager.updateAuth(user!.id,
-        payload: payload, credentials: credentials);
-    notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    userManager.dispose();
-    super.dispose();
+  Future<void> initialize() async {
+    final auth = FirebaseAuth.instance;
+    user = auth.currentUser;
   }
 }

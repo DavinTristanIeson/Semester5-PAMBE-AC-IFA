@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/firebase.dart';
@@ -46,15 +47,33 @@ class FirebaseUserManager
   }
 
   @override
-  Future<UserModel> register(RegisterPayload payload) {
-    // TODO: implement register
-    throw UnimplementedError();
+  Future<UserCredential> getMeAuth() async {
+    final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: 'a',
+      password: 'b',
+    );
+
+    return credential;
   }
 
   @override
-  Future<UserModel> login(LoginPayload payload) {
-    // TODO: implement login
-    throw UnimplementedError();
+  Future<UserCredential> register(RegisterPayload payload) async {
+    final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: payload.email,
+      password: payload.password,
+    );
+
+    return credential;
+  }
+
+  @override
+  Future<UserCredential> login(LoginPayload payload) async {
+    final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: payload.email,
+      password: payload.password,
+    );
+
+    return credential;
   }
 
   @override

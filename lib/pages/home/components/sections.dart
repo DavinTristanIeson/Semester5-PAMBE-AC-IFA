@@ -15,7 +15,7 @@ class HomeRecentRecipesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<RecipeController>();
-    final userId = context.watch<AuthProvider>().user!.id;
+    final userId = context.watch<AuthProvider>().user!.uid;
     return AsyncApiSampleScrollSection(
         future: controller.getRecentRecipes(),
         itemBuilder: (context, data) => RecipeCard(
@@ -41,7 +41,7 @@ class HomeTrendingRecipesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<RecipeController>();
-    final userId = context.watch<AuthProvider>().user?.id;
+    final userId = context.watch<AuthProvider>().user?.uid;
     return AsyncApiSampleScrollSection(
         future: controller.getTrendingRecipes(),
         itemBuilder: (context, data) => RecipeCard(

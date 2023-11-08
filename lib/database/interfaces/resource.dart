@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/models/notification.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
@@ -43,9 +44,9 @@ abstract class INetworkImageResourceManager {
 }
 
 abstract class IUserResourceManager {
-  Future<UserModel> login(LoginPayload payload);
-  Future<UserModel> register(RegisterPayload payload);
-  Future<UserModel?> get(String id);
+  Future<UserCredential> login(LoginPayload payload);
+  Future<UserCredential> register(RegisterPayload payload);
+  Future<UserCredential?> get(String id);
   Future<UserModel?> put(String id, UserEditPayload payload);
   Future<UserModel?> remove(String id, {required LoginPayload credentials});
   Future<UserModel?> updateAuth(String id,
