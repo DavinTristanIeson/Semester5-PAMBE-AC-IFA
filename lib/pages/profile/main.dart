@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/controllers/user.dart';
@@ -55,9 +56,12 @@ class ProfileScreen extends StatelessWidget {
             return ErrorView(error: Either.right(snapshot.error.toString()));
           }
           if (!snapshot.hasData) {
-            return EmptyView(
-              content:
-                  Either.right("Sorry, we cannot find any user matching you!"),
+            return Padding(
+              padding: const EdgeInsets.all(AcSizes.space),
+              child: EmptyView(
+                content: Either.right(
+                    "Sorry, we cannot find any user matching you!"),
+              ),
             );
           }
           return ProfileScreenBody(user: snapshot.data!, editable: true);

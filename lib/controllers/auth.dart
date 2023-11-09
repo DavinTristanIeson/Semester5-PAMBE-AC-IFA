@@ -19,7 +19,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   void _onUserChanged(User? user) {
-    user = user;
+    this.user = user;
     notifyListeners();
   }
 

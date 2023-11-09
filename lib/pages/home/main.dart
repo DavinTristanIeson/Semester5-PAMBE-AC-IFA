@@ -9,7 +9,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (context.watch<AuthProvider>().isGuest) {
+    final isGuest = context.watch<AuthProvider>().isGuest;
+    if (isGuest) {
       return const GuestHomeScreen();
     } else {
       return const UserHomeScreen();

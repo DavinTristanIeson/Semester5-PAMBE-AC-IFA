@@ -49,7 +49,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 icon: const Icon(Icons.search)),
           if (tab == RecipeLibTabs.profile)
             IconButton(
-                onPressed: () {
+                onPressed: () async {
                   context.read<AuthProvider>().logout();
                 },
                 icon: const Icon(Icons.logout)),

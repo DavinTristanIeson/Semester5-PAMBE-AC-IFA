@@ -41,10 +41,16 @@ class FirebaseUserManager
     try {
       final (:data, snapshot: _) = await processDocumentSnapshot(
           () => db.collection(collectionPath).doc(id).get(),
-          transform: (json, snapshot) => Future.value(UserModel.fromJson({
-                ...json,
-                "id": snapshot.id,
-              })));
+          transform: (json, snapshot) async {
+        return Future.value(UserModel.fromJson({
+          ...json,
+          "id": snapshot.id,
+          "imagePath": json[UserFirestoreKeys.imagePath.name] is String
+              ? await imageManager.urlof(json[UserFirestoreKeys.imagePath.name])
+              : null,
+          "imageStoragePath": json[UserFirestoreKeys.imagePath.name],
+        }));
+      });
       cache.put(data.id, data);
       return data;
     } on ApiError catch (e) {
@@ -74,23 +80,24 @@ class FirebaseUserManager
     final prev = await get(id);
     final Map<String, XFile?> reserved = {};
     final Map<String, dynamic> payload = Map.fromEntries(Optional.allWithValue([
+      name?.encase((value) => MapEntry(UserFirestoreKeys.name.name, value)),
       email?.encase((value) => MapEntry(UserFirestoreKeys.email.name, value)),
       bio?.encase((value) => MapEntry(UserFirestoreKeys.bio.name, value)),
-      birthdate?.encase(
-          (value) => MapEntry(UserFirestoreKeys.birthdate.name, value)),
+      birthdate?.encase((value) => MapEntry(
+          UserFirestoreKeys.birthdate.name, value?.millisecondsSinceEpoch)),
       country
           ?.encase((value) => MapEntry(UserFirestoreKeys.country.name, value)),
     ], then: (value) {
       return value;
     }));
     if (image != null) {
-      final newImagePath = image.hasValue
-          ? null
-          : imageManager.getPath(userId: id, name: image.value!.name);
+      final newImagePath = image.hasValue && image.value != null
+          ? imageManager.getPath(userId: id, name: image.value!.name)
+          : null;
 
-      if (prev?.imagePath != newImagePath) {
-        if (prev?.imagePath != null) {
-          reserved[prev!.imagePath!] = null;
+      if (prev?.imageStoragePath != newImagePath) {
+        if (prev?.imageStoragePath != null) {
+          reserved[prev!.imageStoragePath!] = null;
         }
         if (newImagePath != null) {
           reserved[newImagePath] = image.value!;
@@ -100,7 +107,11 @@ class FirebaseUserManager
     }
 
     try {
-      await db.collection(collectionPath).doc(id).update(payload);
+      if (prev == null) {
+        await db.collection(collectionPath).doc(id).set(payload);
+      } else {
+        await db.collection(collectionPath).doc(id).update(payload);
+      }
     } catch (e) {
       throw ApiError(ApiErrorType.storeFailure, inner: e);
     }

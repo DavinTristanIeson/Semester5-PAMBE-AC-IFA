@@ -7,12 +7,19 @@ class FirebaseAuthManager {
     if (error is FirebaseAuthException) {
       if (error.code == 'user-not-found') {
         return ApiError(ApiErrorType.authenticationError,
-            message: 'No user found for that email.', inner: error);
+            message: 'No user found for that email.');
       } else if (error.code == 'wrong-password') {
         return ApiError(ApiErrorType.authenticationError,
-            message: 'Wrong password provided for that user.', inner: error);
-      } else {
-        return ApiError(ApiErrorType.authenticationError, inner: error);
+            message: 'Wrong password provided for that user.');
+      } else if (error.code == 'user-disabled') {
+        return ApiError(ApiErrorType.authenticationError,
+            message: "This user has already been disabled.");
+      } else if (error.code == 'email-already-in-use') {
+        return ApiError(ApiErrorType.authenticationError,
+            message: "That email is already used by another user");
+      } else if (error.code == 'INVALID_LOGIN_CREDENTIALS') {
+        return ApiError(ApiErrorType.authenticationError,
+            message: "Email or password is wrong");
       }
     }
     return ApiError(ApiErrorType.authenticationError, inner: error);

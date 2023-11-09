@@ -9,7 +9,6 @@ typedef RegisterPayload = ({
   String password,
   String name,
   String? bio,
-  XFile? image,
 });
 typedef UserEditPayload = ({
   String name,

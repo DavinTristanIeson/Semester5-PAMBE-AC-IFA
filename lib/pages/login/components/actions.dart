@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
+import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/components/field/text_input.dart';
 import 'package:pambe_ac_ifa/components/function/wrapper.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class LoginSubmitButton extends StatelessWidget {
-  final void Function() onPressed;
+  final Future<void> Function() onPressed;
   final String label;
   const LoginSubmitButton(
       {super.key, required this.onPressed, required this.label});
@@ -27,7 +28,7 @@ class LoginSubmitButton extends StatelessWidget {
           );
         },
         shouldWrap: form.hasErrors,
-        child: ElevatedButton(
+        child: FutureButton(
             onPressed: form.hasErrors ? null : onPressed, child: Text(label)),
       ),
     );

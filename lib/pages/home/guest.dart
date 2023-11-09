@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/models/container.dart';
+import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/home/components/sections.dart';
 import 'package:pambe_ac_ifa/pages/login/login.dart';
 import 'package:pambe_ac_ifa/pages/login/register.dart';
+import 'package:pambe_ac_ifa/pages/search/main.dart';
 
 class GuestHomeScreen extends StatelessWidget {
   const GuestHomeScreen({super.key});
@@ -74,12 +77,22 @@ class GuestHomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Recipe.Lib"),
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.search))],
+        actions: [
+          IconButton(
+              onPressed: () {
+                context.navigator.push(MaterialPageRoute(builder: (context) {
+                  return SearchScreen(
+                      sortBy: SortBy.descending(RecipeSortBy.ratings));
+                }));
+              },
+              icon: const Icon(Icons.search))
+        ],
       ),
       body: ListView(
         children: [
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: AcSizes.space),
+            padding: EdgeInsets.symmetric(
+                vertical: AcSizes.space, horizontal: AcSizes.space),
             child: HomeTrendingRecipesSection(),
           ),
           Padding(

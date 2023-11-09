@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
@@ -9,6 +10,7 @@ import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/field/field_wrapper.dart';
 import 'package:pambe_ac_ifa/controllers/user.dart';
+import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/login/components/actions.dart';
 import 'package:pambe_ac_ifa/pages/profile/components/country_select.dart';
@@ -33,6 +35,8 @@ class EditProfileScreen extends StatefulWidget {
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
+typedef UserAvatarFormType = Either<String?, XFile?>;
+
 class _EditProfileScreenState extends State<EditProfileScreen> {
   late final FormGroup form;
 
@@ -40,10 +44,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
     form = FormGroup({
-      _EditProfileFormKeys.image.name: FormControl<XFile?>(
+      _EditProfileFormKeys.image.name: FormControl<UserAvatarFormType>(
         value: widget.data.imagePath == null
-            ? null
-            : XFile(widget.data.imagePath!),
+            ? Either.right(null)
+            : Either.left(widget.data.imagePath!),
       ),
       _EditProfileFormKeys.name.name: FormControl<String>(
           value: widget.data.name,
@@ -75,9 +79,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final userController = context.read<UserController>();
     try {
       final value = form.value;
+      final image =
+          (value[_EditProfileFormKeys.image.name] as UserAvatarFormType)
+              .rightOr((left) => null);
       await userController.updateProfile((
         name: value[_EditProfileFormKeys.name.name] as String,
-        image: value[_EditProfileFormKeys.image.name] as XFile?,
+        image: image,
         country: value[_EditProfileFormKeys.country.name] as String?,
         birthdate: value[_EditProfileFormKeys.birthdate.name] as DateTime?,
         bio: value[_EditProfileFormKeys.bio.name] as String?,
@@ -166,20 +173,23 @@ class EditProfileScreenBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        ReactiveValueListenableBuilder<XFile?>(
+        ReactiveValueListenableBuilder<UserAvatarFormType>(
             formControlName: _EditProfileFormKeys.image.name,
             builder: (context, control, child) {
               return GestureDetector(
                 onTap: () async {
-                  control.value = await _dialogBuilder(context);
+                  control.value = Either.right(await _dialogBuilder(context));
                 },
                 child: Center(
                   child: CircleAvatar(
+                    backgroundColor: context.colors.tertiary,
                     radius: context.relativeWidth(0.25, 60.0, 120.0),
-                    foregroundImage: (control.value == null
-                            ? const AssetImage(MaybeImage.userFallbackImagePath)
-                            : FileImage(File(control.value!.path)))
-                        as ImageProvider,
+                    foregroundImage: control.value!.right != null
+                        ? FileImage(File(control.value!.right!.path))
+                        : (control.value!.left != null
+                            ? CachedNetworkImageProvider(control.value!.left!)
+                            : const AssetImage(MaybeImage
+                                .userFallbackImagePath)) as ImageProvider,
                     child: control.value == null
                         ? const Icon(Icons.camera_alt)
                         : null,

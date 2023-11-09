@@ -157,7 +157,7 @@ class RecipeTable {
       final allLocalRecipes = await txn.query(tableName,
           where: "${_RecipeColumns.userId.name} = ?", whereArgs: [userId]);
       for (final rawRecipe in allLocalRecipes) {
-        final recipe = LocalRecipeModel.fromJson(rawRecipe);
+        final recipe = LocalRecipeModel.fromJson({...rawRecipe, "steps": []});
         reserved.addAll(imageManager.markRecipeImagesForRemoval(recipe));
         await stepsController.removeAll(txn, recipe.id);
       }

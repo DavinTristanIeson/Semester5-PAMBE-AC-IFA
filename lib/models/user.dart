@@ -14,6 +14,9 @@ class UserModel with SupportsLocalAndOnlineImagesMixin {
   @override
   String? imagePath;
 
+  @JsonKey(includeToJson: false)
+  String? imageStoragePath;
+
   @JsonEpochConverter()
   DateTime? birthdate;
 
@@ -31,6 +34,7 @@ class UserModel with SupportsLocalAndOnlineImagesMixin {
     this.bio,
     this.country,
     this.birthdate,
+    this.imageStoragePath,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {

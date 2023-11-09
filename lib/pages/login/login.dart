@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class _LoginScreenForm extends StatefulWidget {
-  final void Function(LoginPayload payload) onSubmit;
+  final Future<void> Function(LoginPayload payload) onSubmit;
   const _LoginScreenForm({required this.onSubmit});
 
   @override
@@ -53,7 +53,7 @@ class _LoginScreenFormState extends State<_LoginScreenForm> {
               placeholder: "Enter your password"),
           LoginSubmitButton(
               onPressed: () {
-                widget.onSubmit((
+                return widget.onSubmit((
                   email: form.value["email"] as String,
                   password: form.value["password"] as String,
                 ));
@@ -68,7 +68,7 @@ class _LoginScreenFormState extends State<_LoginScreenForm> {
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
-  void _login(BuildContext context, LoginPayload payload) async {
+  Future<void> _login(BuildContext context, LoginPayload payload) async {
     final navigator = Navigator.of(context);
     final auth = context.read<AuthProvider>();
 
@@ -96,7 +96,7 @@ class LoginScreen extends StatelessWidget {
           Builder(builder: (context) {
             return _LoginScreenForm(
               onSubmit: (payload) {
-                _login(context, payload);
+                return _login(context, payload);
               },
             );
           }),

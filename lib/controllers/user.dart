@@ -20,7 +20,6 @@ class UserController extends ChangeNotifier {
   Future<UserModel> register(String userId, RegisterPayload payload) async {
     final result = await userManager.put(userId,
         email: Optional.some(payload.email),
-        image: Optional.some(payload.image),
         bio: Optional.some(payload.bio),
         name: Optional.some(payload.name));
     notifyListeners();

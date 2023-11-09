@@ -7,6 +7,7 @@ import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/notification.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/controllers/user.dart';
 import 'package:pambe_ac_ifa/database/firebase/auth.dart';
 import 'package:pambe_ac_ifa/database/firebase/lib/images.dart';
 import 'package:pambe_ac_ifa/database/firebase/notification.dart';
@@ -46,6 +47,15 @@ void main() async {
       ProxyProvider<AuthProvider, NotificationController>(
           create: (context) => NotificationController(
               notificationManager: FirebaseNotificationManager(), userId: null),
+          update: (context, authProvider, prev) {
+            final userId = authProvider.user?.uid;
+            prev!.userId = userId;
+            return prev;
+          }),
+      ChangeNotifierProxyProvider<AuthProvider, UserController>(
+          create: (context) => UserController(
+              userManager: FirebaseUserManager(
+                  imageManager: FirebaseImageManager(storagePath: "user"))),
           update: (context, authProvider, prev) {
             final userId = authProvider.user?.uid;
             prev!.userId = userId;

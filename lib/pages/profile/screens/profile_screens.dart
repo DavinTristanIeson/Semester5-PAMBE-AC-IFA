@@ -34,23 +34,23 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> {
     );
   }
 
-  Widget buildLocation() {
+  Widget buildLocation(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(
+        Icon(
           Icons.pin_drop,
-          color: Color.fromARGB(255, 255, 159, 42),
+          color: context.colors.primary,
         ),
         const SizedBox(
-          width: 5,
+          width: AcSizes.sm,
         ),
         Text(
           widget.user.country!,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: Color.fromARGB(255, 255, 159, 42),
+            color: context.colors.primary,
           ),
         ),
       ],
@@ -99,27 +99,21 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> {
       child: Column(
         children: [
           buildProfileOnboard(),
-          Text(
-            widget.user.name,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: context.colors.primary,
+          TextItem(firstText: widget.user.name, secondText: widget.user.email),
+          if (widget.user.country != null)
+            Padding(
+              padding:
+                  const EdgeInsets.only(top: AcSizes.space, bottom: AcSizes.md),
+              child: buildLocation(context),
             ),
-          ),
-          Text(
-            widget.user.email,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w400,
-              color: context.colors.primary,
-            ),
-          ),
-          if (widget.user.country != null) buildLocation(),
           if (widget.user.birthdate != null)
-            TextItem(
-                firstText: "Date of Birth",
-                secondText: widget.user.birthdate!.toLocaleString()),
+            Padding(
+              padding:
+                  const EdgeInsets.only(top: AcSizes.space, bottom: AcSizes.md),
+              child: TextItem(
+                  firstText: "Date of Birth",
+                  secondText: widget.user.birthdate!.toLocaleDateString()),
+            ),
           const SizedBox(
             height: AcSizes.space,
           ),

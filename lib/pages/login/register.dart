@@ -24,7 +24,7 @@ enum _RegisterFormKeys {
 }
 
 class _RegisterScreenForm extends StatefulWidget {
-  final void Function(RegisterPayload payload) onSubmit;
+  final Future<void> Function(RegisterPayload payload) onSubmit;
   const _RegisterScreenForm({required this.onSubmit});
 
   @override
@@ -58,8 +58,11 @@ class _RegisterScreenFormState extends State<_RegisterScreenForm> {
               : null;
         })
       ]),
-      _RegisterFormKeys.name.name: FormControl<String>(
-          validators: [Validators.minLength(5), AcValidators.acceptedChars]),
+      _RegisterFormKeys.name.name: FormControl<String>(validators: [
+        Validators.required,
+        Validators.minLength(5),
+        AcValidators.acceptedChars
+      ]),
       _RegisterFormKeys.bio.name: FormControl<String>(),
     });
   }
@@ -99,13 +102,12 @@ class _RegisterScreenFormState extends State<_RegisterScreenForm> {
               placeholder: "Tell us about you!"),
           LoginSubmitButton(
               onPressed: () {
-                widget.onSubmit((
+                return widget.onSubmit((
                   email: form.value[_RegisterFormKeys.email.name] as String,
                   password:
                       form.value[_RegisterFormKeys.password.name] as String,
                   name: form.value[_RegisterFormKeys.name.name] as String,
                   bio: form.value[_RegisterFormKeys.bio.name] as String?,
-                  image: form.value[_RegisterFormKeys.image.name] as XFile?,
                 ));
               },
               label: "Register")
@@ -118,7 +120,7 @@ class _RegisterScreenFormState extends State<_RegisterScreenForm> {
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
-  void _register(BuildContext context, RegisterPayload payload) async {
+  Future<void> _register(BuildContext context, RegisterPayload payload) async {
     final navigator = Navigator.of(context);
     final authProvider = context.read<AuthProvider>();
     final userController = context.read<UserController>();
@@ -147,7 +149,7 @@ class RegisterScreen extends StatelessWidget {
           Builder(builder: (context) {
             return _RegisterScreenForm(
               onSubmit: (payload) {
-                _register(context, payload);
+                return _register(context, payload);
               },
             );
           }),

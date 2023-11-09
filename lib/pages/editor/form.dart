@@ -4,6 +4,7 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
+import 'package:pambe_ac_ifa/components/function/future_caller.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
@@ -75,7 +76,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
     }
   }
 
-  void save() async {
+  Future<void> save() async {
     final controller = context.read<LocalRecipeController>();
     final messenger = AcSnackbarMessenger.of(context);
     if (form.invalid) {
@@ -244,10 +245,14 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
         ),
         floatingActionButton: Tooltip(
           message: "Save",
-          child: FloatingActionButton(
-            onPressed: save,
-            child: const Icon(Icons.save),
-          ),
+          child: FutureProcedureCaller(
+              process: save,
+              builder: (context, snapshot, call) {
+                return FloatingActionButton(
+                  onPressed: call,
+                  child: const Icon(Icons.save),
+                );
+              }),
         ),
         body: ReactiveForm(
           formGroup: form,

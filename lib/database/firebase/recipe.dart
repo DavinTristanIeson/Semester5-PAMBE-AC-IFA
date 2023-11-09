@@ -116,7 +116,7 @@ class FirebaseRecipeManager
     if (searchState?.sortBy != null) {
       var sortBy = switch (searchState!.sortBy.factor) {
         RecipeSortBy.createdDate => RecipeFirestoreKeys.createdAt,
-        RecipeSortBy.ratings => RecipeFirestoreKeys.ratings,
+        // RecipeSortBy.ratings => RecipeFirestoreKeys.ratings,
         _ => null
       };
       if (sortBy != null) {

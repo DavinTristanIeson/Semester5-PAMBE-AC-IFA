@@ -36,7 +36,9 @@ class RecipeController extends ChangeNotifier {
     return getAll(RecipeSearchState(
         limit: 5,
         sortBy: SortBy.descending(RecipeSortBy.ratings),
-        filterBy: RecipeFilterBy.viewedBy(_userId!, viewed: false)));
+        filterBy: _userId != null
+            ? RecipeFilterBy.viewedBy(_userId!, viewed: false)
+            : null));
   }
 
   Future<List<RecipeLiteModel>> getBookmarkedRecipes() async {
@@ -91,11 +93,11 @@ class RecipeController extends ChangeNotifier {
     }
     final yourRecipes = await getRecipesByUser(_userId!);
     // To make sure we don't get rate limited
-    await Future.sync(() => yourRecipes.chunks(4).map((chunk) {
-          for (final item in chunk) {
-            return recipeManager.remove(item.id);
-          }
-        }));
+    await Future.wait(yourRecipes.chunks(4).map((chunk) async {
+      for (final item in chunk) {
+        await recipeManager.remove(item.id);
+      }
+    }));
     notifyListeners();
   }
 

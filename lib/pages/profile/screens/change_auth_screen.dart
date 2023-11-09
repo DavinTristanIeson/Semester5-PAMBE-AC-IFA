@@ -4,11 +4,13 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
+import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/controllers/user.dart';
 import 'package:pambe_ac_ifa/database/interfaces/user.dart';
+import 'package:pambe_ac_ifa/pages/home/main.dart';
 import 'package:pambe_ac_ifa/pages/login/components/actions.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -79,7 +81,7 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
     form.dispose();
   }
 
-  void save() async {
+  Future<void> save() async {
     final messenger = AcSnackbarMessenger.of(context);
     if (form.invalid) {
       messenger.sendError("Please resolve all errors before saving");
@@ -119,12 +121,57 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
       ), credentials: credentials!);
       if (email != null) {
         await userController.updateEmail(email);
+        messenger.sendSuccess("Your email has been updated successfully");
       }
-      messenger.sendSuccess("Your credentials has been updated successfully");
+      if (password != null) {
+        messenger.sendSuccess("Your password has been updated successfully");
+      }
       navigator.pop();
     } catch (e) {
       messenger.sendError(e);
+      return;
     }
+  }
+
+  Future<void> deleteAccount() async {
+    final messenger = AcSnackbarMessenger.of(context);
+    final auth = context.read<AuthProvider>();
+    final navigator = Navigator.of(context);
+    final localRecipeController = context.read<LocalRecipeController>();
+    final recipeController = context.read<RecipeController>();
+    final userController = context.read<UserController>();
+    LoginPayload? credentials;
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return ChangeAuthDialog(
+              onConfirm: (creds) {
+                credentials = creds;
+                Navigator.pop(context);
+              },
+              reason:
+                  "Your account will be deleted and all of your recipes will no longer be accessible");
+        });
+    if (credentials == null) {
+      return;
+    }
+    try {
+      await localRecipeController.removeAll();
+      await recipeController.removeAll();
+    } catch (e) {
+      messenger.sendError(e);
+      return;
+    }
+    try {
+      await userController.remove(credentials: credentials!);
+      await auth.deleteAccount(credentials: credentials!);
+    } catch (e) {
+      messenger.sendError(e);
+      return;
+    }
+    navigator.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        (route) => false);
   }
 
   @override
@@ -132,48 +179,20 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
     return Scaffold(
       appBar: OnlyReturnAppBar(
         actions: [
-          OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: context.colors.error,
-                side: BorderSide(color: context.colors.error),
-              ),
-              onPressed: () async {
-                final auth = context.read<AuthProvider>();
-                final messenger = AcSnackbarMessenger.of(context);
-                final localRecipeController =
-                    context.read<LocalRecipeController>();
-                final recipeController = context.read<RecipeController>();
-                final userController = context.read<UserController>();
-                LoginPayload? credentials;
-                await showDialog(
-                    context: context,
-                    builder: (context) {
-                      return ChangeAuthDialog(
-                          onConfirm: (creds) {
-                            credentials = creds;
-                          },
-                          reason:
-                              "Your account will be deleted and all of your recipes will no longer be accessible");
-                    });
-                if (credentials == null) {
-                  return;
-                }
-                // TODO: Group this in a service maybe??
-                try {
-                  await auth.deleteAccount(credentials: credentials!);
-                  await userController.remove(credentials: credentials!);
-                } catch (e) {
-                  messenger.sendError(e);
-                }
-                try {
-                  await localRecipeController.removeAll();
-                  await recipeController.removeAll();
-                } catch (e) {
-                  messenger.sendError(e);
-                }
+          FutureButtonCompute(
+              onPressed: deleteAccount,
+              progressIndicatorColor: context.colors.error,
+              builder: (context, onPressed, icon) {
+                return OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: context.colors.error,
+                      side: BorderSide(color: context.colors.error),
+                    ),
+                    icon: icon!,
+                    label: const Text("Delete Account"),
+                    onPressed: onPressed);
               },
-              icon: const Icon(Icons.delete),
-              label: const Text("Delete Account"))
+              icon: const Icon(Icons.delete))
         ],
       ),
       body: ReactiveForm(
@@ -288,17 +307,17 @@ class _ChangeAuthDialogState extends State<ChangeAuthDialog> {
 }
 
 class ChangeAuthScreenBody extends StatelessWidget {
-  final void Function() onSave;
+  final Future<void> Function() onSave;
   const ChangeAuthScreenBody({super.key, required this.onSave});
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        buildGenericTextInput(
-            name: _ChangeAuthFormKeys.email.name,
-            label: "New Email",
-            placeholder: "Leave empty if email won't be changed"),
+        // buildGenericTextInput(
+        //     name: _ChangeAuthFormKeys.email.name,
+        //     label: "New Email",
+        //     placeholder: "Leave empty if email won't be changed"),
         buildGenericTextInput(
             name: _ChangeAuthFormKeys.password.name,
             label: "New Password",
@@ -319,10 +338,10 @@ class ChangeAuthScreenBody extends StatelessWidget {
         Center(
           child: Padding(
             padding: const EdgeInsets.only(top: AcSizes.lg, bottom: AcSizes.lg),
-            child: ElevatedButton.icon(
+            child: FutureButton(
               icon: const Icon(Icons.save),
               onPressed: onSave,
-              label: const Text(
+              child: const Text(
                 "Save Changes",
               ),
             ),

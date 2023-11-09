@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 
 class TextItem extends StatelessWidget {
@@ -14,15 +15,20 @@ class TextItem extends StatelessWidget {
         Text(
           firstText,
           style: TextStyle(
-            fontSize: 24,
+            fontSize: AcSizes.fontEmphasis,
             fontWeight: FontWeight.w500,
             color: context.colors.primary,
           ),
         ),
         const SizedBox(
-          height: 10,
+          height: AcSizes.sm,
         ),
-        Text(secondText),
+        Text(
+          secondText,
+          style: TextStyle(
+            color: context.colors.primary,
+          ),
+        ),
       ],
     );
   }

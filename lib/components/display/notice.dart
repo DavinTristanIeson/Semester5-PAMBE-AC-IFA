@@ -64,25 +64,30 @@ class EmptyView extends StatelessWidget {
         color: Color.fromRGBO(0, 0, 0, 0.2),
       ),
       padding: const EdgeInsets.all(AcSizes.space),
-      child: Column(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.warning,
-            color: context.colors.tertiary,
-            size: AcSizes.iconBig * 2,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.warning,
+                color: context.colors.tertiary,
+                size: AcSizes.iconBig * 2,
+              ),
+              const SizedBox(
+                height: AcSizes.lg,
+              ),
+              content.leftOr((left) => Text(
+                    left,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: context.colors.tertiary,
+                    ),
+                  )),
+            ],
           ),
-          const SizedBox(
-            height: AcSizes.lg,
-          ),
-          content.leftOr((left) => Text(
-                left,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: context.colors.tertiary,
-                ),
-              )),
         ],
       ),
     );
