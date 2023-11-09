@@ -51,6 +51,7 @@ class Optional<T> {
   Optional.none()
       : _hasValue = false,
         value = null;
+
   get hasValue => _hasValue;
   T or(T Function() fn) {
     return hasValue ? value! : fn();

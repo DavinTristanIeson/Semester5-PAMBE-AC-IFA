@@ -158,6 +158,7 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
                 if (credentials == null) {
                   return;
                 }
+                // TODO: Group this in a service maybe??
                 try {
                   await auth.deleteAccount(credentials: credentials!);
                   await userController.remove(credentials: credentials!);

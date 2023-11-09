@@ -32,35 +32,15 @@ class AuthProvider extends ChangeNotifier {
   bool get isGuest => user == null;
   bool get isLoggedIn => user != null;
 
-  ApiError _wrapFirebaseAuthError(FirebaseAuthException error) {
-    if (error.code == 'user-not-found') {
-      return ApiError(ApiErrorType.authenticationError,
-          message: 'No user found for that email.', inner: error);
-    } else if (error.code == 'wrong-password') {
-      return ApiError(ApiErrorType.authenticationError,
-          message: 'Wrong password provided for that user.', inner: error);
-    } else {
-      return ApiError(ApiErrorType.authenticationError, inner: error);
-    }
-  }
-
   Future<User> login(LoginPayload payload) async {
-    try {
-      await authManager.login(payload);
-    } on FirebaseAuthException catch (e) {
-      throw _wrapFirebaseAuthError(e);
-    }
+    await authManager.login(payload);
 
     return FirebaseAuth.instance.currentUser!;
   }
 
   Future<User> register(RegisterPayload payload) async {
-    try {
-      await authManager
-          .register((email: payload.email, password: payload.password));
-    } on FirebaseAuthException catch (e) {
-      throw _wrapFirebaseAuthError(e);
-    }
+    await authManager
+        .register((email: payload.email, password: payload.password));
 
     return FirebaseAuth.instance.currentUser!;
   }
@@ -87,10 +67,5 @@ class AuthProvider extends ChangeNotifier {
           "AuthProvider.user should not be null when updateAuth is called");
     }
     return authManager.deleteAccount(user!.uid, credentials: credentials);
-  }
-
-  Future<void> initialize() async {
-    final auth = FirebaseAuth.instance;
-    user = auth.currentUser;
   }
 }

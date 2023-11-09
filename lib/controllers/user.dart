@@ -17,12 +17,22 @@ class UserController extends ChangeNotifier {
     return userId == null ? Future.value(null) : userManager.get(userId!);
   }
 
-  Future<UserModel> put(UserEditPayload payload) {
+  Future<UserModel> register(String userId, RegisterPayload payload) async {
+    final result = await userManager.put(userId,
+        email: Optional.some(payload.email),
+        image: Optional.some(payload.image),
+        bio: Optional.some(payload.bio),
+        name: Optional.some(payload.name));
+    notifyListeners();
+    return result;
+  }
+
+  Future<UserModel> updateProfile(UserEditPayload payload) async {
     if (userId == null) {
       throw InvalidStateError(
           "UserController.userId should not be null when put is called.");
     }
-    return userManager.put(
+    final result = await userManager.put(
       userId!,
       name: Optional.some(payload.name),
       bio: Optional.some(payload.bio),
@@ -30,6 +40,8 @@ class UserController extends ChangeNotifier {
       birthdate: Optional.some(payload.birthdate),
       country: Optional.some(payload.country),
     );
+    notifyListeners();
+    return result;
   }
 
   Future<UserModel> updateEmail(String email) {
@@ -43,11 +55,12 @@ class UserController extends ChangeNotifier {
     );
   }
 
-  Future<void> remove({required LoginPayload credentials}) {
+  Future<void> remove({required LoginPayload credentials}) async {
     if (userId == null) {
       throw InvalidStateError(
           "UserController.userId should not be null when put is called.");
     }
-    return userManager.remove(userId!);
+    await userManager.remove(userId!);
+    notifyListeners();
   }
 }

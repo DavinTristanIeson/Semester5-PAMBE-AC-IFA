@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
@@ -5,6 +6,7 @@ import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
+import 'package:pambe_ac_ifa/controllers/user.dart';
 import 'package:pambe_ac_ifa/database/interfaces/user.dart';
 import 'package:pambe_ac_ifa/pages/home/main.dart';
 import 'package:pambe_ac_ifa/pages/login/components/actions.dart';
@@ -118,9 +120,12 @@ class RegisterScreen extends StatelessWidget {
 
   void _register(BuildContext context, RegisterPayload payload) async {
     final navigator = Navigator.of(context);
+    final authProvider = context.read<AuthProvider>();
+    final userController = context.read<UserController>();
     final messenger = AcSnackbarMessenger.of(context);
     try {
-      await context.read<AuthProvider>().register(payload);
+      final User(:uid) = await authProvider.register(payload);
+      await userController.register(uid, payload);
       navigator.pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
           (route) => false);

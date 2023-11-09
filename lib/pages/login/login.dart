@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:pambe_ac_ifa/auth.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/database/interfaces/user.dart';
 import 'package:pambe_ac_ifa/pages/home/main.dart';
 import 'package:pambe_ac_ifa/pages/login/components/actions.dart';
 import 'package:pambe_ac_ifa/pages/startup/components.dart';
+import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class _LoginScreenForm extends StatefulWidget {
@@ -69,11 +70,11 @@ class LoginScreen extends StatelessWidget {
 
   void _login(BuildContext context, LoginPayload payload) async {
     final navigator = Navigator.of(context);
-    final auth = Auth();
+    final auth = context.read<AuthProvider>();
 
     final messenger = AcSnackbarMessenger.of(context);
     try {
-      await auth.login(payload.email, payload.password);
+      await auth.login(payload);
       navigator.pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
           (route) => false);

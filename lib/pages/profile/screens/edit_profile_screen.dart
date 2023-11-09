@@ -75,7 +75,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final userController = context.read<UserController>();
     try {
       final value = form.value;
-      await userController.put((
+      await userController.updateProfile((
         name: value[_EditProfileFormKeys.name.name] as String,
         image: value[_EditProfileFormKeys.image.name] as XFile?,
         country: value[_EditProfileFormKeys.country.name] as String?,
