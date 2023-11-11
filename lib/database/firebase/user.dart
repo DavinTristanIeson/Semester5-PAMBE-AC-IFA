@@ -90,17 +90,17 @@ class FirebaseUserManager
     ], then: (value) {
       return value;
     }));
-    if (image != null) {
-      final newImagePath = image.hasValue && image.value != null
-          ? imageManager.getPath(userId: id, name: image.value!.name)
-          : null;
+    if (image != null && image.hasValue) {
+      final newImagePath = image.value == null
+          ? null
+          : imageManager.getPath(userId: id, name: image.value!.name);
 
       if (prev?.imageStoragePath != newImagePath) {
         if (prev?.imageStoragePath != null) {
           reserved[prev!.imageStoragePath!] = null;
         }
         if (newImagePath != null) {
-          reserved[newImagePath] = image.value!;
+          reserved[newImagePath] = image.value;
         }
       }
       payload[UserFirestoreKeys.imagePath.name] = newImagePath;

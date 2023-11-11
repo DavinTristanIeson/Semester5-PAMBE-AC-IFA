@@ -13,7 +13,7 @@ typedef RegisterPayload = ({
 typedef UserEditPayload = ({
   String name,
   String? bio,
-  XFile? image,
+  Optional<XFile?> image,
   DateTime? birthdate,
   String? country,
 });

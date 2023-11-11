@@ -35,7 +35,7 @@ class UserController extends ChangeNotifier {
       userId!,
       name: Optional.some(payload.name),
       bio: Optional.some(payload.bio),
-      image: Optional.some(payload.image),
+      image: payload.image,
       birthdate: Optional.some(payload.birthdate),
       country: Optional.some(payload.country),
     );

@@ -43,7 +43,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   value: searchState.search,
                   onSearch: (value) {
                     setState(() {
-                      searchState = searchState.copyWith(search: value);
+                      searchState =
+                          searchState.copyWith(search: Optional.some(value));
                     });
                   }),
             ),

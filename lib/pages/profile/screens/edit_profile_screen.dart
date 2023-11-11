@@ -80,11 +80,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       final value = form.value;
       final image =
-          (value[_EditProfileFormKeys.image.name] as UserAvatarFormType)
-              .rightOr((left) => null);
+          (value[_EditProfileFormKeys.image.name] as UserAvatarFormType);
       await userController.updateProfile((
         name: value[_EditProfileFormKeys.name.name] as String,
-        image: image,
+        image: image.hasLeft ? Optional.none() : Optional.some(image.right),
         country: value[_EditProfileFormKeys.country.name] as String?,
         birthdate: value[_EditProfileFormKeys.birthdate.name] as DateTime?,
         bio: value[_EditProfileFormKeys.bio.name] as String?,

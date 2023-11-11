@@ -33,6 +33,8 @@ class RemoteRecipeImageManager {
       if (former?.imageStoragePath != null) {
         reserved[former!.imageStoragePath!] = null;
       }
+    } else {
+      copy.imagePath = former?.imageStoragePath;
     }
 
     for (final step in copy.steps) {

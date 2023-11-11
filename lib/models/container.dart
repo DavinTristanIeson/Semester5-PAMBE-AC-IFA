@@ -64,7 +64,7 @@ class Optional<T> {
   static T valueOf<T>(Optional<T>? optionalValue,
       {required T Function() otherwise}) {
     return optionalValue != null && optionalValue.hasValue
-        ? optionalValue.value!
+        ? optionalValue.value as T
         : otherwise();
   }
 

@@ -250,13 +250,13 @@ class RecipeSearchState {
   }
 
   RecipeSearchState copyWith({
-    String? search,
+    Optional<String>? search,
     SortBy<RecipeSortBy>? sortBy,
     RecipeFilterBy? filterBy,
     int? limit,
   }) {
     return RecipeSearchState(
-        search: search ?? this.search,
+        search: Optional.valueOf<String?>(search, otherwise: () => this.search),
         sortBy: sortBy ?? this.sortBy,
         filterBy: filterBy ?? this.filterBy,
         limit: limit ?? this.limit);

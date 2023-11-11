@@ -172,10 +172,10 @@ class ActionableErrorMessage extends StatelessWidget {
       padding: const EdgeInsets.all(AcSizes.space),
       child: Column(
         children: [
-          Text(error.toString(),
+          error.leftOr((right) => Text(right.toString(),
               textAlign: TextAlign.center,
               style: context.texts.bodyMedium!
-                  .copyWith(color: context.colors.error)),
+                  .copyWith(color: context.colors.error))),
           message.leftOr((right) => Text(
                 right,
                 textAlign: TextAlign.center,

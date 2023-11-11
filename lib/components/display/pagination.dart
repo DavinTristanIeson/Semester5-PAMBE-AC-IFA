@@ -26,11 +26,13 @@ class AcPagedListView<TKey, TValue> extends StatelessWidget {
               },
               newPageErrorIndicatorBuilder: (context) {
                 return ActionableErrorMessage.refresh(
-                    error: controller.error, onRefresh: controller.refresh);
+                    error: Either.right(controller.error),
+                    onRefresh: controller.refresh);
               },
               firstPageErrorIndicatorBuilder: (context) {
                 return ActionableErrorMessage.refresh(
-                    error: controller.error, onRefresh: controller.refresh);
+                    error: Either.right(controller.error),
+                    onRefresh: controller.refresh);
               },
               itemBuilder: (context, item, index) => Padding(
                   padding: const EdgeInsets.symmetric(
