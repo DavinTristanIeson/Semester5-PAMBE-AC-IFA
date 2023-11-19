@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
-import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
+import 'package:pambe_ac_ifa/database/interfaces/common.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 

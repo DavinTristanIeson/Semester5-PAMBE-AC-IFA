@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
-import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
+import 'package:pambe_ac_ifa/database/interfaces/common.dart';
 
 const String globalFirebaseImageStoragePathRoot = "images";
 

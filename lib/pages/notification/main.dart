@@ -4,7 +4,7 @@ import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/components/display/pagination.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/notification.dart';
-import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
+import 'package:pambe_ac_ifa/database/interfaces/common.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/notification.dart';
 import 'package:pambe_ac_ifa/pages/notification/components/notification_tile.dart';

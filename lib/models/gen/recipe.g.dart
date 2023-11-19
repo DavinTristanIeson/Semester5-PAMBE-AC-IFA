@@ -30,7 +30,7 @@ Map<String, dynamic> _$LocalRecipeLiteModelToJson(
 RecipeLiteModel _$RecipeLiteModelFromJson(Map<String, dynamic> json) =>
     RecipeLiteModel(
       id: json['id'] as String,
-      user: _$userPropertyFromJson(json['user']),
+      user: $userPropertyFromJson(json['user']),
       title: json['title'] as String,
       description: json['description'] as String,
       createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
@@ -44,7 +44,7 @@ Map<String, dynamic> _$RecipeLiteModelToJson(RecipeLiteModel instance) =>
       'description': instance.description,
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'imagePath': instance.imagePath,
-      'user': _$userPropertyToJson(instance.user),
+      'user': $userPropertyToJson(instance.user),
     };
 
 LocalRecipeModel _$LocalRecipeModelFromJson(Map<String, dynamic> json) =>
@@ -77,7 +77,7 @@ RecipeModel _$RecipeModelFromJson(Map<String, dynamic> json) => RecipeModel(
       createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
       imagePath: json['imagePath'] as String?,
       imageStoragePath: json['imageStoragePath'] as String?,
-      user: _$userPropertyFromJson(json['user']),
+      user: $userPropertyFromJson(json['user']),
       steps: (json['steps'] as List<dynamic>)
           .map((e) => RecipeStepModel.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -89,6 +89,6 @@ Map<String, dynamic> _$RecipeModelToJson(RecipeModel instance) =>
       'description': instance.description,
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'imagePath': instance.imagePath,
-      'user': _$userPropertyToJson(instance.user),
+      'user': $userPropertyToJson(instance.user),
       'steps': instance.steps.map((e) => e.toJson()).toList(),
     };

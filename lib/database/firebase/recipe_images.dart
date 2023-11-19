@@ -1,5 +1,5 @@
 import 'package:image_picker/image_picker.dart';
-import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
+import 'package:pambe_ac_ifa/database/interfaces/common.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:path/path.dart';
 

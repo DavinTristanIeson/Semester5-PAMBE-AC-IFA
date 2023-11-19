@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/models/notification.dart';
-import 'package:pambe_ac_ifa/models/recipe.dart';
 
 abstract class ILocalImageResourceManager {
   Future<File?> get(String imagePath);
@@ -23,19 +22,6 @@ abstract class INetworkImageResourceManager {
 }
 
 typedef PaginatedQueryResult<T> = ({List<T> data, dynamic nextPage});
-
-abstract class IRecipeResourceManager {
-  Future<PaginatedQueryResult<RecipeLiteModel>> getAll(
-      {Object? page, RecipeSearchState? searchState});
-  Future<RecipeModel?> get(String id);
-  Future<RecipeModel> put(
-    LocalRecipeModel recipe, {
-    required String userId,
-  });
-  Future<void> remove(String id);
-
-  void dispose();
-}
 
 abstract class INotificationResourceManager {
   Future<PaginatedQueryResult<NotificationModel>> getAll(

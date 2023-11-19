@@ -3,8 +3,10 @@ import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/firebase/recipe_images.dart';
 import 'package:pambe_ac_ifa/database/firebase/user.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
-import 'package:pambe_ac_ifa/database/interfaces/firebase.dart';
-import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
+import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
+import 'package:pambe_ac_ifa/database/interfaces/common.dart';
+import 'package:pambe_ac_ifa/database/mixins/firebase.dart';
+import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 
 enum RecipeStepFirestoreKeys {
@@ -50,9 +52,15 @@ class FirebaseRecipeManager
           staleTime: const Duration(minutes: 1),
         );
 
-  String keyOfRecipeQuery(
-      {QueryDocumentSnapshot? page, RecipeSearchState? searchState}) {
-    return "${searchState?.getApiParams() ?? ''};${page?.id ?? ''}";
+  String keyOfRecipeQuery({
+    QueryDocumentSnapshot? page,
+    int? limit,
+    SortBy<RecipeSortBy>? sort,
+    RecipeFilterBy? filter,
+    String? search,
+  }) {
+    final filterParams = filter?.apiParams;
+    return "limit=$limit&sort=${sort?.apiParams}&search=$search&filter[${filterParams?.key}]=${filterParams?.value};${page?.id ?? ''}";
   }
 
   Future<RecipeModel> _transformRecipe(
@@ -101,20 +109,25 @@ class FirebaseRecipeManager
     }
   }
 
-  Future<PaginatedQueryResult<RecipeLiteModel>> getRegularRecipes(
-      {QueryDocumentSnapshot? page, RecipeSearchState? searchState}) async {
-    final queryKey = keyOfRecipeQuery(page: page, searchState: searchState);
+  Future<PaginatedQueryResult<RecipeLiteModel>> getRegularRecipes({
+    QueryDocumentSnapshot? page,
+    int? limit,
+    SortBy<RecipeSortBy>? sort,
+    RecipeFilterBy? filter,
+    String? search,
+  }) async {
+    final queryKey = keyOfRecipeQuery(
+        page: page, limit: limit, sort: sort, filter: filter, search: search);
     if (queryCache.has(queryKey)) {
       return Future.value(queryCache.get(queryKey));
     }
 
-    var query = db.collection(collectionPath).limit(searchState?.limit ?? 15);
-    if (searchState?.search != null) {
-      query = query.where(RecipeFirestoreKeys.title.name,
-          isEqualTo: searchState!.search);
+    var query = db.collection(collectionPath).limit(limit ?? 15);
+    if (search != null) {
+      query = query.where(RecipeFirestoreKeys.title.name, isEqualTo: search);
     }
-    if (searchState?.sortBy != null) {
-      var sortBy = switch (searchState!.sortBy.factor) {
+    if (sort != null) {
+      var sortBy = switch (sort.factor) {
         RecipeSortBy.createdDate => RecipeFirestoreKeys.createdAt,
         // RecipeSortBy.ratings => RecipeFirestoreKeys.ratings,
         _ => null
@@ -128,11 +141,11 @@ class FirebaseRecipeManager
     if (page != null) {
       query = query.startAfter([page.id]);
     }
-    if (searchState?.filterBy != null) {
-      switch (searchState!.filterBy!.type) {
+    if (filter != null) {
+      switch (filter.type) {
         case RecipeFilterByType.createdByUser:
           query = query.where(RecipeFirestoreKeys.userId.name,
-              isEqualTo: searchState.filterBy!.userId);
+              isEqualTo: filter.userId);
         default:
       }
     }
@@ -147,10 +160,15 @@ class FirebaseRecipeManager
   }
 
   @override
-  Future<PaginatedQueryResult<RecipeLiteModel>> getAll(
-      {Object? page, RecipeSearchState? searchState}) async {
+  Future<PaginatedQueryResult<RecipeLiteModel>> getAll({
+    dynamic page,
+    int? limit,
+    SortBy<RecipeSortBy>? sort,
+    RecipeFilterBy? filter,
+    String? search,
+  }) async {
     return getRegularRecipes(
-        page: page as QueryDocumentSnapshot?, searchState: searchState);
+        page: page, limit: limit, sort: sort, filter: filter, search: search);
   }
 
   @override

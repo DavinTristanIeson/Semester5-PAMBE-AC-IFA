@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
+import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
 import 'package:pambe_ac_ifa/database/sqflite/tables/recipe.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/editor/components/models.dart';

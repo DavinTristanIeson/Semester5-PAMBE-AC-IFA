@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
-import 'package:pambe_ac_ifa/database/interfaces/firebase.dart';
-import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
+import 'package:pambe_ac_ifa/database/interfaces/common.dart';
 import 'package:pambe_ac_ifa/database/interfaces/user.dart';
+import 'package:pambe_ac_ifa/database/mixins/firebase.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 

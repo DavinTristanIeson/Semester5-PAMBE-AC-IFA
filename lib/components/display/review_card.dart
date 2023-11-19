@@ -12,7 +12,7 @@ enum StarRatingType {
 }
 
 class StarRating extends StatelessWidget {
-  final double rating;
+  final int rating;
   final StarRatingType type;
   const StarRating(
       {super.key, required this.rating, this.type = StarRatingType.wide});
@@ -36,7 +36,7 @@ class StarRating extends StatelessWidget {
   }
 
   Row buildWideVersion(BuildContext context) {
-    int starsCount = clampDouble(rating, 0, 5).round();
+    int starsCount = rating;
     return Row(
       children: [
         for (int i = 0; i < starsCount; i++)
@@ -52,7 +52,7 @@ class StarRating extends StatelessWidget {
 }
 
 class ReviewCard extends StatelessWidget {
-  final double rating;
+  final int rating;
   final Either<Widget, String>? content;
   final UserModel? reviewer;
   final DateTime reviewedAt;
@@ -72,7 +72,7 @@ class ReviewCard extends StatelessWidget {
           ? null
           : () {
               context.navigator.push(MaterialPageRoute(
-                  builder: (context) => ReviewScreen(
+                  builder: (context) => ReviewsScreen(
                         recipeId: reviewFor!.id,
                       )));
             },

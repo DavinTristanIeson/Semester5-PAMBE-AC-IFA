@@ -1,7 +1,8 @@
 import 'dart:convert';
 
-import 'package:pambe_ac_ifa/database/interfaces/http.dart';
-import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
+import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
+import 'package:pambe_ac_ifa/database/interfaces/common.dart';
+import 'package:pambe_ac_ifa/database/mixins/http.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:http/http.dart' as http;
@@ -22,11 +23,44 @@ class HttpRecipeManager
     return res.data;
   }
 
+  Map<String, dynamic> getApiParams(
+      {int? page,
+      required SortBy<RecipeSortBy> sort,
+      required int limit,
+      String? search,
+      RecipeFilterBy? filter}) {
+    final Map<String, String> params = {
+      "sort": sort.apiParams,
+      "limit": limit.toString(),
+      "page": (page ?? 1).toString(),
+    };
+    if (search != null) {
+      params["search"] = search;
+    }
+    if (filter != null) {
+      MapEntry<String, dynamic> filters = filter.apiParams;
+      if (filters.value != null) {
+        params["filter[${filters.key}]"] = filters.value.toString();
+      }
+    }
+    return params;
+  }
+
   @override
-  Future<PaginatedQueryResult<RecipeLiteModel>> getAll(
-      {Object? page, RecipeSearchState? searchState}) async {
+  Future<PaginatedQueryResult<RecipeLiteModel>> getAll({
+    dynamic page,
+    int? limit,
+    SortBy<RecipeSortBy>? sort,
+    RecipeFilterBy? filter,
+    String? search,
+  }) async {
     final response = await makeNetworkCall(() => http.get(urlOf("recipes",
-        params: searchState?.getApiParams(page: page as int?))));
+        params: getApiParams(
+            limit: limit ?? 15,
+            sort: sort ?? SortBy.descending(RecipeSortBy.createdDate),
+            filter: filter,
+            search: search,
+            page: page as int?))));
     final ApiResult<List<RecipeLiteModel>> res = processHttpResponse(response,
         transform: (json) => (json as List)
                 .cast<Map<String, Object?>>()

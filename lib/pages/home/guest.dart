@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
-import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/home/components/sections.dart';
 import 'package:pambe_ac_ifa/pages/login/login.dart';
 import 'package:pambe_ac_ifa/pages/login/register.dart';

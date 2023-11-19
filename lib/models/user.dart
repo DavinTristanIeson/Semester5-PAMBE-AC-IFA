@@ -46,3 +46,15 @@ class UserModel with SupportsLocalAndOnlineImagesMixin {
   }
   Map<String, dynamic> toJson() => _$UserModelToJson(this);
 }
+
+String? $userPropertyToJson(dynamic json) {
+  return (json as UserModel?)?.id;
+}
+
+UserModel? $userPropertyFromJson(dynamic json) {
+  if (json is UserModel || json == null) {
+    return json;
+  } else {
+    return UserModel.fromJson(json);
+  }
+}

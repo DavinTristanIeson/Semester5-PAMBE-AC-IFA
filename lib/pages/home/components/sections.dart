@@ -3,6 +3,7 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/home/components/async_scroll_section.dart';

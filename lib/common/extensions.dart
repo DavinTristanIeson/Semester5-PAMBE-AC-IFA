@@ -59,6 +59,14 @@ extension DateTimeUtilities on DateTime {
   }
 }
 
+extension StringUtilities on String {
+  String ellipsisIfExceed(int length) {
+    return this.length > length
+        ? replaceRange(this.length - 3, null, "...")
+        : this;
+  }
+}
+
 extension BuildContextInheritedValues on BuildContext {
   ColorScheme get colors => Theme.of(this).colorScheme;
   ThemeData get theme => Theme.of(this);

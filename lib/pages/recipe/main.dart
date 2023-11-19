@@ -62,9 +62,9 @@ class RecipeScreen extends StatelessWidget {
                 reviews: List.generate(
                     5,
                     (i) => ReviewModel(
-                        rating: 3.5,
+                        rating: 3,
                         reviewedAt: DateTime.now(),
-                        reviewer: UserModel(
+                        user: UserModel(
                             id: "0",
                             name: "User",
                             email: "placeholder@email.com",

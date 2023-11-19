@@ -16,7 +16,7 @@ class HomePageBody extends StatelessWidget {
             Size.fromHeight(context.relativeHeight(1 / 5, 140.0, 180.0))),
         itemBuilder: (context, index) {
           return ReviewCard(
-            rating: 3.5,
+            rating: 3,
             reviewer: null,
             reviewedAt: DateTime.now(),
             content: Either.right("Review"),

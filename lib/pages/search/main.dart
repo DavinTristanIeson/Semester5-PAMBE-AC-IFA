@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
+import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
-import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/search/body.dart';
 import 'package:pambe_ac_ifa/pages/search/search_bar.dart';
 

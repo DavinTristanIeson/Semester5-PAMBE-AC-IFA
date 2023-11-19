@@ -16,6 +16,10 @@ class Either<TLeft, TRight> {
     return this._right;
   }
 
+  get whichever {
+    return this._left ?? this._right;
+  }
+
   TLeft leftOr(TLeft Function(TRight right) defaultValue) {
     return _left == null ? defaultValue(_right as TRight) : _left!;
   }

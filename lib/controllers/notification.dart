@@ -1,4 +1,4 @@
-import 'package:pambe_ac_ifa/database/interfaces/resource.dart';
+import 'package:pambe_ac_ifa/database/interfaces/common.dart';
 import 'package:pambe_ac_ifa/models/notification.dart';
 
 class NotificationController {

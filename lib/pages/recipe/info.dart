@@ -106,7 +106,7 @@ class RecipeInfoScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: AcSizes.md),
                 child: ReviewCard(
                     rating: e.rating,
-                    reviewer: e.reviewer,
+                    reviewer: e.user,
                     reviewedAt: e.reviewedAt,
                     content: Either.right(e.content)),
               ))
@@ -130,7 +130,7 @@ class RecipeInfoScreen extends StatelessWidget {
         IconButton(
             onPressed: () {
               context.navigator.push(MaterialPageRoute(
-                  builder: (context) => ReviewScreen(
+                  builder: (context) => ReviewsScreen(
                         recipeId: recipeId,
                       )));
             },

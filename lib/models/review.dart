@@ -11,14 +11,18 @@ class ReviewModel {
 
   @JsonEpochConverter()
   DateTime reviewedAt;
-  double rating;
+  int rating;
 
-  UserModel reviewer;
+  @JsonKey(
+    toJson: $userPropertyToJson,
+    fromJson: $userPropertyFromJson,
+  )
+  UserModel? user;
   ReviewModel(
       {this.content,
       required this.reviewedAt,
       required this.rating,
-      required this.reviewer});
+      required this.user});
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
     try {

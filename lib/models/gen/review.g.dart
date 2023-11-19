@@ -10,8 +10,8 @@ ReviewModel _$ReviewModelFromJson(Map<String, dynamic> json) => ReviewModel(
       content: json['content'] as String?,
       reviewedAt:
           const JsonEpochConverter().fromJson(json['reviewedAt'] as int),
-      rating: (json['rating'] as num).toDouble(),
-      reviewer: UserModel.fromJson(json['reviewer'] as Map<String, dynamic>),
+      rating: json['rating'] as int,
+      user: $userPropertyFromJson(json['user']),
     );
 
 Map<String, dynamic> _$ReviewModelToJson(ReviewModel instance) =>
@@ -19,5 +19,5 @@ Map<String, dynamic> _$ReviewModelToJson(ReviewModel instance) =>
       'content': instance.content,
       'reviewedAt': const JsonEpochConverter().toJson(instance.reviewedAt),
       'rating': instance.rating,
-      'reviewer': instance.reviewer.toJson(),
+      'user': $userPropertyToJson(instance.user),
     };

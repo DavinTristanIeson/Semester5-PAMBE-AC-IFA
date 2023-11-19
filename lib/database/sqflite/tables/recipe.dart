@@ -1,4 +1,5 @@
 import 'package:image_picker/image_picker.dart';
+import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
 import 'package:pambe_ac_ifa/database/sqflite/tables/recipe_images.dart';
 import 'package:pambe_ac_ifa/database/sqflite/tables/recipe_steps.dart';
 import 'package:pambe_ac_ifa/models/container.dart';

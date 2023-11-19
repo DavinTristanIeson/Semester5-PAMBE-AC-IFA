@@ -2,7 +2,6 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:pambe_ac_ifa/common/json.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
-import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe_steps.dart';
 import 'user.dart';
 export 'recipe_steps.dart';
@@ -67,26 +66,14 @@ class LocalRecipeLiteModel extends AbstractRecipeLiteModel {
   Map<String, dynamic> toJson() => _$LocalRecipeLiteModelToJson(this);
 }
 
-String? _$userPropertyToJson(dynamic json) {
-  return (json as UserModel?)?.id;
-}
-
-UserModel? _$userPropertyFromJson(dynamic json) {
-  if (json is UserModel || json == null) {
-    return json;
-  } else {
-    return UserModel.fromJson(json);
-  }
-}
-
 @JsonSerializable(explicitToJson: true)
 class RecipeLiteModel extends AbstractRecipeLiteModel {
   @JsonKey(includeToJson: false)
   String id;
 
   @JsonKey(
-    toJson: _$userPropertyToJson,
-    fromJson: _$userPropertyFromJson,
+    toJson: $userPropertyToJson,
+    fromJson: $userPropertyFromJson,
   )
   UserModel? user;
 
@@ -182,101 +169,5 @@ class RecipeModel extends RecipeLiteModel {
     final map = _$RecipeModelToJson(this);
     map["imagePath"] = imageStoragePath;
     return map;
-  }
-}
-
-enum RecipeSortBy {
-  lastViewed,
-  createdDate,
-  ratings,
-  bookmarkedDate;
-
-  @override
-  toString() => name;
-}
-
-enum RecipeFilterByType {
-  createdByUser,
-  hasBeenViewedBy,
-  hasBeenBookmarkedBy,
-  local;
-
-  @override
-  toString() => name;
-}
-
-class RecipeFilterBy {
-  String? userId;
-  bool? viewed;
-  RecipeFilterByType type;
-  RecipeFilterBy._(this.type);
-  RecipeFilterBy.createdByUser(String userId)
-      : type = RecipeFilterByType.createdByUser,
-        // ignore: prefer_initializing_formals
-        userId = userId;
-  RecipeFilterBy.viewedBy(String userId, {this.viewed = true})
-      : type = RecipeFilterByType.hasBeenViewedBy,
-        // ignore: prefer_initializing_formals
-        userId = userId;
-  RecipeFilterBy.bookmarkedBy(String userId)
-      : type = RecipeFilterByType.hasBeenBookmarkedBy,
-        // ignore: prefer_initializing_formals
-        userId = userId;
-  static RecipeFilterBy get local => RecipeFilterBy._(RecipeFilterByType.local);
-  MapEntry<String, String?> get apiParams {
-    return switch (type) {
-      RecipeFilterByType.createdByUser => MapEntry(type.name, userId!),
-      RecipeFilterByType.hasBeenViewedBy =>
-        MapEntry(type.name, "${viewed! ? '' : '-'}$userId"),
-      RecipeFilterByType.hasBeenBookmarkedBy => MapEntry(type.name, userId!),
-      RecipeFilterByType.local => MapEntry(type.name, null),
-    };
-  }
-}
-
-class RecipeSearchState {
-  late SortBy<RecipeSortBy> sortBy;
-  RecipeFilterBy? filterBy;
-  String? search;
-  int limit;
-
-  RecipeSearchState({
-    this.search,
-    SortBy<RecipeSortBy>? sortBy,
-    this.filterBy,
-    this.limit = 15,
-  }) {
-    this.sortBy = sortBy ?? SortBy.descending(RecipeSortBy.createdDate);
-  }
-
-  RecipeSearchState copyWith({
-    Optional<String>? search,
-    SortBy<RecipeSortBy>? sortBy,
-    RecipeFilterBy? filterBy,
-    int? limit,
-  }) {
-    return RecipeSearchState(
-        search: Optional.valueOf<String?>(search, otherwise: () => this.search),
-        sortBy: sortBy ?? this.sortBy,
-        filterBy: filterBy ?? this.filterBy,
-        limit: limit ?? this.limit);
-  }
-
-  Map<String, dynamic> getApiParams({int? page}) {
-    final Map<String, String> params = {
-      "sort": sortBy.apiParams,
-      "limit": limit.toString(),
-      "page": (page ?? 1).toString(),
-    };
-    if (search != null) {
-      params["search"] = search!;
-    }
-    if (filterBy != null) {
-      MapEntry<String, dynamic> filters = filterBy!.apiParams;
-      if (filters.value != null) {
-        params["filter[${filters.key}]"] = filters.value.toString();
-      }
-    }
-    return params;
   }
 }
