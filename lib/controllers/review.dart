@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/database/interfaces/common.dart';
+import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/review.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
@@ -13,10 +15,8 @@ enum ReviewFilterByType {
 
 class ReviewFilterBy {
   ReviewFilterByType type;
-  String? userId;
   String? recipeId;
   String? reviewId;
-  ReviewFilterBy.user(this.userId) : type = ReviewFilterByType.user;
   ReviewFilterBy.recipe(this.recipeId) : type = ReviewFilterByType.recipe;
   ReviewFilterBy.review(this.reviewId) : type = ReviewFilterByType.review;
 }
@@ -33,32 +33,53 @@ class ReviewSearchState {
   }) : this.sort = sort ?? SortBy.descending(ReviewSortBy.createdAt);
 }
 
-class ReviewController extends ChangeNotifier {
+class ReviewController extends ChangeNotifier implements AuthDependent {
   IReviewResourceManager reviewManager;
+  @override
+  String? userId;
   ReviewController({required this.reviewManager});
 
-  Future<PaginatedQueryResult<ReviewModel>> getAll(
+  Future<PaginatedQueryResult<ReviewModel>> getAllWithPagination(
       {required ReviewSearchState searchState,
       Either<QueryDocumentSnapshot, String>? page}) {
-    return reviewManager.getAll(
-        page: page?.whichever,
-        recipeId: searchState.filter.recipeId,
-        userId: searchState.filter.userId,
-        limit: searchState.limit);
+    return Future.value((
+      data: <ReviewModel>[],
+      nextPage: null,
+    ));
+    // return reviewManager.getAll(
+    //     page: page?.whichever,
+    //     recipeId: searchState.filter.recipeId,
+    //     limit: searchState.limit);
   }
 
-  Future<ReviewModel?> get(String reviewId) {
-    return reviewManager.get(reviewId);
+  Future<List<ReviewModel>> getAll(
+      {required ReviewSearchState searchState,
+      Either<QueryDocumentSnapshot, String>? page}) async {
+    return (await getAllWithPagination(page: page, searchState: searchState))
+        .data;
+  }
+
+  Future<ReviewModel?> get(
+      {required String recipeId, required String reviewId}) {
+    return reviewManager.get(reviewId: reviewId, recipeId: recipeId);
   }
 
   Future<ReviewModel> put({
-    required String userId,
+    required String recipeId,
     String? content,
     required int rating,
   }) {
+    if (userId == null) {
+      throw InvalidStateError(
+          "ReviewController.userId should not be null when put is invoked");
+    }
     // Satu user satu review
     return reviewManager.put(
-        userId: userId, rating: rating, content: content, reviewId: userId);
+        userId: userId!,
+        rating: rating,
+        content: content,
+        reviewId: userId!,
+        recipeId: recipeId);
   }
 
   Future<void> remove(String reviewId) {

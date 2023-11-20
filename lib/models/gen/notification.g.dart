@@ -13,7 +13,8 @@ NotificationModel _$NotificationModelFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String,
       content: json['content'] as String?,
       createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
-      reviewTargetId: json['reviewTargetId'] as String?,
+      reviewId: json['reviewId'] as String?,
+      recipeId: json['recipeId'] as String?,
     );
 
 Map<String, dynamic> _$NotificationModelToJson(NotificationModel instance) =>
@@ -22,7 +23,8 @@ Map<String, dynamic> _$NotificationModelToJson(NotificationModel instance) =>
       'title': instance.title,
       'content': instance.content,
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
-      'reviewTargetId': instance.reviewTargetId,
+      'reviewId': instance.reviewId,
+      'recipeId': instance.recipeId,
     };
 
 const _$NotificationTypeEnumMap = {
@@ -30,3 +32,14 @@ const _$NotificationTypeEnumMap = {
   NotificationType.system: 'system',
   NotificationType.review: 'review',
 };
+
+Map<String, dynamic> _$NotificationPayloadToJson(
+        NotificationPayload instance) =>
+    <String, dynamic>{
+      'type': _$NotificationTypeEnumMap[instance.type]!,
+      'title': instance.title,
+      'content': instance.content,
+      'reviewId': instance.reviewId,
+      'recipeId': instance.recipeId,
+      'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
+    };

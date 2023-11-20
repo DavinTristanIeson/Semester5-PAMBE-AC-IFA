@@ -9,11 +9,13 @@ enum ReviewSortBy {
 abstract class IReviewResourceManager {
   Future<PaginatedQueryResult<ReviewModel>> getAll(
       {dynamic page, String? recipeId, String? userId, int? limit});
-  Future<ReviewModel?> get(String reviewId);
+  Future<ReviewModel?> get(
+      {required String recipeId, required String reviewId});
   Future<ReviewModel> put({
-    String? reviewId,
+    required String recipeId,
     required String userId,
     required int rating,
+    String? reviewId,
     String? content,
   });
   Future<void> remove(String reviewId);

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/controllers/review.dart';
 import 'package:pambe_ac_ifa/database/interfaces/review.dart';
@@ -44,11 +46,14 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
         body: CustomScrollView(
           slivers: [
             if (widget.permission == ReviewPermission.permit)
-              const SliverAppBar.large(
+              SliverAppBar.large(
                 backgroundColor: Colors.transparent,
                 elevation: 0,
-                expandedHeight: 600,
-                flexibleSpace: AddReviewSection(),
+                automaticallyImplyLeading: false,
+                expandedHeight: context.relativeHeight(0.5, 350, 450),
+                flexibleSpace: AddReviewSection(
+                  recipeId: widget.recipeId,
+                ),
               ),
             ReviewsList(
               searchState: ReviewSearchState(
@@ -58,13 +63,18 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                   limit: onlyShowOne ? 1 : 15,
                   sort: SortBy.descending(ReviewSortBy.ratings)),
             ),
-            TextButton(
-                onPressed: () {
-                  setState(() {
-                    _showAll = true;
-                  });
-                },
-                child: const Text("Show Other Reviews"))
+            if (onlyShowOne)
+              SliverToBoxAdapter(
+                  child: Padding(
+                padding: const EdgeInsets.only(bottom: AcSizes.space),
+                child: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _showAll = true;
+                      });
+                    },
+                    child: const Text("Show Other Reviews")),
+              )),
           ],
         ));
   }

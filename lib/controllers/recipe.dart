@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/common.dart';
@@ -55,12 +56,13 @@ class RecipeSearchState {
 }
 
 /// Ini untuk resep yang disimpan online
-class RecipeController extends ChangeNotifier {
+class RecipeController extends ChangeNotifier implements AuthDependent {
   IRecipeResourceManager recipeManager;
   String? _userId;
   RecipeController({required this.recipeManager, required String? userId})
       : _userId = userId;
 
+  @override
   set userId(String? userId) {
     _userId = userId;
     notifyListeners();

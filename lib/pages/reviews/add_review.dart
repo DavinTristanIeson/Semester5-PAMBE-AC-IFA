@@ -3,11 +3,11 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/components/field/text_input.dart';
-import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/review.dart';
 import 'package:pambe_ac_ifa/pages/reviews/components/stars_input.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
+import 'package:pambe_ac_ifa/common/validation.dart';
 
 enum _AddReviewFormKeys {
   rating,
@@ -15,7 +15,8 @@ enum _AddReviewFormKeys {
 }
 
 class AddReviewSection extends StatefulWidget {
-  const AddReviewSection({super.key});
+  final String recipeId;
+  const AddReviewSection({super.key, required this.recipeId});
 
   @override
   State<AddReviewSection> createState() => _AddReviewSectionState();
@@ -52,51 +53,68 @@ class _AddReviewSectionState extends State<AddReviewSection> {
       return;
     }
     final reviewController = context.read<ReviewController>();
-    final authProvider = context.read<AuthProvider>();
     final value = form.value;
     await reviewController.put(
-        userId: authProvider.user!.uid,
+        recipeId: widget.recipeId,
         rating: value[_AddReviewFormKeys.rating.name] as int,
         content: value[_AddReviewFormKeys.content.name] as String?);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ReactiveValueListenableBuilder<int>(
-            formControlName: _AddReviewFormKeys.rating.name,
-            builder: (context, control, child) {
-              return ReviewStarsInput(
-                  value: control.value ?? 0,
-                  onChanged: (value) {
-                    control.value = value;
-                  });
-            }),
-        const SizedBox(
-          height: AcSizes.space,
-        ),
-        ReactiveValueListenableBuilder<String?>(
-            formControlName: _AddReviewFormKeys.content.name,
-            builder: (context, control, child) {
-              return AcTextInput(
-                value: control.value,
-                onChanged: (value) {
-                  control.value = value;
-                },
-                label: "Review",
-                placeholder: "What are your thoughts on this recipe?",
-              );
-            }),
-        const SizedBox(height: AcSizes.space),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+    return ReactiveForm(
+      formGroup: form,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AcSizes.space),
+        child: Column(
           children: [
-            FutureButton(
-                onPressed: postReview, child: const Text("Post Review"))
+            ReactiveValueListenableBuilder<int>(
+                formControlName: _AddReviewFormKeys.rating.name,
+                builder: (context, control, child) {
+                  return ReviewStarsInput(
+                      iconSize: 36,
+                      value: control.value ?? 0,
+                      onChanged: (value) {
+                        control.value = value;
+                      });
+                }),
+            const SizedBox(
+              height: AcSizes.space,
+            ),
+            ReactiveValueListenableBuilder<String?>(
+                formControlName: _AddReviewFormKeys.content.name,
+                builder: (context, control, child) {
+                  return AcTextInput(
+                    error: ReactiveFormConfig.of(context)
+                        ?.translateAny(control.errors),
+                    value: control.value,
+                    onChanged: (value) {
+                      control.value = value;
+                    },
+                    label: "Review",
+                    placeholder: "What are your thoughts on this recipe?",
+                  );
+                }),
+            const SizedBox(height: AcSizes.space),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ReactiveFormConsumer(builder: (context, control, child) {
+                  final button = FutureButton(
+                      onPressed: control.invalid ? null : postReview,
+                      child: const Text("Post Review"));
+                  if (control.hasErrors) {
+                    return Tooltip(
+                        message: "Please select a rating", child: button);
+                  } else {
+                    return button;
+                  }
+                })
+              ],
+            ),
           ],
         ),
-      ],
+      ),
     );
   }
 }

@@ -55,7 +55,9 @@ class _NotificationScreenBodyState extends State<NotificationScreenBody> {
 
   Future<PaginatedQueryResult<NotificationModel>> fetch(
       DateTime? pageKey) async {
-    return context.read<NotificationController>().getAll(page: pageKey);
+    return context
+        .read<NotificationController>()
+        .getAllWithPagination(page: pageKey);
   }
 
   @override

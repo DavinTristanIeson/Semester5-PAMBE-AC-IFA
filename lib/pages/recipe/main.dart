@@ -5,10 +5,10 @@ import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/controllers/review.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
-import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/recipe/info.dart';
 import 'package:provider/provider.dart';
 
@@ -16,14 +16,14 @@ class RecipeScreen extends StatelessWidget {
   final RecipeSource source;
   const RecipeScreen({super.key, required this.source});
 
-  Future<AbstractRecipeLiteModel?> getRecipe(BuildContext context) async {
+  Future<AbstractRecipeLiteModel?> _getRecipe(BuildContext context) async {
     final messenger = AcSnackbarMessenger.of(context);
     try {
       if (source.type == RecipeSourceType.local) {
-        final controller = context.watch<LocalRecipeController>();
+        final controller = context.read<LocalRecipeController>();
         return controller.get(source.localId!);
       } else {
-        final controller = context.watch<RecipeController>();
+        final controller = context.read<RecipeController>();
         final result = await controller.get(source.remoteId!);
         return result;
       }
@@ -33,17 +33,35 @@ class RecipeScreen extends StatelessWidget {
     }
   }
 
+  Future<List<ReviewModel>>? _getReviews(BuildContext context) {
+    final reviewController = context.read<ReviewController>();
+    if (source.type == RecipeSourceType.local) {
+      return null;
+    }
+    return reviewController.getAll(
+        searchState:
+            ReviewSearchState(filter: ReviewFilterBy.recipe(source.remoteId)));
+  }
+
   @override
   Widget build(BuildContext context) {
+    final future = Future(() async {
+      final recipeFuture = _getRecipe(context);
+      final reviewsFuture = _getReviews(context);
+      return (
+        recipe: await recipeFuture,
+        reviews: await reviewsFuture,
+      );
+    });
     return Scaffold(
       appBar: const OnlyReturnAppBar(),
       body: FutureBuilder(
-          future: getRecipe(context),
+          future: future,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
-            if (!snapshot.hasData) {
+            if (!snapshot.hasData || snapshot.data!.recipe == null) {
               return Padding(
                 padding: const EdgeInsets.all(AcSizes.space),
                 child: EmptyView(
@@ -51,25 +69,16 @@ class RecipeScreen extends StatelessWidget {
                         "We were unable to find any recipe associated with ID: ${source.localId ?? source.remoteId}")),
               );
             }
-            List<AbstractRecipeStepModel> steps = snapshot.data is RecipeModel
-                ? (snapshot.data as RecipeModel).steps
-                : (snapshot.data is LocalRecipeModel)
-                    ? (snapshot.data as LocalRecipeModel).steps
-                    : [];
+            List<AbstractRecipeStepModel> steps =
+                snapshot.data!.recipe is RecipeModel
+                    ? (snapshot.data!.recipe as RecipeModel).steps
+                    : (snapshot.data!.recipe is LocalRecipeModel)
+                        ? (snapshot.data!.recipe as LocalRecipeModel).steps
+                        : [];
             return RecipeInfoScreen(
-                recipe: snapshot.data!,
+                recipe: snapshot.data!.recipe!,
                 steps: steps,
-                reviews: List.generate(
-                    5,
-                    (i) => ReviewModel(
-                        rating: 3,
-                        reviewedAt: DateTime.now(),
-                        user: UserModel(
-                            id: "0",
-                            name: "User",
-                            email: "placeholder@email.com",
-                            imagePath: "https://www.google.com"),
-                        content: "Rating" * 10)));
+                reviews: snapshot.data!.reviews);
           }),
     );
   }

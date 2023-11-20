@@ -51,7 +51,7 @@ class _ReviewsListState extends State<ReviewsList> {
   Future<PaginatedQueryResult<ReviewModel>> fetch(
       ReviewSearchState state, QueryDocumentSnapshot? pageKey) async {
     final controller = context.read<ReviewController>();
-    return controller.getAll(
+    return controller.getAllWithPagination(
         searchState: state,
         page: pageKey == null
             ? Either.left(pageKey)

@@ -7,11 +7,13 @@ import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/notification.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/controllers/review.dart';
 import 'package:pambe_ac_ifa/controllers/user.dart';
 import 'package:pambe_ac_ifa/database/firebase/auth.dart';
 import 'package:pambe_ac_ifa/database/firebase/lib/images.dart';
 import 'package:pambe_ac_ifa/database/firebase/notification.dart';
 import 'package:pambe_ac_ifa/database/firebase/recipe.dart';
+import 'package:pambe_ac_ifa/database/firebase/review.dart';
 import 'package:pambe_ac_ifa/database/firebase/user.dart';
 import 'package:pambe_ac_ifa/database/sqflite/lib/image.dart';
 import 'package:pambe_ac_ifa/database/sqflite/tables/recipe.dart';
@@ -45,40 +47,33 @@ void main() async {
           create: (context) =>
               AuthProvider(authManager: FirebaseAuthManager())),
       ProxyProvider<AuthProvider, NotificationController>(
-          create: (context) => NotificationController(
-              notificationManager: FirebaseNotificationManager(), userId: null),
-          update: (context, authProvider, prev) {
-            final userId = authProvider.user?.uid;
-            prev!.userId = userId;
-            return prev;
-          }),
+        create: (context) => NotificationController(
+            notificationManager: FirebaseNotificationManager(), userId: null),
+        update: AuthProvider.registerUidToProvider,
+      ),
       ChangeNotifierProxyProvider<AuthProvider, UserController>(
-          create: (context) => UserController(
-              userManager: FirebaseUserManager(
-                  imageManager: FirebaseImageManager(storagePath: "user"))),
-          update: (context, authProvider, prev) {
-            final userId = authProvider.user?.uid;
-            prev!.userId = userId;
-            return prev;
-          }),
+        create: (context) => UserController(
+            userManager: FirebaseUserManager(
+                imageManager: FirebaseImageManager(storagePath: "user"))),
+        update: AuthProvider.registerUidToProvider,
+      ),
       ChangeNotifierProxyProvider<AuthProvider, RecipeController>(
-          create: (context) => RecipeController(
-              recipeManager: FirebaseRecipeManager(FirebaseFirestore.instance,
-                  userManager: userManager,
-                  imageManager: FirebaseImageManager(storagePath: "recipes")),
-              userId: null),
-          update: (context, authProvider, prev) {
-            final userId = authProvider.user?.uid;
-            prev!.userId = userId;
-            return prev;
-          }),
+        create: (context) => RecipeController(
+            recipeManager: FirebaseRecipeManager(FirebaseFirestore.instance,
+                userManager: userManager,
+                imageManager: FirebaseImageManager(storagePath: "recipes")),
+            userId: null),
+        update: AuthProvider.registerUidToProvider,
+      ),
       ChangeNotifierProxyProvider<AuthProvider, LocalRecipeController>(
-          create: (context) => LocalRecipeController(recipeTable: recipeTable),
-          update: (context, authProvider, prev) {
-            final userId = authProvider.user?.uid;
-            prev!.userId = userId;
-            return prev;
-          }),
+        create: (context) => LocalRecipeController(recipeTable: recipeTable),
+        update: AuthProvider.registerUidToProvider,
+      ),
+      ChangeNotifierProxyProvider<AuthProvider, ReviewController>(
+        create: (context) =>
+            ReviewController(reviewManager: FirebaseReviewManager()),
+        update: AuthProvider.registerUidToProvider,
+      )
     ],
     child: const AcReactiveFormConfig(child: RecipeLibApp()),
   ));

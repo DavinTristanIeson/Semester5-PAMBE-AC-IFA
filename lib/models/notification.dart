@@ -28,7 +28,8 @@ class NotificationModel {
   @JsonEpochConverter()
   DateTime createdAt;
 
-  String? reviewTargetId;
+  String? reviewId;
+  String? recipeId;
 
   NotificationModel({
     required this.id,
@@ -36,7 +37,8 @@ class NotificationModel {
     required this.title,
     this.content,
     required this.createdAt,
-    this.reviewTargetId,
+    this.reviewId,
+    this.recipeId,
   });
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
@@ -47,4 +49,31 @@ class NotificationModel {
     }
   }
   Map<String, dynamic> toJson() => _$NotificationModelToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true, createFactory: false)
+class NotificationPayload {
+  NotificationType type;
+  String title;
+  String? content;
+  String? reviewId;
+  String? recipeId;
+
+  @JsonEpochConverter()
+  DateTime createdAt;
+  NotificationPayload.general({required this.title, this.content})
+      : type = NotificationType.general,
+        createdAt = DateTime.now();
+  NotificationPayload.system({required this.title, this.content})
+      : type = NotificationType.system,
+        createdAt = DateTime.now();
+  NotificationPayload.review(
+      {required this.title,
+      required this.reviewId,
+      required this.recipeId,
+      this.content})
+      : type = NotificationType.review,
+        createdAt = DateTime.now();
+
+  Map<String, dynamic> toJson() => _$NotificationPayloadToJson(this);
 }

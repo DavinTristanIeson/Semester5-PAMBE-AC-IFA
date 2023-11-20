@@ -7,10 +7,12 @@ part 'gen/review.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class ReviewModel {
+  @JsonKey(includeToJson: false)
+  String id;
   String? content;
 
   @JsonEpochConverter()
-  DateTime reviewedAt;
+  DateTime createdAt;
   int rating;
 
   @JsonKey(
@@ -19,8 +21,9 @@ class ReviewModel {
   )
   UserModel? user;
   ReviewModel(
-      {this.content,
-      required this.reviewedAt,
+      {required this.id,
+      this.content,
+      required this.createdAt,
       required this.rating,
       required this.user});
 

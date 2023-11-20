@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/interfaces/common.dart';
+import 'package:pambe_ac_ifa/database/interfaces/notification.dart';
 import 'package:pambe_ac_ifa/database/mixins/firebase.dart';
 import 'package:pambe_ac_ifa/models/notification.dart';
 
@@ -10,7 +11,8 @@ enum NotificationFirestoreKeys {
   content,
   createdAt,
   isRead,
-  reviewTargetId,
+  reviewId,
+  recipeId,
 }
 
 class FirebaseNotificationManager
@@ -51,15 +53,25 @@ class FirebaseNotificationManager
 
   @override
   Future<PaginatedQueryResult<NotificationModel>> getAll(
-      {dynamic page, required String userId}) async {
+      {dynamic page,
+      required String userId,
+      int? limit,
+      NotificationFilterBy? filter}) async {
     final lastCreatedAt = page as DateTime?;
     final queryKey = lastCreatedAt?.toString() ?? '';
     if (queryCache.has(queryKey)) {
       return Future.value(queryCache.get(queryKey));
     }
     var query = getCollection(userId)
-        .limit(15)
+        .limit(limit ?? 15)
         .orderBy(NotificationFirestoreKeys.createdAt.name, descending: true);
+    if (filter != null) {
+      switch (filter.type) {
+        case NotificationFilterByType.type:
+          query = query.where(NotificationFirestoreKeys.type.name,
+              isEqualTo: filter.notificationType.name);
+      }
+    }
     if (lastCreatedAt != null) {
       query = query.startAfter([lastCreatedAt.millisecondsSinceEpoch]);
     }
@@ -99,5 +111,19 @@ class FirebaseNotificationManager
       });
     }
     await batch.commit();
+  }
+
+  @override
+  Future<void> clear({required String userId}) {
+    // TODO: implement clear
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> notify(
+      {required String targetUserId,
+      required NotificationPayload notification}) {
+    // TODO: implement notify
+    throw UnimplementedError();
   }
 }

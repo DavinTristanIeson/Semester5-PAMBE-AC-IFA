@@ -5,17 +5,19 @@ import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
 import 'package:pambe_ac_ifa/components/display/review_card.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
 import 'package:pambe_ac_ifa/pages/profile/main.dart';
 import 'package:pambe_ac_ifa/pages/recipe/viewer.dart';
 import 'package:pambe_ac_ifa/pages/reviews/main.dart';
+import 'package:provider/provider.dart';
 
 class RecipeInfoScreen extends StatelessWidget {
   final AbstractRecipeLiteModel recipe;
   final List<AbstractRecipeStepModel> steps;
-  final List<ReviewModel> reviews;
+  final List<ReviewModel>? reviews;
   const RecipeInfoScreen(
       {super.key,
       required this.recipe,
@@ -98,46 +100,53 @@ class RecipeInfoScreen extends StatelessWidget {
   }
 
   Widget buildReviewList() {
+    if (reviews!.isEmpty) {
+      return EmptyView(
+        content: Either.right(
+            "This recipe hadn't had any reviews.\nBe the first to comment!"),
+      );
+    }
     return ListView(
       scrollDirection: Axis.horizontal,
-      children: reviews
+      children: reviews!
           .take(5)
           .map<Widget>((e) => Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AcSizes.md),
-                child: ReviewCard(
-                    rating: e.rating,
-                    reviewer: e.user,
-                    reviewedAt: e.reviewedAt,
-                    content: Either.right(e.content)),
+                child: ReviewCard(review: e),
               ))
           .toList(),
     );
   }
 
-  Row buildSeeReviewsButton(BuildContext context, String recipeId) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // To make sure the text is centered
-        const SizedBox(width: AcSizes.lg + AcSizes.sm),
-        Text(
-          "SEE WHAT OTHERS THINK",
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.primary,
-            fontWeight: FontWeight.w500,
+  Widget buildSeeReviewsButton(BuildContext context, String recipeId) {
+    final uid = context.watch<AuthProvider>().user?.uid;
+    return TextButton(
+      onPressed: () {
+        context.navigator.push(MaterialPageRoute(
+            builder: (context) => ReviewsScreen(
+                  recipeId: recipeId,
+                  permission: recipe is RecipeLiteModel &&
+                          (recipe as RecipeLiteModel).user?.id == uid
+                      ? ReviewPermission.deny
+                      : ReviewPermission.permit,
+                )));
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // To make sure the text is centered
+          const SizedBox(width: AcSizes.lg + AcSizes.sm),
+          Text(
+            "SEE WHAT OTHERS THINK",
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-        ),
-        IconButton(
-            onPressed: () {
-              context.navigator.push(MaterialPageRoute(
-                  builder: (context) => ReviewsScreen(
-                        recipeId: recipeId,
-                      )));
-            },
-            iconSize: AcSizes.lg,
-            icon: Icon(Icons.arrow_right_alt,
-                color: Theme.of(context).colorScheme.primary))
-      ],
+          Icon(Icons.arrow_right_alt,
+              color: Theme.of(context).colorScheme.primary),
+        ],
+      ),
     );
   }
 
@@ -195,9 +204,10 @@ class RecipeInfoScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AcSizes.lg),
-          ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 160.0),
-              child: buildReviewList()),
+          if (reviews != null)
+            ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 160.0),
+                child: buildReviewList()),
           const SizedBox(height: AcSizes.md),
           if (recipeId != null) buildSeeReviewsButton(context, recipeId),
           Padding(

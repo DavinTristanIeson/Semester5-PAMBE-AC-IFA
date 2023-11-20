@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
@@ -14,11 +15,12 @@ enum AcSharedPrefKeys {
   const AcSharedPrefKeys(this.key);
 }
 
-class LocalRecipeController extends ChangeNotifier {
+class LocalRecipeController extends ChangeNotifier implements AuthDependent {
   RecipeTable recipeTable;
   String? _userId;
   LocalRecipeController({required this.recipeTable});
 
+  @override
   set userId(String? userId) {
     _userId = userId;
     notifyListeners();

@@ -2,8 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
-import 'package:pambe_ac_ifa/models/container.dart';
-import 'package:pambe_ac_ifa/models/user.dart';
+import 'package:pambe_ac_ifa/models/review.dart';
 import 'package:pambe_ac_ifa/pages/reviews/main.dart';
 
 enum StarRatingType {
@@ -52,28 +51,26 @@ class StarRating extends StatelessWidget {
 }
 
 class ReviewCard extends StatelessWidget {
-  final int rating;
-  final Either<Widget, String>? content;
-  final UserModel? reviewer;
-  final DateTime reviewedAt;
-  final MinimalModel? reviewFor;
-  const ReviewCard(
-      {super.key,
-      required this.rating,
-      this.content,
-      required this.reviewer,
-      required this.reviewedAt,
-      this.reviewFor});
+  final ReviewModel review;
+  final String? recipeId;
+  final String? recipeName;
+  const ReviewCard({
+    super.key,
+    required this.review,
+    this.recipeId,
+    this.recipeName,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: reviewFor == null
+      onTap: recipeId == null
           ? null
           : () {
               context.navigator.push(MaterialPageRoute(
                   builder: (context) => ReviewsScreen(
-                        recipeId: reviewFor!.id,
+                        recipeId: recipeId!,
+                        reviewId: review.id,
                       )));
             },
       child: Container(
@@ -91,13 +88,11 @@ class ReviewCard extends StatelessWidget {
           children: [
             buildUserAndRating(context),
             const SizedBox(height: AcSizes.md),
-            if (content != null)
-              content!.leftOr(
-                (right) => Text(right,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    maxLines: 4,
-                    overflow: TextOverflow.ellipsis),
-              ),
+            if (review.content != null)
+              Text(review.content!,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  maxLines: 4,
+                  overflow: TextOverflow.ellipsis),
           ],
         ),
       ),
@@ -105,13 +100,13 @@ class ReviewCard extends StatelessWidget {
   }
 
   Widget buildUserAndRating(BuildContext context) {
-    Widget reviewerNameWidget = Text(reviewer?.name ?? "Deleted User",
-        style: reviewer == null
+    Widget reviewerNameWidget = Text(review.user?.name ?? "Deleted User",
+        style: review.user == null
             ? context.texts.titleMedium!.copyWith(fontStyle: FontStyle.italic)
             : null,
         overflow: TextOverflow.ellipsis);
     Widget starRatingWidget =
-        StarRating(rating: rating, type: StarRatingType.compact);
+        StarRating(rating: review.rating, type: StarRatingType.compact);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +120,7 @@ class ReviewCard extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            reviewFor != null
+            recipeName != null
                 ? Row(
                     children: [
                       reviewerNameWidget,
@@ -134,8 +129,8 @@ class ReviewCard extends StatelessWidget {
                     ],
                   )
                 : reviewerNameWidget,
-            reviewFor != null
-                ? Text("on ${reviewFor!.name}", style: context.texts.titleSmall)
+            recipeName != null
+                ? Text("on $recipeName", style: context.texts.titleSmall)
                 : starRatingWidget
           ],
         ),

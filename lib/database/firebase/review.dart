@@ -6,7 +6,7 @@ import 'package:pambe_ac_ifa/models/review.dart';
 
 enum ReviewFirestoreKeys {
   content,
-  reviewedAt,
+  createdAt,
   rating,
   userId,
 }
@@ -15,7 +15,8 @@ class FirebaseReviewManager
     with FirebaseResourceManagerMixin
     implements IReviewResourceManager {
   @override
-  Future<ReviewModel?> get(String reviewId) {
+  Future<ReviewModel?> get(
+      {required String reviewId, required String recipeId}) {
     // TODO: implement get
     throw UnimplementedError();
   }
@@ -48,6 +49,7 @@ class FirebaseReviewManager
   @override
   Future<ReviewModel> put(
       {String? reviewId,
+      required String recipeId,
       required String userId,
       required int rating,
       String? content}) {

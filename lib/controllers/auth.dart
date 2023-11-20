@@ -6,6 +6,10 @@ import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+abstract class AuthDependent {
+  set userId(String? id);
+}
+
 class AuthProvider extends ChangeNotifier {
   FirebaseAuthManager authManager;
   User? user;
@@ -67,5 +71,12 @@ class AuthProvider extends ChangeNotifier {
           "AuthProvider.user should not be null when updateAuth is called");
     }
     return authManager.deleteAccount(user!.uid, credentials: credentials);
+  }
+
+  static T registerUidToProvider<T extends AuthDependent>(
+      BuildContext context, AuthProvider provider, T? dependent) {
+    final userId = provider.user?.uid;
+    dependent!.userId = userId;
+    return dependent;
   }
 }

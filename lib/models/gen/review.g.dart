@@ -7,9 +7,9 @@ part of '../review.dart';
 // **************************************************************************
 
 ReviewModel _$ReviewModelFromJson(Map<String, dynamic> json) => ReviewModel(
+      id: json['id'] as String,
       content: json['content'] as String?,
-      reviewedAt:
-          const JsonEpochConverter().fromJson(json['reviewedAt'] as int),
+      createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
       rating: json['rating'] as int,
       user: $userPropertyFromJson(json['user']),
     );
@@ -17,7 +17,7 @@ ReviewModel _$ReviewModelFromJson(Map<String, dynamic> json) => ReviewModel(
 Map<String, dynamic> _$ReviewModelToJson(ReviewModel instance) =>
     <String, dynamic>{
       'content': instance.content,
-      'reviewedAt': const JsonEpochConverter().toJson(instance.reviewedAt),
+      'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'rating': instance.rating,
       'user': $userPropertyToJson(instance.user),
     };

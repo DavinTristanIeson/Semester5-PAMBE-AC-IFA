@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:pambe_ac_ifa/models/notification.dart';
 
 abstract class ILocalImageResourceManager {
   Future<File?> get(String imagePath);
@@ -22,10 +21,3 @@ abstract class INetworkImageResourceManager {
 }
 
 typedef PaginatedQueryResult<T> = ({List<T> data, dynamic nextPage});
-
-abstract class INotificationResourceManager {
-  Future<PaginatedQueryResult<NotificationModel>> getAll(
-      {dynamic page, required String userId});
-  Future<void> markAllRead({required String userId});
-  Future<bool> hasUnread({required String userId});
-}

@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/user.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 
-class UserController extends ChangeNotifier {
+class UserController extends ChangeNotifier implements AuthDependent {
   final IUserResourceManager userManager;
   String? userId;
   UserController({required this.userManager, this.userId});
