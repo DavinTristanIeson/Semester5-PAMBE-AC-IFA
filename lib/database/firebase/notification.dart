@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/interfaces/common.dart';
+import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/notification.dart';
 import 'package:pambe_ac_ifa/database/mixins/firebase.dart';
 import 'package:pambe_ac_ifa/models/notification.dart';
@@ -114,16 +115,32 @@ class FirebaseNotificationManager
   }
 
   @override
-  Future<void> clear({required String userId}) {
-    // TODO: implement clear
-    throw UnimplementedError();
+  Future<void> clear({required String userId}) async {
+    final result = await getCollection(userId).get();
+    final batch = db.batch();
+    for (final doc in result.docs) {
+      batch.delete(doc.reference);
+    }
+    try {
+      await batch.commit();
+    } catch (e) {
+      throw ApiError(ApiErrorType.deleteFailure, inner: e);
+    }
   }
 
   @override
   Future<void> notify(
       {required String targetUserId,
-      required NotificationPayload notification}) {
-    // TODO: implement notify
-    throw UnimplementedError();
+      required NotificationPayload notification}) async {
+    try {
+      await getCollection(targetUserId).add({
+        ...notification.toJson(),
+        NotificationFirestoreKeys.createdAt.name:
+            DateTime.now().millisecondsSinceEpoch,
+        NotificationFirestoreKeys.isRead.name: false,
+      });
+    } catch (e) {
+      throw ApiError(ApiErrorType.storeFailure, inner: e);
+    }
   }
 }

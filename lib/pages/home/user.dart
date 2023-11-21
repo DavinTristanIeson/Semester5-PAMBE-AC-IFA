@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/components/app/confirmation.dart';
+import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
+import 'package:pambe_ac_ifa/controllers/notification.dart';
+import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/pages/home/body.dart';
 import 'package:pambe_ac_ifa/pages/library/main.dart';
 import 'package:pambe_ac_ifa/pages/notification/main.dart';
@@ -47,6 +51,31 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       builder: (context) => const SearchScreen()));
                 },
                 icon: const Icon(Icons.search)),
+          if (tab == RecipeLibTabs.notifications)
+            IconButton(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return SimpleConfirmationDialog.delete(
+                            onConfirm: () async {
+                              final messenger = AcSnackbarMessenger.of(context);
+                              try {
+                                await context
+                                    .read<NotificationController>()
+                                    .clear();
+                                messenger.sendSuccess(
+                                    "Notification successfully deleted");
+                              } catch (e) {
+                                messenger.sendError(e);
+                              }
+                            },
+                            message:
+                                Either.right("Notifications can't be deleted"),
+                            context: context);
+                      });
+                },
+                icon: const Icon(Icons.delete_forever)),
           if (tab == RecipeLibTabs.profile)
             IconButton(
                 onPressed: () async {
