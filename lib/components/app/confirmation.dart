@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/function/future_caller.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 /// Default confirmation dialog. Used with showDialog
 class SimpleConfirmationDialog extends StatelessWidget {
@@ -122,6 +124,66 @@ class SimpleConfirmationDialog extends StatelessWidget {
                   onPressed: null, child: Text("Waiting..."));
             }
             return TextButton(onPressed: call, child: positiveText);
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class ImagePickMethodDialog extends StatelessWidget {
+  final FutureOr<void> Function(ImageSource source) onPickSource;
+  final Either<Widget, String>? message;
+  final Either<Widget, String>? title;
+
+  const ImagePickMethodDialog(
+      {super.key,
+      required BuildContext context,
+      this.message,
+      this.title,
+      required this.onPickSource});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: title?.leftOr((right) => Text(right)) ??
+          Text("Select Picture Source", style: context.texts.titleLarge),
+      content: message?.leftOr((right) => Text(right)) ??
+          const Text(
+            'Where do you want to take the picture from?',
+          ),
+      backgroundColor: AcColors.white,
+      actions: <Widget>[
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: context.colors.secondary,
+          ),
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        TextButton(
+          child: const Text('Camera'),
+          onPressed: () async {
+            final navigator = Navigator.of(context);
+            final permissionResponse = await Permission.camera.request();
+            if (permissionResponse.isPermanentlyDenied) {
+              final open = await openAppSettings();
+              if (!open) return;
+            }
+            if (permissionResponse.isGranted) {
+              onPickSource(ImageSource.camera);
+              navigator.pop();
+            }
+          },
+        ),
+        TextButton(
+          child: const Text('Gallery'),
+          onPressed: () async {
+            final navigator = Navigator.of(context);
+            onPickSource(ImageSource.gallery);
+            navigator.pop();
           },
         ),
       ],

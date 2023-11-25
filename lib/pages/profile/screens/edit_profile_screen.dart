@@ -6,6 +6,7 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
+import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/field/field_wrapper.dart';
@@ -232,51 +233,19 @@ class EditProfileScreenBody extends StatelessWidget {
     await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Select Picture Source", style: context.texts.titleLarge),
-          content: const Text(
-            'Select where you want your picture taken from',
-          ),
-          backgroundColor: AcColors.white,
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: context.colors.secondary,
-              ),
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Camera'),
-              onPressed: () async {
-                final navigator = Navigator.of(context);
-                image = await _getImage(ImageSource.camera);
-                navigator.pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Gallery'),
-              onPressed: () async {
-                final navigator = Navigator.of(context);
-                image = await _getImage(ImageSource.gallery);
-                navigator.pop();
-              },
-            ),
-          ],
+        return ImagePickMethodDialog(
+          context: context,
+          onPickSource: (source) async {
+            image = await _picker.pickImage(
+              source: source,
+              maxWidth: 800,
+              maxHeight: 800,
+            );
+          },
         );
       },
     );
     return image;
-  }
-
-  Future<XFile?> _getImage(ImageSource source) async {
-    return await _picker.pickImage(
-      source: source,
-      maxWidth: 800,
-      maxHeight: 800,
-    );
   }
 
   Future<DateTime?> showCalender(BuildContext ctx, DateTime? date) async {

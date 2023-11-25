@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/touchable.dart';
 
 class ImagePickerField extends StatelessWidget {
@@ -19,9 +20,18 @@ class ImagePickerField extends StatelessWidget {
       this.error});
 
   void pickImage(BuildContext context) async {
-    XFile? result = await _picker.pickImage(
-        source: ImageSource.gallery, maxHeight: 600.0, maxWidth: 800.0);
-    onChanged(result);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return ImagePickMethodDialog(
+            context: context,
+            onPickSource: (source) async {
+              XFile? result = await _picker.pickImage(
+                  source: source, maxHeight: 600.0, maxWidth: 800.0);
+              onChanged(result);
+            },
+          );
+        });
   }
 
   Widget buildNoImage(BuildContext context) {
