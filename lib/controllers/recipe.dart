@@ -7,6 +7,7 @@ import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/common.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
+import 'package:pambe_ac_ifa/modules/future.dart';
 
 class RecipeSearchState {
   late SortBy<RecipeSortBy> sortBy;
@@ -58,8 +59,12 @@ class RecipeSearchState {
 /// Ini untuk resep yang disimpan online
 class RecipeController extends ChangeNotifier implements AuthDependent {
   IRecipeResourceManager recipeManager;
+  IBookmarkResourceManager bookmarkManager;
   String? _userId;
-  RecipeController({required this.recipeManager, required String? userId})
+  RecipeController(
+      {required this.recipeManager,
+      required this.bookmarkManager,
+      required String? userId})
       : _userId = userId;
 
   @override
@@ -109,6 +114,23 @@ class RecipeController extends ChangeNotifier implements AuthDependent {
     RecipeSearchState searchState, {
     dynamic page,
   }) async {
+    if (searchState.filterBy?.type == RecipeFilterByType.hasBeenBookmarkedBy) {
+      if (_userId == null) {
+        throw InvalidStateError(
+            "RecipeController._userId is expected to be non-null when getAllWithPagination is called.");
+      }
+      final (data: bookmarks, :nextPage) =
+          await bookmarkManager.getAll(userId: _userId!);
+      final recipeFuture = FutureChunkDistributor(
+              bookmarks.map((e) => recipeManager.get(e.recipeId)),
+              chunkSize: 4)
+          .wait();
+      final recipes = (await recipeFuture).notNull<RecipeModel>().toList();
+      return (
+        data: recipes,
+        nextPage: bookmarks.length < searchState.limit ? null : nextPage,
+      );
+    }
     final (:data, :nextPage) = await recipeManager.getAll(
         page: page,
         limit: searchState.limit,
@@ -128,7 +150,7 @@ class RecipeController extends ChangeNotifier implements AuthDependent {
   Future<RecipeModel> put(LocalRecipeModel recipe) async {
     if (_userId == null) {
       throw InvalidStateError(
-          "RecipeController.userId is expected to be non-null when put is called.");
+          "RecipeController._userId is expected to be non-null when put is called.");
     }
     final result = await recipeManager.put(recipe, userId: _userId!);
     notifyListeners();
@@ -143,7 +165,7 @@ class RecipeController extends ChangeNotifier implements AuthDependent {
   Future<void> removeAll() async {
     if (_userId == null) {
       throw InvalidStateError(
-          "RecipeController.userId is expected to be non-null when removeAll is called.");
+          "RecipeController._userId is expected to be non-null when removeAll is called.");
     }
     final yourRecipes = await getRecipesByUser(_userId!);
     // To make sure we don't get rate limited
@@ -153,6 +175,26 @@ class RecipeController extends ChangeNotifier implements AuthDependent {
       }
     }));
     notifyListeners();
+  }
+
+  Future<void> bookmark(String recipeId, bool isBookmarked) async {
+    if (_userId == null) {
+      throw InvalidStateError(
+          "RecipeController._userId is expected to be non-null when bookmark is called.");
+    }
+    await bookmarkManager.set(
+        recipeId: recipeId, userId: _userId!, isBookmarked: isBookmarked);
+    notifyListeners();
+  }
+
+  Future<bool> isBookmarked(String recipeId) {
+    if (_userId == null) {
+      throw InvalidStateError(
+          "RecipeController._userId is expected to be non-null when isBookmarked is called.");
+    }
+    return bookmarkManager
+        .get(userId: _userId!, recipeId: recipeId)
+        .into((value) => value != null);
   }
 
   @override

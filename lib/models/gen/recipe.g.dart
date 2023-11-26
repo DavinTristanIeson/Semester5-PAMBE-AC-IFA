@@ -36,6 +36,7 @@ RecipeLiteModel _$RecipeLiteModelFromJson(Map<String, dynamic> json) =>
       createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
       imagePath: json['imagePath'] as String?,
       imageStoragePath: json['imageStoragePath'] as String?,
+      rating: (json['rating'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$RecipeLiteModelToJson(RecipeLiteModel instance) =>
@@ -45,6 +46,7 @@ Map<String, dynamic> _$RecipeLiteModelToJson(RecipeLiteModel instance) =>
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'imagePath': instance.imagePath,
       'user': $userPropertyToJson(instance.user),
+      'rating': instance.rating,
     };
 
 LocalRecipeModel _$LocalRecipeModelFromJson(Map<String, dynamic> json) =>
@@ -81,7 +83,7 @@ RecipeModel _$RecipeModelFromJson(Map<String, dynamic> json) => RecipeModel(
       steps: (json['steps'] as List<dynamic>)
           .map((e) => RecipeStepModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-    );
+    )..rating = (json['rating'] as num?)?.toDouble();
 
 Map<String, dynamic> _$RecipeModelToJson(RecipeModel instance) =>
     <String, dynamic>{
@@ -90,5 +92,21 @@ Map<String, dynamic> _$RecipeModelToJson(RecipeModel instance) =>
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'imagePath': instance.imagePath,
       'user': $userPropertyToJson(instance.user),
+      'rating': instance.rating,
       'steps': instance.steps.map((e) => e.toJson()).toList(),
+    };
+
+RecipeBookmarkModel _$RecipeBookmarkModelFromJson(Map<String, dynamic> json) =>
+    RecipeBookmarkModel(
+      createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
+      userId: json['userId'] as String,
+      recipeId: json['recipeId'] as String,
+    );
+
+Map<String, dynamic> _$RecipeBookmarkModelToJson(
+        RecipeBookmarkModel instance) =>
+    <String, dynamic>{
+      'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
+      'userId': instance.userId,
+      'recipeId': instance.recipeId,
     };

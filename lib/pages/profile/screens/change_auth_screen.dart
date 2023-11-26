@@ -179,20 +179,14 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
     return Scaffold(
       appBar: OnlyReturnAppBar(
         actions: [
-          FutureButtonCompute(
+          FutureOutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: context.colors.error,
+                side: BorderSide(color: context.colors.error),
+              ),
               onPressed: deleteAccount,
               progressIndicatorColor: context.colors.error,
-              builder: (context, onPressed, icon) {
-                return OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: context.colors.error,
-                      side: BorderSide(color: context.colors.error),
-                    ),
-                    icon: icon!,
-                    label: const Text("Delete Account"),
-                    onPressed: onPressed);
-              },
-              icon: const Icon(Icons.delete))
+              child: const Text("Delete Account"))
         ],
       ),
       body: ReactiveForm(

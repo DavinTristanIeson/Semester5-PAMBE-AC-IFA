@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
-import 'package:pambe_ac_ifa/components/function/future_caller.dart';
+import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -93,23 +93,23 @@ class SimpleConfirmationDialog extends StatelessWidget {
       content: message,
       backgroundColor: AcColors.white,
       actions: [
-        FutureProcedureCaller(process: () async {
-          if (onCancel != null) {
-            try {
-              await onCancel!();
-              navigator.pop();
-            } catch (e) {
-              navigator.pop();
-              rethrow;
-            }
-          } else {
-            navigator.pop();
-          }
-        }, builder: (context, snapshot, call) {
-          return TextButton(onPressed: call, child: negativeText);
-        }),
-        FutureProcedureCaller(
-          process: () async {
+        FutureTextButton(
+            onPressed: () async {
+              if (onCancel != null) {
+                try {
+                  await onCancel!();
+                  navigator.pop();
+                } catch (e) {
+                  navigator.pop();
+                  rethrow;
+                }
+              } else {
+                navigator.pop();
+              }
+            },
+            child: negativeText),
+        FutureTextButton(
+          onPressed: () async {
             try {
               await onConfirm();
               navigator.pop();
@@ -118,13 +118,7 @@ class SimpleConfirmationDialog extends StatelessWidget {
               rethrow;
             }
           },
-          builder: (context, snapshot, call) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const TextButton(
-                  onPressed: null, child: Text("Waiting..."));
-            }
-            return TextButton(onPressed: call, child: positiveText);
-          },
+          child: positiveText,
         ),
       ],
     );

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
@@ -10,6 +9,7 @@ import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/controllers/review.dart';
 import 'package:pambe_ac_ifa/controllers/user.dart';
 import 'package:pambe_ac_ifa/database/firebase/auth.dart';
+import 'package:pambe_ac_ifa/database/firebase/bookmark.dart';
 import 'package:pambe_ac_ifa/database/firebase/lib/images.dart';
 import 'package:pambe_ac_ifa/database/firebase/notification.dart';
 import 'package:pambe_ac_ifa/database/firebase/recipe.dart';
@@ -59,8 +59,10 @@ void main() async {
       ),
       ChangeNotifierProxyProvider<AuthProvider, RecipeController>(
         create: (context) => RecipeController(
-            recipeManager: FirebaseRecipeManager(FirebaseFirestore.instance,
+            bookmarkManager: FirebaseBookmarkManager(),
+            recipeManager: FirebaseRecipeManager(
                 userManager: userManager,
+                bookmarkManager: FirebaseBookmarkManager(),
                 imageManager: FirebaseImageManager(storagePath: "recipes")),
             userId: null),
         update: AuthProvider.registerUidToProvider,

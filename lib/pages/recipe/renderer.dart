@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
-import 'package:pambe_ac_ifa/components/function/future_caller.dart';
+import 'package:pambe_ac_ifa/components/function/future.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/editor/components/step.dart';
 import 'package:pambe_ac_ifa/pages/recipe/components/step.dart';
@@ -65,11 +65,11 @@ class _RecipeStepRendererState extends State<RecipeStepRenderer> {
       stepNumbers.add((stepNumbers.lastOrNull ?? 0) +
           (step.type == RecipeStepVariant.regular ? 1 : 0));
     }
-    return FutureProcedureCaller<void>(
-        process: widget.next,
-        builder: (context, snapshot, call) {
+    return FutureButtonCompute(
+        onPressed: widget.next,
+        builder: (context, remote) {
           return GestureDetector(
-            onTap: call,
+            onTap: remote.call,
             child: Stack(
               children: [
                 ListView.builder(
@@ -94,7 +94,7 @@ class _RecipeStepRendererState extends State<RecipeStepRenderer> {
                             step: steps[index], number: stepNumbers[index]),
                       );
                     }),
-                if (call != null)
+                if (remote.call != null)
                   const Positioned(
                       bottom: AcSizes.space,
                       left: 0,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/components/app/confirmation.dart';
+import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
@@ -15,6 +17,28 @@ import 'package:provider/provider.dart';
 class LibraryBookmarkedRecipesSection extends StatelessWidget {
   const LibraryBookmarkedRecipesSection({super.key});
 
+  Widget buildSecondaryAction(BuildContext context, RecipeLiteModel data) {
+    final controller = context.read<RecipeController>();
+    return FutureOutlinedButton(
+      onPressed: () {
+        return showDialog(
+            context: context,
+            builder: (context) {
+              return SimpleConfirmationDialog.delete(
+                  onConfirm: () {
+                    controller.bookmark(data.id, false);
+                  },
+                  positiveText: Either.right("Remove Bookmark"),
+                  message: Either.right(
+                      "Are you sure you want to remove this bookmark?"),
+                  context: context);
+            });
+      },
+      icon: const Icon(Icons.bookmark_remove),
+      child: const Text("Remove"),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<RecipeController>();
@@ -23,15 +47,9 @@ class LibraryBookmarkedRecipesSection extends StatelessWidget {
         future: controller.getBookmarkedRecipes(),
         itemBuilder: (context, data) {
           return RecipeCard(
-            recipe: data,
-            recipeSource: RecipeSource.remote(data.id),
-            secondaryAction: OutlinedButton.icon(
-                onPressed: () {
-                  // TODO: Unbookmark
-                },
-                icon: const Icon(Icons.bookmark_remove),
-                label: const Text("Remove")),
-          );
+              recipe: data,
+              recipeSource: RecipeSource.remote(data.id),
+              secondaryAction: buildSecondaryAction(context, data));
         },
         itemConstraints:
             BoxConstraints.tight(RecipeCard.getDefaultImageSize(context)),

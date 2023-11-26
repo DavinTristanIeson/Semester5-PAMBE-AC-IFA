@@ -22,9 +22,9 @@ abstract class IRecipeResourceManager {
 
 enum RecipeSortBy {
   lastViewed,
+  bookmarkedDate,
   createdDate,
-  ratings,
-  bookmarkedDate;
+  ratings;
 
   @override
   toString() => name;
@@ -67,4 +67,19 @@ class RecipeFilterBy {
       RecipeFilterByType.local => MapEntry(type.name, null),
     };
   }
+}
+
+abstract class IBookmarkResourceManager {
+  Future<PaginatedQueryResult<RecipeBookmarkModel>> getAll({
+    required String userId,
+    int? limit,
+    dynamic page,
+  });
+  Future<RecipeBookmarkModel?> get(
+      {required String userId, required String recipeId});
+  Future<void> set({
+    required String recipeId,
+    required String userId,
+    required bool isBookmarked,
+  });
 }

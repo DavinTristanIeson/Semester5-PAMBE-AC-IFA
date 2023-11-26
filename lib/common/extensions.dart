@@ -43,6 +43,20 @@ extension IterableUtilities<T> on Iterable<T> {
       return part;
     });
   }
+
+  Iterable<T2> notNull<T2 extends T>() {
+    return where((element) => element != null).cast<T2>();
+  }
+}
+
+extension FutureUtilities<T> on Future<T> {
+  Future<T2> cast<T2>() async {
+    return (await this) as T2;
+  }
+
+  Future<T2> into<T2>(T2 Function(T value) convert) async {
+    return convert(await this);
+  }
 }
 
 extension DateTimeUtilities on DateTime {

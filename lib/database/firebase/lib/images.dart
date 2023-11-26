@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/common.dart';
+import 'package:pambe_ac_ifa/modules/future.dart';
 
 const String globalFirebaseImageStoragePathRoot = "images";
 
@@ -33,20 +33,19 @@ class FirebaseImageManager implements INetworkImageResourceManager {
   @override
   Future<void> process(Map<String, XFile?> resources,
       {required String userId}) async {
-    await Future.wait(resources.entries.chunks(4).map((resources) async {
-      for (final resource in resources) {
-        try {
-          if (resource.value == null) {
-            await remove(resource.key);
-          } else {
-            await db.ref(resource.key).putFile(File(resource.value!.path));
-          }
-          cache.markStale(key: resource.key);
-        } catch (e) {
-          debugPrint("ERROR WITH ${resource.key} - ${resource.value?.path}");
+    await FutureChunkDistributor(resources.entries.map((resource) async {
+      try {
+        if (resource.value == null) {
+          await remove(resource.key);
+        } else {
+          await db.ref(resource.key).putFile(File(resource.value!.path));
         }
+        cache.markStale(key: resource.key);
+      } catch (e) {
+        debugPrint("ERROR WITH ${resource.key} - ${resource.value?.path}");
       }
-    }));
+    }), chunkSize: 4)
+        .wait();
   }
 
   @override

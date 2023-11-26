@@ -84,6 +84,8 @@ class RecipeLiteModel extends AbstractRecipeLiteModel {
   @JsonKey(includeToJson: false)
   ExternalImageSource get imageSource => ExternalImageSource.network;
 
+  double? rating;
+
   RecipeLiteModel({
     required this.id,
     required this.user,
@@ -92,6 +94,7 @@ class RecipeLiteModel extends AbstractRecipeLiteModel {
     required super.createdAt,
     super.imagePath,
     this.imageStoragePath,
+    this.rating,
   });
 
   factory RecipeLiteModel.fromJson(Map<String, dynamic> json) {
@@ -169,5 +172,31 @@ class RecipeModel extends RecipeLiteModel {
     final map = _$RecipeModelToJson(this);
     map["imagePath"] = imageStoragePath;
     return map;
+  }
+}
+
+@JsonSerializable()
+class RecipeBookmarkModel {
+  @JsonEpochConverter()
+  DateTime createdAt;
+
+  String userId;
+  String recipeId;
+
+  RecipeBookmarkModel({
+    required this.createdAt,
+    required this.userId,
+    required this.recipeId,
+  });
+
+  factory RecipeBookmarkModel.fromJson(Map<String, dynamic> json) {
+    try {
+      return _$RecipeBookmarkModelFromJson(json);
+    } catch (e) {
+      throw ApiError(ApiErrorType.shapeMismatch, inner: e);
+    }
+  }
+  Map<String, dynamic> toJson() {
+    return _$RecipeBookmarkModelToJson(this);
   }
 }

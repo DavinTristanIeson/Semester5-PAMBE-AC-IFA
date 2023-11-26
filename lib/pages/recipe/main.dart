@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
+import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
@@ -54,7 +56,12 @@ class RecipeScreen extends StatelessWidget {
       );
     });
     return Scaffold(
-      appBar: const OnlyReturnAppBar(),
+      appBar: OnlyReturnAppBar(
+        actions: [
+          if (source.remoteId != null)
+            _RecipeBookmarkButton(recipeId: source.remoteId!),
+        ],
+      ),
       body: FutureBuilder(
           future: future,
           builder: (context, snapshot) {
@@ -81,5 +88,45 @@ class RecipeScreen extends StatelessWidget {
                 reviews: snapshot.data!.reviews);
           }),
     );
+  }
+}
+
+class _RecipeBookmarkButton extends StatelessWidget {
+  final String recipeId;
+  const _RecipeBookmarkButton({required this.recipeId});
+
+  @override
+  Widget build(BuildContext context) {
+    final recipeController = context.watch<RecipeController>();
+    return FutureBuilder(
+        future: recipeController.isBookmarked(recipeId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done ||
+              !snapshot.hasData ||
+              snapshot.hasError) {
+            return const SizedBox();
+          }
+          bool isBookmarked = snapshot.data!;
+          if (isBookmarked) {
+            return Tooltip(
+                message: "Remove Bookmark",
+                child: FutureIconButton(
+                  icon:
+                      Icon(Icons.bookmark_remove, color: context.colors.error),
+                  onPressed: () {
+                    return recipeController.bookmark(recipeId, false);
+                  },
+                ));
+          } else {
+            return Tooltip(
+                message: "Add Bookmark",
+                child: FutureIconButton(
+                  icon: Icon(Icons.bookmark_add, color: context.colors.primary),
+                  onPressed: () {
+                    return recipeController.bookmark(recipeId, true);
+                  },
+                ));
+          }
+        });
   }
 }

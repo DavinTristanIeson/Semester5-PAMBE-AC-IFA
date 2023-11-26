@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/components/display/skeleton.dart';
 import 'package:pambe_ac_ifa/components/display/some_items_scroll.dart';
@@ -32,7 +33,20 @@ class AsyncApiSampleScrollSection<T> extends StatelessWidget {
         builder: (context, snapshot) {
           final data = snapshot.data;
           if (snapshot.hasError) {
-            return ErrorView(error: Either.right(snapshot.error!.toString()));
+            return SampleScrollSection(
+                itemCount: 1,
+                itemBuilder: (context, index) {
+                  return ConstrainedBox(
+                    constraints: itemConstraints.copyWith(
+                      maxWidth: context.screenWidth - AcSizes.xl,
+                      minWidth: context.screenWidth - AcSizes.xl,
+                    ),
+                    child: ErrorView(
+                        error: Either.right(snapshot.error!.toString())),
+                  );
+                },
+                header: header,
+                viewMoreButton: viewMoreButton);
           }
           return SampleScrollSection(
             itemCount: snapshot.connectionState != ConnectionState.done

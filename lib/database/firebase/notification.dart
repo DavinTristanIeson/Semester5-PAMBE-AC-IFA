@@ -92,12 +92,16 @@ class FirebaseNotificationManager
 
   @override
   Future<bool> hasUnread({required String userId}) async {
-    final countUnread = await getCollection(userId)
-        .where(NotificationFirestoreKeys.isRead.name, isEqualTo: false)
-        .limit(1)
-        .count()
-        .get();
-    return countUnread.count > 0;
+    try {
+      final countUnread = await getCollection(userId)
+          .where(NotificationFirestoreKeys.isRead.name, isEqualTo: false)
+          .limit(1)
+          .count()
+          .get();
+      return countUnread.count > 0;
+    } catch (e) {
+      throw ApiError(ApiErrorType.fetchFailure, inner: e);
+    }
   }
 
   @override
@@ -112,6 +116,9 @@ class FirebaseNotificationManager
       });
     }
     await batch.commit();
+    for (final doc in result.docs) {
+      cache.put(doc.id, _transform(doc.data() as Map<String, dynamic>, doc));
+    }
   }
 
   @override
@@ -123,6 +130,8 @@ class FirebaseNotificationManager
     }
     try {
       await batch.commit();
+      queryCache.clear();
+      cache.clear();
     } catch (e) {
       throw ApiError(ApiErrorType.deleteFailure, inner: e);
     }
@@ -139,6 +148,7 @@ class FirebaseNotificationManager
             DateTime.now().millisecondsSinceEpoch,
         NotificationFirestoreKeys.isRead.name: false,
       });
+      queryCache.clear();
     } catch (e) {
       throw ApiError(ApiErrorType.storeFailure, inner: e);
     }

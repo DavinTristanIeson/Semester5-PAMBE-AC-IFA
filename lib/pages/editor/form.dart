@@ -4,7 +4,8 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
-import 'package:pambe_ac_ifa/components/function/future_caller.dart';
+import 'package:pambe_ac_ifa/components/display/future.dart';
+import 'package:pambe_ac_ifa/components/function/future.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
@@ -107,7 +108,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
     }
   }
 
-  void publish() async {
+  Future<void> publish() async {
     final messenger = AcSnackbarMessenger.of(context);
 
     if (form.invalid || form.dirty || widget.recipe == null) {
@@ -116,7 +117,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
       return;
     }
 
-    showDialog(
+    await showDialog(
         context: context,
         builder: (context) {
           return SimpleConfirmationDialog(
@@ -146,10 +147,10 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
         });
   }
 
-  void unpublish() {
-    if (widget.recipe == null) return;
+  Future<void> unpublish() async {
+    if (widget.recipe == null) return Future.value();
     final messenger = AcSnackbarMessenger.of(context);
-    showDialog(
+    await showDialog(
         context: context,
         builder: (context) {
           return SimpleConfirmationDialog.delete(
@@ -175,7 +176,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
         });
   }
 
-  void delete() async {
+  Future<void> delete() async {
     if (widget.recipe == null) return;
     bool close = false;
     final navigator = Navigator.of(context);
@@ -220,37 +221,37 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
               : [
                   Tooltip(
                     message: "Publish Recipe",
-                    child: IconButton(
+                    child: FutureIconButton(
                         onPressed: publish,
-                        color: Theme.of(context).colorScheme.tertiary,
-                        icon: const Icon(Icons.upload)),
+                        icon: Icon(Icons.upload,
+                            color: Theme.of(context).colorScheme.tertiary)),
                   ),
                   if (widget.recipe!.remoteId != null)
                     Tooltip(
                       message: "Make Recipe Private",
-                      child: IconButton(
+                      child: FutureIconButton(
                         onPressed: unpublish,
-                        color: context.colors.error,
-                        icon: const Icon(Icons.file_upload_off),
+                        icon: Icon(Icons.file_upload_off,
+                            color: context.colors.error),
                       ),
                     ),
                   Tooltip(
                     message: "Delete Recipe",
-                    child: IconButton(
+                    child: FutureIconButton(
                         onPressed: delete,
-                        color: context.colors.error,
-                        icon: const Icon(Icons.delete)),
+                        icon: Icon(Icons.delete, color: context.colors.error)),
                   )
                 ],
         ),
         floatingActionButton: Tooltip(
           message: "Save",
-          child: FutureProcedureCaller(
-              process: save,
-              builder: (context, snapshot, call) {
+          child: FutureButtonCompute(
+              onPressed: save,
+              icon: const Icon(Icons.save),
+              builder: (context, remote) {
                 return FloatingActionButton(
-                  onPressed: call,
-                  child: const Icon(Icons.save),
+                  onPressed: remote.call,
+                  child: remote.icon,
                 );
               }),
         ),

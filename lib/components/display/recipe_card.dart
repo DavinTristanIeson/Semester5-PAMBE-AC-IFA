@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
-import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/recipe/main.dart';
-import 'package:provider/provider.dart';
 
 class ByUserText extends StatelessWidget {
   final UserModel? user;
@@ -57,17 +55,9 @@ class RecipeCard extends StatelessWidget {
           side: BorderSide(color: context.colors.secondary));
 
   Widget buildButtons(BuildContext context) {
-    final isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        if (secondaryAction == null && isLoggedIn)
-          OutlinedButton.icon(
-              onPressed: () {
-                // TODO: Bookmark
-              },
-              icon: const Icon(Icons.bookmark),
-              label: const Text("Bookmark")),
         if (secondaryAction != null) secondaryAction!,
         const SizedBox(
           width: AcSizes.sm,
