@@ -26,7 +26,8 @@ enum RecipeFirestoreKeys {
   userId,
   createdAt,
   imagePath,
-  ratings,
+  totalRating,
+  reviewCount,
   steps,
   description;
 
@@ -43,7 +44,7 @@ class FirebaseRecipeManager
   INetworkImageResourceManager imageManager;
   RemoteRecipeImageManager recipeImageHelper;
   IBookmarkResourceManager bookmarkManager;
-  CacheClient<RecipeModel> cache;
+  CacheClient<RecipeModel?> cache;
   CacheClient<PaginatedQueryResult<RecipeLiteModel>> queryCache;
   FirebaseRecipeManager(
       {required this.userManager,
@@ -95,24 +96,31 @@ class FirebaseRecipeManager
     });
   }
 
+  Future<RecipeLiteModel> _transformLite(
+      Map<String, Object?> json, DocumentSnapshot<Object?> snapshot) async {
+    final imagePath = json[RecipeFirestoreKeys.imagePath.name] as String?;
+    return RecipeLiteModel.fromJson({
+      ...json,
+      "id": snapshot.id,
+      "user": await userManager
+          .get(json[RecipeFirestoreKeys.userId.name] as String),
+      "imagePath":
+          imagePath == null ? null : await imageManager.urlof(imagePath),
+      "imageStoragePath": imagePath,
+    });
+  }
+
   @override
   Future<RecipeModel?> get(String id) async {
     if (cache.has(id)) {
       return Future.value(cache.get(id));
     }
-    try {
-      final (:data, snapshot: _) = await processDocumentSnapshot(
-          () => db.collection(collectionPath).doc(id).get(),
-          transform: _transform);
-      cache.put(id, data);
-      return data;
-    } on ApiError catch (e) {
-      if (e.type == ApiErrorType.resourceNotFound) {
-        return null;
-      } else {
-        rethrow;
-      }
-    }
+
+    final (:data, snapshot: _) = await processDocumentSnapshot(
+        () => db.collection(collectionPath).doc(id).get(),
+        transform: _transform);
+    cache.put(id, data);
+    return data;
   }
 
   Query<Map<String, dynamic>> _setQueryParams(
@@ -127,7 +135,7 @@ class FirebaseRecipeManager
     }
     if (sort != null) {
       key = switch (sort.factor) {
-        RecipeSortBy.ratings => RecipeFirestoreKeys.ratings,
+        RecipeSortBy.ratings => RecipeFirestoreKeys.totalRating,
         _ => RecipeFirestoreKeys.createdAt,
       };
       query = query.orderBy(key.name);
@@ -194,8 +202,8 @@ class FirebaseRecipeManager
       }
     }
 
-    final (:data, :snapshot) =
-        await processQuerySnapshot(() => query.get(), transform: _transform);
+    final (:data, :snapshot) = await processQuerySnapshot(() => query.get(),
+        transform: _transformLite);
     final result = (data: data, nextPage: snapshot.docs.lastOrNull);
 
     queryCache.put(queryKey, result);

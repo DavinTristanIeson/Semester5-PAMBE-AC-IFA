@@ -20,7 +20,7 @@ class FirebaseNotificationManager
     with FirebaseResourceManagerMixin
     implements INotificationResourceManager {
   FirebaseFirestore db;
-  CacheClient<NotificationModel> cache;
+  CacheClient<NotificationModel?> cache;
   CacheClient<PaginatedQueryResult<NotificationModel>> queryCache;
   FirebaseNotificationManager()
       : cache = CacheClient(
@@ -40,7 +40,7 @@ class FirebaseNotificationManager
     return NotificationModel.fromJson({...json, "id": snapshot.id});
   }
 
-  Future<NotificationModel> get(
+  Future<NotificationModel?> get(
       {required String userId, required String id}) async {
     if (cache.has(id)) {
       return Future.value(cache.get(id));

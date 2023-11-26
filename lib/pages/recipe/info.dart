@@ -119,34 +119,62 @@ class RecipeInfoScreen extends StatelessWidget {
   }
 
   Widget buildSeeReviewsButton(BuildContext context, String recipeId) {
-    final uid = context.watch<AuthProvider>().user?.uid;
-    return TextButton(
-      onPressed: () {
-        context.navigator.push(MaterialPageRoute(
-            builder: (context) => ReviewsScreen(
-                  recipeId: recipeId,
-                  permission: recipe is RecipeLiteModel &&
-                          (recipe as RecipeLiteModel).user?.id == uid
-                      ? ReviewPermission.deny
-                      : ReviewPermission.permit,
-                )));
-      },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // To make sure the text is centered
-          const SizedBox(width: AcSizes.lg + AcSizes.sm),
-          Text(
-            "SEE WHAT OTHERS THINK",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.w500,
+    final auth = context.watch<AuthProvider>();
+    final recipe = this.recipe as RecipeLiteModel;
+    return Column(
+      children: [
+        if (recipe.rating > 0.0)
+          Padding(
+            padding: const EdgeInsets.only(top: AcSizes.lg),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  recipe.rating.toString(),
+                  style: TextStyle(
+                    color: context.colors.primary,
+                    fontWeight: FontWeight.w500,
+                    fontSize: AcSizes.fontLarge,
+                  ),
+                ),
+                const SizedBox(width: AcSizes.sm),
+                Icon(
+                  Icons.star,
+                  color: context.colors.primary,
+                ),
+              ],
+              // To make sure the text is centered
             ),
           ),
-          Icon(Icons.arrow_right_alt,
-              color: Theme.of(context).colorScheme.primary),
-        ],
-      ),
+        TextButton(
+          onPressed: () {
+            context.navigator.push(MaterialPageRoute(
+                builder: (context) => ReviewsScreen(
+                      recipeId: recipeId,
+                      permission: auth.isGuest ||
+                              (recipe.user != null &&
+                                  recipe.user!.id == auth.user!.uid)
+                          ? ReviewPermission.deny
+                          : ReviewPermission.permit,
+                    )));
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(width: AcSizes.lg + AcSizes.sm),
+              Text(
+                "SEE WHAT OTHERS THINK",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Icon(Icons.arrow_right_alt,
+                  color: Theme.of(context).colorScheme.primary),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -208,7 +236,6 @@ class RecipeInfoScreen extends StatelessWidget {
             ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 160.0),
                 child: buildReviewList()),
-          const SizedBox(height: AcSizes.md),
           if (recipeId != null) buildSeeReviewsButton(context, recipeId),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: AcSizes.lg),

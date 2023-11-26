@@ -6,7 +6,6 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 /// Default confirmation dialog. Used with showDialog
 class SimpleConfirmationDialog extends StatelessWidget {
@@ -161,15 +160,8 @@ class ImagePickMethodDialog extends StatelessWidget {
           child: const Text('Camera'),
           onPressed: () async {
             final navigator = Navigator.of(context);
-            final permissionResponse = await Permission.camera.request();
-            if (permissionResponse.isPermanentlyDenied) {
-              final open = await openAppSettings();
-              if (!open) return;
-            }
-            if (permissionResponse.isGranted) {
-              onPickSource(ImageSource.camera);
-              navigator.pop();
-            }
+            onPickSource(ImageSource.camera);
+            navigator.pop();
           },
         ),
         TextButton(

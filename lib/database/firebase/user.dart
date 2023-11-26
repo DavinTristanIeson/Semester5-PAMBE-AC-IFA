@@ -26,7 +26,7 @@ class FirebaseUserManager
   static const String collectionPath = "users";
   FirebaseFirestore db;
   INetworkImageResourceManager imageManager;
-  CacheClient<UserModel> cache;
+  CacheClient<UserModel?> cache;
   FirebaseUserManager({required this.imageManager})
       : cache = CacheClient(
             staleTime: const Duration(minutes: 7),
@@ -38,28 +38,20 @@ class FirebaseUserManager
     if (cache.has(id)) {
       return cache.get(id);
     }
-    try {
-      final (:data, snapshot: _) = await processDocumentSnapshot(
-          () => db.collection(collectionPath).doc(id).get(),
-          transform: (json, snapshot) async {
-        return Future.value(UserModel.fromJson({
-          ...json,
-          "id": snapshot.id,
-          "imagePath": json[UserFirestoreKeys.imagePath.name] is String
-              ? await imageManager.urlof(json[UserFirestoreKeys.imagePath.name])
-              : null,
-          "imageStoragePath": json[UserFirestoreKeys.imagePath.name],
-        }));
-      });
-      cache.put(data.id, data);
-      return data;
-    } on ApiError catch (e) {
-      if (e.type == ApiErrorType.resourceNotFound) {
-        return null;
-      } else {
-        rethrow;
-      }
-    }
+    final (:data, snapshot: _) = await processDocumentSnapshot(
+        () => db.collection(collectionPath).doc(id).get(),
+        transform: (json, snapshot) async {
+      return Future.value(UserModel.fromJson({
+        ...json,
+        "id": snapshot.id,
+        "imagePath": json[UserFirestoreKeys.imagePath.name] is String
+            ? await imageManager.urlof(json[UserFirestoreKeys.imagePath.name])
+            : null,
+        "imageStoragePath": json[UserFirestoreKeys.imagePath.name],
+      }));
+    });
+    cache.put(id, data);
+    return data;
   }
 
   @override

@@ -41,5 +41,6 @@ Map<String, dynamic> _$NotificationPayloadToJson(
       'content': instance.content,
       'reviewId': instance.reviewId,
       'recipeId': instance.recipeId,
+      'rating': instance.rating,
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
     };

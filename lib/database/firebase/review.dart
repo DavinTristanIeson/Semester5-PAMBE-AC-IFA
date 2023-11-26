@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
+import 'package:pambe_ac_ifa/database/firebase/recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/common.dart';
 import 'package:pambe_ac_ifa/database/interfaces/review.dart';
@@ -20,9 +23,11 @@ class FirebaseReviewManager
     implements IReviewResourceManager {
   FirebaseFirestore db;
   IUserResourceManager userManager;
-  CacheClient<ReviewModel> cache;
+  FirebaseRecipeManager recipeManager;
+  CacheClient<ReviewModel?> cache;
   CacheClient<PaginatedQueryResult<ReviewModel>> queryCache;
-  FirebaseReviewManager({required this.userManager})
+  FirebaseReviewManager(
+      {required this.userManager, required this.recipeManager})
       : db = FirebaseFirestore.instance,
         cache = CacheClient(
             staleTime: const Duration(minutes: 5),
@@ -109,9 +114,13 @@ class FirebaseReviewManager
       ReviewFirestoreKeys.rating.name: rating,
       ReviewFirestoreKeys.createdAt.name: DateTime.now().millisecondsSinceEpoch
     };
+    final review = reviewId != null
+        ? await get(recipeId: recipeId, reviewId: reviewId)
+        : null;
 
     String id;
     try {
+      recipeManager.cache.markStale(key: recipeId);
       if (reviewId != null) {
         await getCollection(recipeId).doc(reviewId).set(json);
         id = reviewId;
@@ -124,6 +133,31 @@ class FirebaseReviewManager
     } catch (e) {
       throw ApiError(ApiErrorType.storeFailure, inner: e);
     }
+
+    // Always get up to date information
+    recipeManager.cache.markStale(key: recipeId);
+    final recipe = await recipeManager.get(recipeId);
+    try {
+      // Tidak bisa buat ini jadi sebuah transaction karena Transaction tidak support .add.
+      // Artinya kalau ini gagal karena alasan apapun, datanya jadi tidak sinkron.
+      // dATaBAse
+      // Kita pun tidak bisa pakai aggregation query karena cloud_firestore belum support .sum() dan .avg(), hanya .count() saja, padahal versi
+      // Node.js sudah bisa.
+
+      // Ga tahu deh, ga suka pakai firebase aku.
+      await db
+          .collection(FirebaseRecipeManager.collectionPath)
+          .doc(recipeId)
+          .update({
+        RecipeFirestoreKeys.totalRating.name:
+            (recipe?.totalRating ?? 0) - (review?.rating ?? 0) + rating,
+        RecipeFirestoreKeys.reviewCount.name:
+            (recipe?.reviewCount ?? 0) + (review == null ? 1 : 0),
+      });
+    } catch (e) {
+      throw ApiError(ApiErrorType.storeFailure, inner: e);
+    }
+    recipeManager.cache.markStale(key: recipeId);
 
     return get(reviewId: id, recipeId: recipeId).cast<ReviewModel>();
   }
@@ -142,5 +176,23 @@ class FirebaseReviewManager
     } catch (e) {
       throw ApiError(ApiErrorType.deleteFailure, inner: e);
     }
+
+    // Always get up to date information
+    recipeManager.cache.markStale(key: recipeId);
+    final recipe = await recipeManager.get(recipeId);
+    try {
+      await db
+          .collection(FirebaseRecipeManager.collectionPath)
+          .doc(recipeId)
+          .update({
+        RecipeFirestoreKeys.totalRating.name:
+            max(0, (recipe?.totalRating ?? 0) - prev.rating),
+        RecipeFirestoreKeys.reviewCount.name:
+            max(0, (recipe?.reviewCount ?? 0) - 1),
+      });
+    } catch (e) {
+      throw ApiError(ApiErrorType.deleteFailure, inner: e);
+    }
+    recipeManager.cache.markStale(key: recipeId);
   }
 }

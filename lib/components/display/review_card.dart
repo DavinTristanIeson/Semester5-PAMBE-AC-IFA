@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
@@ -78,8 +77,8 @@ class ReviewCard extends StatelessWidget {
             color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(AcSizes.br),
             boxShadow: const [AcDecoration.shadowSmall]),
-        constraints: BoxConstraints.tight(Size.fromWidth(
-            clampDouble(MediaQuery.of(context).size.width / 3, 300.0, 500.0))),
+        constraints: BoxConstraints.tight(
+            Size.fromWidth(context.relativeWidth(0.333, 300.0, 500.0))),
         padding: const EdgeInsets.all(AcSizes.md),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

@@ -5,6 +5,7 @@ import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/controllers/review.dart';
@@ -54,10 +55,11 @@ class RecipeScreen extends StatelessWidget {
         reviews: await reviewsFuture,
       );
     });
+    final authProvider = context.read<AuthProvider>();
     return Scaffold(
       appBar: OnlyReturnAppBar(
         actions: [
-          if (source.remoteId != null)
+          if (source.remoteId != null && authProvider.isLoggedIn)
             _RecipeBookmarkButton(recipeId: source.remoteId!),
         ],
       ),

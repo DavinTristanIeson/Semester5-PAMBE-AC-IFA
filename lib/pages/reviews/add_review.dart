@@ -83,7 +83,7 @@ class _AddReviewSectionState extends State<AddReviewSection> {
           targetUserId: widget.recipe.user!.id,
           notification: NotificationPayload.review(
               title:
-                  "${review.user ?? 'A user'} reviewed your recipe, ${widget.recipe.title}",
+                  "${review.user?.name ?? 'A user'} reviewed your recipe, ${widget.recipe.title}",
               reviewId: review.id,
               recipeId: widget.recipe.id,
               content: review.content,

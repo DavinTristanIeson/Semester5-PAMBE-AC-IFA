@@ -84,7 +84,14 @@ class RecipeLiteModel extends AbstractRecipeLiteModel {
   @JsonKey(includeToJson: false)
   ExternalImageSource get imageSource => ExternalImageSource.network;
 
-  double? rating;
+  double? totalRating;
+  int? reviewCount;
+  double get rating {
+    if (totalRating == null || reviewCount == null || reviewCount == 0.0) {
+      return 0.0;
+    }
+    return totalRating! / reviewCount!;
+  }
 
   RecipeLiteModel({
     required this.id,
@@ -94,7 +101,8 @@ class RecipeLiteModel extends AbstractRecipeLiteModel {
     required super.createdAt,
     super.imagePath,
     this.imageStoragePath,
-    this.rating,
+    this.totalRating,
+    this.reviewCount,
   });
 
   factory RecipeLiteModel.fromJson(Map<String, dynamic> json) {

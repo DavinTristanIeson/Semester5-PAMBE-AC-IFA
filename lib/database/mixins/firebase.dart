@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 
 mixin FirebaseResourceManagerMixin {
-  Future<({T data, DocumentSnapshot snapshot})> processDocumentSnapshot<T>(
+  Future<({T? data, DocumentSnapshot snapshot})> processDocumentSnapshot<T>(
     Future<DocumentSnapshot> Function() query, {
     required FutureOr<T> Function(
             Map<String, dynamic> data, DocumentSnapshot snapshot)
@@ -17,7 +17,7 @@ mixin FirebaseResourceManagerMixin {
       throw ApiError(ApiErrorType.fromServer, inner: e);
     }
     if (!snapshot.exists) {
-      throw ApiError(ApiErrorType.resourceNotFound);
+      return (data: null, snapshot: snapshot);
     }
     try {
       return (

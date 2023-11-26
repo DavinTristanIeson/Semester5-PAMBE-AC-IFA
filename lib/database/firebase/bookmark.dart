@@ -13,7 +13,7 @@ enum BookmarkFirestoreKeys {
 class FirebaseBookmarkManager extends IBookmarkResourceManager
     with FirebaseResourceManagerMixin {
   FirebaseFirestore db;
-  CacheClient<RecipeBookmarkModel> cache;
+  CacheClient<RecipeBookmarkModel?> cache;
   CacheClient<PaginatedQueryResult<RecipeBookmarkModel>> queryCache;
   FirebaseBookmarkManager()
       : db = FirebaseFirestore.instance,
@@ -57,20 +57,12 @@ class FirebaseBookmarkManager extends IBookmarkResourceManager
     if (cache.has(key)) {
       return Future.value(cache.get(key));
     }
-    try {
-      final (data: bookmark, snapshot: _) = await processDocumentSnapshot(
-          () => getCollection(userId: userId).doc(recipeId).get(),
-          transform: (data, snapshot) =>
-              _transform(data, snapshot, userId: userId));
-      cache.put(key, bookmark);
-      return bookmark;
-    } on ApiError catch (e) {
-      if (e.type == ApiErrorType.resourceNotFound) {
-        return null;
-      } else {
-        rethrow;
-      }
-    }
+    final (data: bookmark, snapshot: _) = await processDocumentSnapshot(
+        () => getCollection(userId: userId).doc(recipeId).get(),
+        transform: (data, snapshot) =>
+            _transform(data, snapshot, userId: userId));
+    cache.put(key, bookmark);
+    return bookmark;
   }
 
   @override
