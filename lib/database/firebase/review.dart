@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:pambe_ac_ifa/common/json.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/common.dart';
 import 'package:pambe_ac_ifa/database/interfaces/review.dart';
+import 'package:pambe_ac_ifa/database/interfaces/user.dart';
 import 'package:pambe_ac_ifa/database/mixins/firebase.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
 
@@ -16,47 +18,80 @@ enum ReviewFirestoreKeys {
 class FirebaseReviewManager
     with FirebaseResourceManagerMixin
     implements IReviewResourceManager {
-  static const String collectionPath = "recipes";
   FirebaseFirestore db;
-  FirebaseReviewManager(this.db);
+  IUserResourceManager userManager;
+  CacheClient<ReviewModel> cache;
+  CacheClient<PaginatedQueryResult<ReviewModel>> queryCache;
+  FirebaseReviewManager({required this.userManager})
+      : db = FirebaseFirestore.instance,
+        cache = CacheClient(
+            staleTime: const Duration(minutes: 5),
+            cleanupInterval: const Duration(minutes: 3)),
+        queryCache = CacheClient(
+          staleTime: const Duration(minutes: 2),
+          cleanupInterval: const Duration(minutes: 1, seconds: 30),
+        );
 
   CollectionReference getCollection(String recipeId) {
-    return db.collection(collectionPath).doc(recipeId).collection("reviews");
+    return db.collection("recipes").doc(recipeId).collection("reviews");
   }
 
-  String keyOfRecipeQuery({
+  String getQueryKey({
+    required String recipeId,
     QueryDocumentSnapshot? page,
     int? limit,
-    String? search,
   }) {
-    return "limit=$limit;${page?.id ?? ''}";
+    return "$recipeId;limit=$limit;page=${page?.id}";
   }
 
-  ReviewModel _transform(
-      Map<String, dynamic> json, DocumentSnapshot<Object?> snapshot) {
-    return ReviewModel.fromJson({...json, "id": snapshot.id});
+  String getKey({
+    required String recipeId,
+    required String reviewId,
+  }) {
+    return "$recipeId;$reviewId";
+  }
+
+  Future<ReviewModel> _transform(
+      Map<String, dynamic> json, DocumentSnapshot<Object?> snapshot) async {
+    return ReviewModel.fromJson({
+      ...json,
+      "id": snapshot.id,
+      "user": await userManager.get(json[ReviewFirestoreKeys.userId.name])
+    });
   }
 
   @override
   Future<ReviewModel?> get(
       {required String reviewId, required String recipeId}) async {
+    final key = getKey(recipeId: recipeId, reviewId: reviewId);
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
     final (:data, snapshot: _) = await processDocumentSnapshot(
         () => getCollection(recipeId).doc(reviewId).get(),
         transform: _transform);
+    cache.put(key, data);
     return data;
   }
 
   @override
   Future<PaginatedQueryResult<ReviewModel>> getAll(
       {dynamic page, required String recipeId, int? limit}) async {
-    var query = db.collection(collectionPath).limit(limit ?? 15);
+    final key = getQueryKey(recipeId: recipeId);
+    if (queryCache.has(key)) {
+      return Future.value(queryCache.get(key));
+    }
+
+    var query = getCollection(recipeId).limit(limit ?? 15);
     if (page != null) {
-      query = query.startAfter([page.id]);
+      query = query.startAfter([(page as QueryDocumentSnapshot).id]);
     }
 
     final (:data, :snapshot) =
         await processQuerySnapshot(() => query.get(), transform: _transform);
     final result = (data: data, nextPage: snapshot.docs.lastOrNull);
+
+    queryCache.put(key, result);
 
     return result;
   }
@@ -69,37 +104,28 @@ class FirebaseReviewManager
       required int rating,
       String? content}) async {
     final json = <String, dynamic>{
-      'userId': userId,
-      'content': content,
-      'rating': rating,
+      ReviewFirestoreKeys.userId.name: userId,
+      ReviewFirestoreKeys.content.name: content,
+      ReviewFirestoreKeys.rating.name: rating,
+      ReviewFirestoreKeys.createdAt.name: DateTime.now().millisecondsSinceEpoch
     };
-    if (reviewId != null) {
-      json['createdAt'] = DateTime.now().millisecondsSinceEpoch;
-    }
 
     String id;
     try {
       if (reviewId != null) {
-        await db
-            .collection(collectionPath)
-            .doc(recipeId)
-            .collection("reviews")
-            .doc(reviewId)
-            .set(json);
+        await getCollection(recipeId).doc(reviewId).set(json);
         id = reviewId;
       } else {
-        final docRef = await db
-            .collection(collectionPath)
-            .doc(recipeId)
-            .collection("reviews")
-            .add(json);
+        final docRef = await getCollection(recipeId).add(json);
         id = docRef.id;
       }
+      cache.markStale(key: getKey(recipeId: recipeId, reviewId: id));
+      queryCache.markStale(prefix: recipeId);
     } catch (e) {
       throw ApiError(ApiErrorType.storeFailure, inner: e);
     }
 
-    return (await get(reviewId: id, recipeId: recipeId))!;
+    return get(reviewId: id, recipeId: recipeId).cast<ReviewModel>();
   }
 
   @override
@@ -110,15 +136,11 @@ class FirebaseReviewManager
       return;
     }
     try {
-      await db
-          .collection(collectionPath)
-          .doc(recipeId)
-          .collection("reviews")
-          .doc(reviewId)
-          .delete();
+      await getCollection(reviewId).doc(reviewId).delete();
+      cache.markStale(key: getKey(recipeId: recipeId, reviewId: reviewId));
+      queryCache.markStale(prefix: recipeId);
     } catch (e) {
       throw ApiError(ApiErrorType.deleteFailure, inner: e);
     }
-    throw UnimplementedError();
   }
 }

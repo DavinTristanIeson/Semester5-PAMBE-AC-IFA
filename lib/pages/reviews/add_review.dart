@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/components/field/text_input.dart';
+import 'package:pambe_ac_ifa/controllers/notification.dart';
 import 'package:pambe_ac_ifa/controllers/review.dart';
+import 'package:pambe_ac_ifa/models/notification.dart';
+import 'package:pambe_ac_ifa/models/recipe.dart';
+import 'package:pambe_ac_ifa/models/review.dart';
 import 'package:pambe_ac_ifa/pages/reviews/components/stars_input.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -15,8 +20,10 @@ enum _AddReviewFormKeys {
 }
 
 class AddReviewSection extends StatefulWidget {
-  final String recipeId;
-  const AddReviewSection({super.key, required this.recipeId});
+  final RecipeLiteModel recipe;
+  final void Function() onReviewed;
+  const AddReviewSection(
+      {super.key, required this.recipe, required this.onReviewed});
 
   @override
   State<AddReviewSection> createState() => _AddReviewSectionState();
@@ -53,18 +60,47 @@ class _AddReviewSectionState extends State<AddReviewSection> {
       return;
     }
     final reviewController = context.read<ReviewController>();
+    final notificationController = context.read<NotificationController>();
     final value = form.value;
-    await reviewController.put(
-        recipeId: widget.recipeId,
-        rating: value[_AddReviewFormKeys.rating.name] as int,
-        content: value[_AddReviewFormKeys.content.name] as String?);
+    ReviewModel review;
+    try {
+      review = await reviewController.put(
+          recipeId: widget.recipe.id,
+          rating: value[_AddReviewFormKeys.rating.name] as int,
+          content: value[_AddReviewFormKeys.content.name] as String?);
+      messenger.sendSuccess("Your review was successfully posted!");
+      form.reset();
+    } catch (e) {
+      messenger.sendError(e);
+      return;
+    }
+    if (widget.recipe.user == null) {
+      widget.onReviewed();
+      return;
+    }
+    try {
+      await notificationController.notify(
+          targetUserId: widget.recipe.user!.id,
+          notification: NotificationPayload.review(
+              title:
+                  "${review.user ?? 'A user'} reviewed your recipe, ${widget.recipe.title}",
+              reviewId: review.id,
+              recipeId: widget.recipe.id,
+              content: review.content,
+              rating: review.rating));
+      widget.onReviewed();
+    } catch (e) {
+      messenger.sendError(e);
+      return;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return ReactiveForm(
       formGroup: form,
-      child: Padding(
+      child: Container(
+        decoration: BoxDecoration(color: context.colors.background),
         padding: const EdgeInsets.symmetric(horizontal: AcSizes.space),
         child: Column(
           children: [

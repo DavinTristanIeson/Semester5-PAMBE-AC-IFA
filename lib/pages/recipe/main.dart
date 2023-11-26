@@ -41,8 +41,7 @@ class RecipeScreen extends StatelessWidget {
       return null;
     }
     return reviewController.getAll(
-        searchState:
-            ReviewSearchState(filter: ReviewFilterBy.recipe(source.remoteId)));
+        searchState: ReviewSearchState(recipeId: source.remoteId!, limit: 5));
   }
 
   @override
@@ -67,6 +66,13 @@ class RecipeScreen extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Padding(
+                padding: const EdgeInsets.all(AcSizes.space),
+                child:
+                    ErrorView(error: Either.right(snapshot.error.toString())),
+              );
             }
             if (!snapshot.hasData || snapshot.data!.recipe == null) {
               return Padding(

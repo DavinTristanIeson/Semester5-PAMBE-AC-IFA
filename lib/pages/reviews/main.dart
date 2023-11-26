@@ -2,18 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
+import 'package:pambe_ac_ifa/components/display/notice.dart';
+import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/controllers/review.dart';
 import 'package:pambe_ac_ifa/database/interfaces/review.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
+import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/reviews/add_review.dart';
 import 'package:pambe_ac_ifa/pages/reviews/list.dart';
+import 'package:provider/provider.dart';
 
 enum ReviewPermission {
   permit,
   deny,
 }
 
-class ReviewsScreen extends StatefulWidget {
+class ReviewsScreen extends StatelessWidget {
   final String? reviewId;
   final String recipeId;
   final ReviewPermission permission;
@@ -24,58 +28,108 @@ class ReviewsScreen extends StatefulWidget {
       this.permission = ReviewPermission.permit});
 
   @override
-  State<ReviewsScreen> createState() => _ReviewsScreenState();
+  Widget build(BuildContext context) {
+    final recipeController = context.read<RecipeController>();
+    return Scaffold(
+        appBar: const OnlyReturnAppBar(),
+        body: FutureBuilder(
+            future: recipeController.get(recipeId),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              if (snapshot.hasError) {
+                return ErrorView(
+                    error: Either.right(snapshot.error.toString()));
+              }
+              if (!snapshot.hasData) {
+                return EmptyView(
+                  content:
+                      Either.right("Cannot find recipe with ID: $recipeId"),
+                );
+              }
+              return _ReviewsScreen(
+                permission: permission,
+                recipe: snapshot.data!,
+                reviewId: reviewId,
+              );
+            }));
+  }
 }
 
-class _ReviewsScreenState extends State<ReviewsScreen> {
+class _ReviewsScreen extends StatefulWidget {
+  final ReviewPermission permission;
+  final RecipeLiteModel recipe;
+  final String? reviewId;
+  const _ReviewsScreen(
+      {required this.permission, required this.recipe, this.reviewId});
+
+  @override
+  State<_ReviewsScreen> createState() => _ReviewsScreenState();
+}
+
+class _ReviewsScreenState extends State<_ReviewsScreen> {
   bool _showAll = false;
+  late ReviewSearchState searchState;
   @override
   void initState() {
     super.initState();
     _showAll = widget.reviewId == null;
+    searchState = _initializeSearchState();
   }
 
   bool get onlyShowOne {
     return !_showAll && widget.reviewId != null;
   }
 
+  ReviewSearchState _initializeSearchState() {
+    return ReviewSearchState(
+        recipeId: widget.recipe.id,
+        reviewId: widget.reviewId,
+        limit: onlyShowOne ? 1 : 15,
+        sort: SortBy.descending(ReviewSortBy.ratings));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: const OnlyReturnAppBar(),
-        body: CustomScrollView(
-          slivers: [
-            if (widget.permission == ReviewPermission.permit)
-              SliverAppBar.large(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                automaticallyImplyLeading: false,
-                expandedHeight: context.relativeHeight(0.5, 350, 450),
-                flexibleSpace: AddReviewSection(
-                  recipeId: widget.recipeId,
-                ),
-              ),
-            ReviewsList(
-              searchState: ReviewSearchState(
-                  filter: onlyShowOne
-                      ? ReviewFilterBy.review(widget.reviewId)
-                      : ReviewFilterBy.recipe(widget.recipeId),
-                  limit: onlyShowOne ? 1 : 15,
-                  sort: SortBy.descending(ReviewSortBy.ratings)),
+    return CustomScrollView(
+      slivers: [
+        if (widget.permission == ReviewPermission.permit)
+          SliverAppBar(
+            backgroundColor: context.colors.background,
+            automaticallyImplyLeading: false,
+            expandedHeight: context.relativeHeight(0.5, 350, 450),
+            flexibleSpace: AddReviewSection(
+              recipe: widget.recipe,
+              onReviewed: () {
+                setState(() {
+                  _showAll = true;
+                  searchState = _initializeSearchState();
+                });
+              },
             ),
-            if (onlyShowOne)
-              SliverToBoxAdapter(
-                  child: Padding(
-                padding: const EdgeInsets.only(bottom: AcSizes.space),
-                child: TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _showAll = true;
-                      });
-                    },
-                    child: const Text("Show Other Reviews")),
-              )),
-          ],
-        ));
+            toolbarHeight: 0.0,
+            floating: true,
+            collapsedHeight: 0.0,
+          ),
+        ReviewsList(
+          searchState: searchState,
+        ),
+        if (onlyShowOne)
+          SliverToBoxAdapter(
+              child: Padding(
+            padding: const EdgeInsets.only(bottom: AcSizes.space),
+            child: TextButton(
+                onPressed: () {
+                  setState(() {
+                    _showAll = true;
+                  });
+                },
+                child: const Text("Show Other Reviews")),
+          )),
+      ],
+    );
   }
 }

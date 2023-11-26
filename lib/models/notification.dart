@@ -58,6 +58,7 @@ class NotificationPayload {
   String? content;
   String? reviewId;
   String? recipeId;
+  int? rating;
 
   @JsonEpochConverter()
   DateTime createdAt;
@@ -71,6 +72,7 @@ class NotificationPayload {
       {required this.title,
       required this.reviewId,
       required this.recipeId,
+      required this.rating,
       this.content})
       : type = NotificationType.review,
         createdAt = DateTime.now();

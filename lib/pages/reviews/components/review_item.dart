@@ -17,6 +17,51 @@ class ReviewItem extends StatefulWidget {
 class _ReviewItemState extends State<ReviewItem> {
   bool isShown = false;
 
+  Widget buildUserAndRating(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: AcSizes.avatarRadius,
+              backgroundImage: widget.review.user == null
+                  ? MaybeImage.fallbackUserImage
+                  : widget.review.user!.image,
+            ),
+            const SizedBox(
+              width: AcSizes.space,
+            ),
+            Column(
+              children: [
+                Text(
+                  widget.review.user?.name ?? "Deleted User",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: AcSizes.fontEmphasis,
+                      fontStyle:
+                          widget.review.user == null ? FontStyle.italic : null),
+                ),
+                Text(widget.review.createdAt.toLocaleString(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w300,
+                      fontSize: AcSizes.fontSmall,
+                      fontStyle: FontStyle.italic,
+                    )),
+              ],
+            )
+          ],
+        ),
+        StarRating(
+          rating: widget.review.rating,
+          type: StarRatingType.wide,
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -26,22 +71,9 @@ class _ReviewItemState extends State<ReviewItem> {
             boxShadow: const [AcDecoration.shadowSmall]),
         padding: const EdgeInsets.all(AcSizes.md),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CircleAvatar(
-                  radius: AcSizes.avatarRadius,
-                  backgroundImage: widget.review.user == null
-                      ? MaybeImage.fallbackUserImage
-                      : widget.review.user!.image,
-                ),
-                StarRating(
-                  rating: widget.review.rating,
-                  type: StarRatingType.wide,
-                )
-              ],
-            ),
+            buildUserAndRating(context),
             if (widget.review.content != null)
               Padding(
                 padding: const EdgeInsets.only(

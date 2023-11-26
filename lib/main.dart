@@ -72,8 +72,8 @@ void main() async {
         update: AuthProvider.registerUidToProvider,
       ),
       ChangeNotifierProxyProvider<AuthProvider, ReviewController>(
-        create: (context) =>
-            ReviewController(reviewManager: FirebaseReviewManager()),
+        create: (context) => ReviewController(
+            reviewManager: FirebaseReviewManager(userManager: userManager)),
         update: AuthProvider.registerUidToProvider,
       )
     ],

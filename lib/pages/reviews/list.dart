@@ -5,7 +5,6 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/display/pagination.dart';
 import 'package:pambe_ac_ifa/controllers/review.dart';
 import 'package:pambe_ac_ifa/database/interfaces/common.dart';
-import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
 import 'package:pambe_ac_ifa/pages/reviews/components/review_item.dart';
 import 'package:provider/provider.dart';
@@ -51,11 +50,7 @@ class _ReviewsListState extends State<ReviewsList> {
   Future<PaginatedQueryResult<ReviewModel>> fetch(
       ReviewSearchState state, QueryDocumentSnapshot? pageKey) async {
     final controller = context.read<ReviewController>();
-    return controller.getAllWithPagination(
-        searchState: state,
-        page: pageKey == null
-            ? Either.left(pageKey)
-            : Either.right(widget.reviewId));
+    return controller.getAllWithPagination(searchState: state, page: pageKey);
   }
 
   @override

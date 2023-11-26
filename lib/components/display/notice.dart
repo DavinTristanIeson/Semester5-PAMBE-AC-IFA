@@ -67,26 +67,28 @@ class EmptyView extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.warning,
-                color: context.colors.tertiary,
-                size: AcSizes.iconBig * 2,
-              ),
-              const SizedBox(
-                height: AcSizes.lg,
-              ),
-              content.leftOr((left) => Text(
-                    left,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: context.colors.tertiary,
-                    ),
-                  )),
-            ],
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.warning,
+                  color: context.colors.tertiary,
+                  size: AcSizes.iconBig * 2,
+                ),
+                const SizedBox(
+                  height: AcSizes.lg,
+                ),
+                content.leftOr((left) => Text(
+                      left,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: context.colors.tertiary,
+                      ),
+                    )),
+              ],
+            ),
           ),
         ],
       ),

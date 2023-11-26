@@ -60,13 +60,18 @@ class _ErrorWrappingError implements Exception {
   Exception? _innerException;
   Error? _innerError;
   _ErrorWrappingError({Object? inner}) {
-    if (inner is Error) {
-      _innerError = inner;
-      debugPrint(
-          "API ERROR: ${_innerError.toString()}\n${_innerError!.stackTrace}");
-    } else if (inner is Exception) {
-      _innerException = inner;
-      debugPrint("API ERROR: ${_innerException.toString()}");
+    if (inner is ApiError) {
+      _innerError = inner._innerError;
+      _innerException = inner._innerException;
+    } else {
+      if (inner is Error) {
+        _innerError = inner;
+        debugPrint(
+            "API ERROR: ${_innerError.toString()}\n${_innerError!.stackTrace}");
+      } else if (inner is Exception) {
+        _innerException = inner;
+        debugPrint("API ERROR: ${_innerException.toString()}");
+      }
     }
   }
   String? get errorMessage =>

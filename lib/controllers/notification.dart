@@ -51,4 +51,15 @@ class NotificationController implements AuthDependent {
     }
     return notificationManager.clear(userId: userId!);
   }
+
+  Future<void> notify(
+      {required String targetUserId,
+      required NotificationPayload notification}) {
+    if (userId == null) {
+      throw InvalidStateError(
+          "NotificationController.userId should not be null when put is invoked!");
+    }
+    return notificationManager.notify(
+        targetUserId: targetUserId, notification: notification);
+  }
 }
