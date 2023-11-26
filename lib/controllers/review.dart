@@ -82,7 +82,7 @@ class ReviewController extends ChangeNotifier implements AuthDependent {
         recipeId: recipeId);
   }
 
-  Future<void> remove(String reviewId) {
-    return reviewManager.remove(reviewId);
+  Future<void> remove(String reviewId, String recipeId) {
+    return reviewManager.remove(reviewId: reviewId, recipeId: recipeId);
   }
 }

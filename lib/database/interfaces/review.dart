@@ -8,7 +8,7 @@ enum ReviewSortBy {
 
 abstract class IReviewResourceManager {
   Future<PaginatedQueryResult<ReviewModel>> getAll(
-      {dynamic page, String? recipeId, String? userId, int? limit});
+      {dynamic page, required String recipeId, int? limit});
   Future<ReviewModel?> get(
       {required String recipeId, required String reviewId});
   Future<ReviewModel> put({
@@ -18,5 +18,5 @@ abstract class IReviewResourceManager {
     String? reviewId,
     String? content,
   });
-  Future<void> remove(String reviewId);
+  Future<void> remove({required String reviewId, required String recipeId});
 }
