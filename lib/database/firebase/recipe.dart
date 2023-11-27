@@ -43,13 +43,15 @@ class FirebaseRecipeManager
   FirebaseUserManager userManager;
   INetworkImageResourceManager imageManager;
   RemoteRecipeImageManager recipeImageHelper;
-  IBookmarkResourceManager bookmarkManager;
+  IRecipeRelationshipResourceManager bookmarkManager;
+  IRecipeRelationshipResourceManager viewManager;
   CacheClient<RecipeModel?> cache;
   CacheClient<PaginatedQueryResult<RecipeLiteModel>> queryCache;
   FirebaseRecipeManager(
       {required this.userManager,
       required this.imageManager,
-      required this.bookmarkManager})
+      required this.bookmarkManager,
+      required this.viewManager})
       : db = FirebaseFirestore.instance,
         cache = CacheClient(),
         recipeImageHelper =
@@ -59,7 +61,7 @@ class FirebaseRecipeManager
           staleTime: const Duration(minutes: 1),
         );
 
-  String getQuerykey({
+  String getQueryKey({
     QueryDocumentSnapshot? page,
     int? limit,
     SortBy<RecipeSortBy>? sort,
@@ -138,7 +140,7 @@ class FirebaseRecipeManager
         RecipeSortBy.ratings => RecipeFirestoreKeys.totalRating,
         _ => RecipeFirestoreKeys.createdAt,
       };
-      query = query.orderBy(key.name);
+      query = query.orderBy(key.name, descending: sort.isDescending);
     }
     if (page != null) {
       final lastDoc = page.data() as Map<String, dynamic>?;
@@ -158,15 +160,6 @@ class FirebaseRecipeManager
     String? search,
     required String userId,
   }) async {
-    final queryKey = getQuerykey(
-        page: page,
-        limit: limit,
-        sort: sort,
-        filter: RecipeFilterBy.bookmarkedBy(userId),
-        search: search);
-    if (queryCache.has(queryKey)) {
-      return Future.value(queryCache.get(queryKey));
-    }
     final (data: bookmarks, :nextPage) =
         await bookmarkManager.getAll(userId: userId);
     final recipeFuture = FutureChunkDistributor(
@@ -174,7 +167,8 @@ class FirebaseRecipeManager
             chunkSize: 4)
         .wait();
     final recipes = (await recipeFuture).notNull<RecipeModel>().toList();
-    return (data: recipes, nextPage: nextPage);
+    final result = (data: recipes, nextPage: nextPage);
+    return result;
   }
 
   Future<PaginatedQueryResult<RecipeLiteModel>> getRegularRecipes({
@@ -184,7 +178,7 @@ class FirebaseRecipeManager
     RecipeFilterBy? filter,
     String? search,
   }) async {
-    final queryKey = getQuerykey(
+    final queryKey = getQueryKey(
         page: page, limit: limit, sort: sort, filter: filter, search: search);
     if (queryCache.has(queryKey)) {
       return Future.value(queryCache.get(queryKey));
@@ -208,6 +202,22 @@ class FirebaseRecipeManager
 
     queryCache.put(queryKey, result);
 
+    return result;
+  }
+
+  Future<PaginatedQueryResult<RecipeLiteModel>> getViewedRecipes({
+    QueryDocumentSnapshot? page,
+    int? limit,
+    SortBy<RecipeSortBy>? sort,
+    String? search,
+    required String userId,
+  }) async {
+    final (data: views, :nextPage) = await viewManager.getAll(userId: userId);
+    final recipeFuture =
+        FutureChunkDistributor(views.map((e) => get(e.recipeId)), chunkSize: 4)
+            .wait();
+    final recipes = (await recipeFuture).notNull<RecipeModel>().toList();
+    final result = (data: recipes, nextPage: nextPage);
     return result;
   }
 
@@ -236,13 +246,13 @@ class FirebaseRecipeManager
               search: search,
               userId: filter.userId!);
         case RecipeFilterByType.hasBeenViewedBy:
-          // TODO: Views
-          return getRegularRecipes(
-              page: page,
-              limit: limit,
-              sort: sort,
-              filter: filter,
-              search: search);
+          return getViewedRecipes(
+            userId: filter.userId!,
+            page: page,
+            limit: limit,
+            sort: sort,
+            search: search,
+          );
         case RecipeFilterByType.local:
           throw InvalidStateError(
               "Local recipes cannot be accessed via FirebaseRecipeManager");

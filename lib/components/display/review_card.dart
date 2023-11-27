@@ -60,6 +60,10 @@ class ReviewCard extends StatelessWidget {
     this.recipeName,
   });
 
+  static double getWidth(BuildContext context) {
+    return context.relativeWidth(0.333, 300.0, 500.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -77,8 +81,7 @@ class ReviewCard extends StatelessWidget {
             color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.all(AcSizes.br),
             boxShadow: const [AcDecoration.shadowSmall]),
-        constraints: BoxConstraints.tight(
-            Size.fromWidth(context.relativeWidth(0.333, 300.0, 500.0))),
+        constraints: BoxConstraints.tight(Size.fromWidth(getWidth(context))),
         padding: const EdgeInsets.all(AcSizes.md),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

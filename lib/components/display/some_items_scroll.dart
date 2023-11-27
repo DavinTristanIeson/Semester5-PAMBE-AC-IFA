@@ -54,12 +54,15 @@ class SampleScrollSection extends StatelessWidget {
                     fontSize: AcSizes.fontLarge,
                     fontWeight: FontWeight.bold,
                     color: context.colors.primary))),
-            if (viewMoreButton != null)
-              viewMoreButton!.leftOr((right) => IconButton(
-                    onPressed: right,
-                    icon: const Icon(Icons.arrow_right_alt),
-                    color: Theme.of(context).colorScheme.primary,
-                  ))
+            viewMoreButton != null
+                ? viewMoreButton!.leftOr((right) => IconButton(
+                      onPressed: right,
+                      icon: const Icon(Icons.arrow_right_alt),
+                      color: Theme.of(context).colorScheme.primary,
+                    ))
+                : const SizedBox(
+                    height: AcSizes.xl + AcSizes.lg,
+                  )
           ],
         ),
         ConstrainedBox(

@@ -22,7 +22,6 @@ class HomeRecentRecipesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<RecipeController>();
-    final userId = context.watch<AuthProvider>().user!.uid;
     return AsyncApiSampleScrollSection(
         future: controller.getRecentRecipes(),
         itemBuilder: (context, data) => RecipeCard(
@@ -30,13 +29,7 @@ class HomeRecentRecipesSection extends StatelessWidget {
               recipeSource: RecipeSource.remote(data.id),
             ),
         header: Either.right("Recents"),
-        viewMoreButton: Either.right(() {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => SearchScreen(
-                    sortBy: SortBy.descending(RecipeSortBy.lastViewed),
-                    filterBy: RecipeFilterBy.viewedBy(userId, viewed: true),
-                  )));
-        }),
+        viewMoreButton: null,
         itemConstraints:
             BoxConstraints.tight(RecipeCard.getDefaultImageSize(context)));
   }
@@ -60,9 +53,8 @@ class HomeTrendingRecipesSection extends StatelessWidget {
           context.navigator.push(MaterialPageRoute(
               builder: (context) => SearchScreen(
                     sortBy: SortBy.descending(RecipeSortBy.ratings),
-                    filterBy: userId == null
-                        ? null
-                        : RecipeFilterBy.viewedBy(userId, viewed: false),
+                    filterBy:
+                        userId == null ? null : RecipeFilterBy.viewedBy(userId),
                   )));
         }),
         itemConstraints:
@@ -95,17 +87,22 @@ class LatestReviewsSection extends StatelessWidget {
           .toList();
     });
     final constraints = BoxConstraints.tight(
-        Size.fromHeight(context.relativeHeight(1 / 5, 100.0, 140.0)));
+        Size.fromHeight(context.relativeHeight(1 / 5, 130.0, 170.0)));
     return AsyncApiSampleScrollSection(
       future: future,
       itemConstraints: constraints,
-      constraints: constraints.copyWith(maxWidth: context.screenWidth),
+      constraints: constraints.copyWith(
+          minWidth: context.screenWidth, maxWidth: context.screenWidth),
       header: Either.right("Latest Reviews"),
       viewMoreButton: null,
       itemBuilder: (context, item) {
-        return ReviewCard(
-          review: item.review,
-          recipeId: item.recipeId,
+        final width = ReviewCard.getWidth(context);
+        return ConstrainedBox(
+          constraints: constraints.copyWith(minWidth: width, maxWidth: width),
+          child: ReviewCard(
+            review: item.review,
+            recipeId: item.recipeId,
+          ),
         );
       },
     );

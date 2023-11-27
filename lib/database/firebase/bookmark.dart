@@ -6,16 +6,17 @@ import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
 import 'package:pambe_ac_ifa/database/mixins/firebase.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 
-enum BookmarkFirestoreKeys {
+enum RecipeRelationshipFirestoreKeys {
   createdAt,
 }
 
-class FirebaseBookmarkManager extends IBookmarkResourceManager
+abstract class FirebaseRecipeRelationshipManager
+    extends IRecipeRelationshipResourceManager
     with FirebaseResourceManagerMixin {
   FirebaseFirestore db;
-  CacheClient<RecipeBookmarkModel?> cache;
-  CacheClient<PaginatedQueryResult<RecipeBookmarkModel>> queryCache;
-  FirebaseBookmarkManager()
+  CacheClient<RecipeRelationshipModel?> cache;
+  CacheClient<PaginatedQueryResult<RecipeRelationshipModel>> queryCache;
+  FirebaseRecipeRelationshipManager()
       : db = FirebaseFirestore.instance,
         cache = CacheClient(
             cleanupInterval: const Duration(minutes: 10),
@@ -24,9 +25,7 @@ class FirebaseBookmarkManager extends IBookmarkResourceManager
             cleanupInterval: const Duration(minutes: 5),
             staleTime: const Duration(minutes: 8));
 
-  CollectionReference getCollection({required String userId}) {
-    return db.collection("users").doc(userId).collection("bookmarks");
-  }
+  CollectionReference getCollection({required String userId});
 
   String getKey({required String userId, required String recipeId}) {
     return "$userId;$recipeId";
@@ -40,10 +39,28 @@ class FirebaseBookmarkManager extends IBookmarkResourceManager
     return "$userId;limit=$limit;page=${page?.id}'";
   }
 
-  RecipeBookmarkModel _transform(
+  Query<Object?> getQuery({
+    required String userId,
+    int? limit,
+    dynamic page,
+  }) {
+    var query = getCollection(userId: userId).limit(limit ?? 15);
+    query = query.orderBy(RecipeRelationshipFirestoreKeys.createdAt.name,
+        descending: true);
+
+    final lastDoc = page as QueryDocumentSnapshot?;
+    if (lastDoc != null && lastDoc.exists) {
+      final json = (lastDoc.data()! as Map<String, dynamic>);
+      query = query
+          .startAfter([json[RecipeRelationshipFirestoreKeys.createdAt.name]]);
+    }
+    return query;
+  }
+
+  RecipeRelationshipModel _transform(
       Map<String, dynamic> data, DocumentSnapshot snapshot,
       {required String userId}) {
-    return RecipeBookmarkModel.fromJson({
+    return RecipeRelationshipModel.fromJson({
       ...data,
       "userId": userId,
       "recipeId": snapshot.id,
@@ -51,7 +68,7 @@ class FirebaseBookmarkManager extends IBookmarkResourceManager
   }
 
   @override
-  Future<RecipeBookmarkModel?> get(
+  Future<RecipeRelationshipModel?> get(
       {required String userId, required String recipeId}) async {
     final key = getKey(userId: userId, recipeId: recipeId);
     if (cache.has(key)) {
@@ -66,7 +83,7 @@ class FirebaseBookmarkManager extends IBookmarkResourceManager
   }
 
   @override
-  Future<PaginatedQueryResult<RecipeBookmarkModel>> getAll({
+  Future<PaginatedQueryResult<RecipeRelationshipModel>> getAll({
     required String userId,
     int? limit,
     dynamic page,
@@ -80,16 +97,7 @@ class FirebaseBookmarkManager extends IBookmarkResourceManager
       return Future.value(queryCache.get(key));
     }
 
-    final collection = getCollection(userId: userId);
-    var query = collection.limit(limit ?? 15);
-    query =
-        query.orderBy(BookmarkFirestoreKeys.createdAt.name, descending: true);
-
-    final lastDoc = page as QueryDocumentSnapshot?;
-    if (lastDoc != null && lastDoc.exists) {
-      final json = (lastDoc.data()! as Map<String, dynamic>);
-      query = query.startAfter([json[BookmarkFirestoreKeys.createdAt.name]]);
-    }
+    final query = getQuery(userId: userId, limit: limit, page: page);
 
     final (:data, :snapshot) = await processQuerySnapshot(() => query.get(),
         transform: (data, snapshot) =>
@@ -103,12 +111,12 @@ class FirebaseBookmarkManager extends IBookmarkResourceManager
   Future<void> set(
       {required String recipeId,
       required String userId,
-      required bool isBookmarked}) async {
+      required bool hasRelation}) async {
     try {
       final doc = getCollection(userId: userId).doc(recipeId);
-      if (isBookmarked) {
+      if (hasRelation) {
         await doc.set({
-          BookmarkFirestoreKeys.createdAt.name:
+          RecipeRelationshipFirestoreKeys.createdAt.name:
               DateTime.now().millisecondsSinceEpoch,
         });
       } else {
@@ -117,11 +125,37 @@ class FirebaseBookmarkManager extends IBookmarkResourceManager
       cache.markStale(key: getKey(userId: userId, recipeId: recipeId));
       queryCache.markStale(prefix: userId);
     } on FirebaseException catch (e) {
-      if (isBookmarked) {
+      if (hasRelation) {
         throw ApiError(ApiErrorType.storeFailure, inner: e);
       } else {
         throw ApiError(ApiErrorType.deleteFailure, inner: e);
       }
     }
+  }
+}
+
+class FirebaseRecipeBookmarkManager extends FirebaseRecipeRelationshipManager {
+  @override
+  CollectionReference<Object?> getCollection({required String userId}) {
+    return db.collection("users").doc(userId).collection("bookmarks");
+  }
+}
+
+class FirebaseRecipeViewManager extends FirebaseRecipeRelationshipManager {
+  @override
+  Query<Object?> getQuery({
+    required String userId,
+    int? limit,
+    dynamic page,
+  }) {
+    return super.getQuery(userId: userId, limit: limit, page: page).where(
+        RecipeRelationshipFirestoreKeys.createdAt.name,
+        isGreaterThan: DateTime.now().millisecondsSinceEpoch -
+            const Duration(days: 7).inMilliseconds);
+  }
+
+  @override
+  CollectionReference<Object?> getCollection({required String userId}) {
+    return db.collection("users").doc(userId).collection("views");
   }
 }

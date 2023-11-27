@@ -28,6 +28,7 @@ class RecipeScreen extends StatelessWidget {
       } else {
         final controller = context.read<RecipeController>();
         final result = await controller.get(source.remoteId!);
+        await controller.view(source.remoteId!);
         return result;
       }
     } catch (e) {

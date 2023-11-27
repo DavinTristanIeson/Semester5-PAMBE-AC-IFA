@@ -42,14 +42,13 @@ enum RecipeFilterByType {
 
 class RecipeFilterBy {
   String? userId;
-  bool? viewed;
   RecipeFilterByType type;
   RecipeFilterBy._(this.type);
   RecipeFilterBy.createdByUser(String userId)
       : type = RecipeFilterByType.createdByUser,
         // ignore: prefer_initializing_formals
         userId = userId;
-  RecipeFilterBy.viewedBy(String userId, {this.viewed = true})
+  RecipeFilterBy.viewedBy(String userId)
       : type = RecipeFilterByType.hasBeenViewedBy,
         // ignore: prefer_initializing_formals
         userId = userId;
@@ -61,25 +60,24 @@ class RecipeFilterBy {
   MapEntry<String, String?> get apiParams {
     return switch (type) {
       RecipeFilterByType.createdByUser => MapEntry(type.name, userId!),
-      RecipeFilterByType.hasBeenViewedBy =>
-        MapEntry(type.name, "${viewed! ? '' : '-'}$userId"),
+      RecipeFilterByType.hasBeenViewedBy => MapEntry(type.name, userId),
       RecipeFilterByType.hasBeenBookmarkedBy => MapEntry(type.name, userId!),
       RecipeFilterByType.local => MapEntry(type.name, null),
     };
   }
 }
 
-abstract class IBookmarkResourceManager {
-  Future<PaginatedQueryResult<RecipeBookmarkModel>> getAll({
+abstract class IRecipeRelationshipResourceManager {
+  Future<PaginatedQueryResult<RecipeRelationshipModel>> getAll({
     required String userId,
     int? limit,
     dynamic page,
   });
-  Future<RecipeBookmarkModel?> get(
+  Future<RecipeRelationshipModel?> get(
       {required String userId, required String recipeId});
   Future<void> set({
     required String recipeId,
     required String userId,
-    required bool isBookmarked,
+    required bool hasRelation,
   });
 }

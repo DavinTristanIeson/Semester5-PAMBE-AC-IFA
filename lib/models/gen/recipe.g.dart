@@ -101,15 +101,16 @@ Map<String, dynamic> _$RecipeModelToJson(RecipeModel instance) =>
       'steps': instance.steps.map((e) => e.toJson()).toList(),
     };
 
-RecipeBookmarkModel _$RecipeBookmarkModelFromJson(Map<String, dynamic> json) =>
-    RecipeBookmarkModel(
+RecipeRelationshipModel _$RecipeRelationshipModelFromJson(
+        Map<String, dynamic> json) =>
+    RecipeRelationshipModel(
       createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
       userId: json['userId'] as String,
       recipeId: json['recipeId'] as String,
     );
 
-Map<String, dynamic> _$RecipeBookmarkModelToJson(
-        RecipeBookmarkModel instance) =>
+Map<String, dynamic> _$RecipeRelationshipModelToJson(
+        RecipeRelationshipModel instance) =>
     <String, dynamic>{
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'userId': instance.userId,

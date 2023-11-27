@@ -45,6 +45,7 @@ class AsyncApiSampleScrollSection<T> extends StatelessWidget {
                         error: Either.right(snapshot.error!.toString())),
                   );
                 },
+                constraints: constraints,
                 header: header,
                 viewMoreButton: viewMoreButton);
           }
@@ -60,6 +61,7 @@ class AsyncApiSampleScrollSection<T> extends StatelessWidget {
               }
               return itemBuilder(context, data![index]);
             },
+            constraints: constraints,
             header: header,
             viewMoreButton: viewMoreButton,
           );

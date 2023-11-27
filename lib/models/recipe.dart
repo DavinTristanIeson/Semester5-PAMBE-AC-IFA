@@ -184,27 +184,27 @@ class RecipeModel extends RecipeLiteModel {
 }
 
 @JsonSerializable()
-class RecipeBookmarkModel {
+class RecipeRelationshipModel {
   @JsonEpochConverter()
   DateTime createdAt;
 
   String userId;
   String recipeId;
 
-  RecipeBookmarkModel({
+  RecipeRelationshipModel({
     required this.createdAt,
     required this.userId,
     required this.recipeId,
   });
 
-  factory RecipeBookmarkModel.fromJson(Map<String, dynamic> json) {
+  factory RecipeRelationshipModel.fromJson(Map<String, dynamic> json) {
     try {
-      return _$RecipeBookmarkModelFromJson(json);
+      return _$RecipeRelationshipModelFromJson(json);
     } catch (e) {
       throw ApiError(ApiErrorType.shapeMismatch, inner: e);
     }
   }
   Map<String, dynamic> toJson() {
-    return _$RecipeBookmarkModelToJson(this);
+    return _$RecipeRelationshipModelToJson(this);
   }
 }

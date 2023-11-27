@@ -43,7 +43,8 @@ void main() async {
       imageManager: FirebaseImageManager(storagePath: 'user'));
   final recipeManager = FirebaseRecipeManager(
       userManager: userManager,
-      bookmarkManager: FirebaseBookmarkManager(),
+      bookmarkManager: FirebaseRecipeBookmarkManager(),
+      viewManager: FirebaseRecipeViewManager(),
       imageManager: FirebaseImageManager(storagePath: "recipes"));
   runApp(MultiProvider(
     providers: [
@@ -63,7 +64,8 @@ void main() async {
       ),
       ChangeNotifierProxyProvider<AuthProvider, RecipeController>(
         create: (context) => RecipeController(
-            bookmarkManager: FirebaseBookmarkManager(),
+            bookmarkManager: FirebaseRecipeBookmarkManager(),
+            viewManager: FirebaseRecipeViewManager(),
             recipeManager: recipeManager,
             userId: null),
         update: AuthProvider.registerUidToProvider,

@@ -7,7 +7,6 @@ import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/common.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
-import 'package:pambe_ac_ifa/modules/future.dart';
 
 class RecipeSearchState {
   late SortBy<RecipeSortBy> sortBy;
@@ -59,11 +58,13 @@ class RecipeSearchState {
 /// Ini untuk resep yang disimpan online
 class RecipeController extends ChangeNotifier implements AuthDependent {
   IRecipeResourceManager recipeManager;
-  IBookmarkResourceManager bookmarkManager;
+  IRecipeRelationshipResourceManager bookmarkManager;
+  IRecipeRelationshipResourceManager viewManager;
   String? _userId;
   RecipeController(
       {required this.recipeManager,
       required this.bookmarkManager,
+      required this.viewManager,
       required String? userId})
       : _userId = userId;
 
@@ -77,23 +78,23 @@ class RecipeController extends ChangeNotifier implements AuthDependent {
     RecipeSearchState searchState, {
     DocumentSnapshot<Map<String, Object?>>? page,
   }) async {
-    return (await getAllWithPagination(searchState, page: page)).data;
+    final (:data, nextPage: _) =
+        await getAllWithPagination(searchState, page: page);
+    return data;
   }
 
   Future<List<RecipeLiteModel>> getRecentRecipes() async {
     return getAll(RecipeSearchState(
-        limit: 5,
+        limit: 10,
         sortBy: SortBy.descending(RecipeSortBy.lastViewed),
-        filterBy: RecipeFilterBy.viewedBy(_userId!, viewed: true)));
+        filterBy: RecipeFilterBy.viewedBy(_userId!)));
   }
 
   Future<List<RecipeLiteModel>> getTrendingRecipes() async {
     return getAll(RecipeSearchState(
         limit: 5,
         sortBy: SortBy.descending(RecipeSortBy.ratings),
-        filterBy: _userId != null
-            ? RecipeFilterBy.viewedBy(_userId!, viewed: false)
-            : null));
+        filterBy: null));
   }
 
   Future<List<RecipeLiteModel>> getBookmarkedRecipes() async {
@@ -114,23 +115,6 @@ class RecipeController extends ChangeNotifier implements AuthDependent {
     RecipeSearchState searchState, {
     dynamic page,
   }) async {
-    if (searchState.filterBy?.type == RecipeFilterByType.hasBeenBookmarkedBy) {
-      if (_userId == null) {
-        throw InvalidStateError(
-            "RecipeController._userId is expected to be non-null when getAllWithPagination is called.");
-      }
-      final (data: bookmarks, :nextPage) =
-          await bookmarkManager.getAll(userId: _userId!);
-      final recipeFuture = FutureChunkDistributor(
-              bookmarks.map((e) => recipeManager.get(e.recipeId)),
-              chunkSize: 4)
-          .wait();
-      final recipes = (await recipeFuture).notNull<RecipeModel>().toList();
-      return (
-        data: recipes,
-        nextPage: bookmarks.length < searchState.limit ? null : nextPage,
-      );
-    }
     final (:data, :nextPage) = await recipeManager.getAll(
         page: page,
         limit: searchState.limit,
@@ -183,7 +167,17 @@ class RecipeController extends ChangeNotifier implements AuthDependent {
           "RecipeController._userId is expected to be non-null when bookmark is called.");
     }
     await bookmarkManager.set(
-        recipeId: recipeId, userId: _userId!, isBookmarked: isBookmarked);
+        recipeId: recipeId, userId: _userId!, hasRelation: isBookmarked);
+    notifyListeners();
+  }
+
+  Future<void> view(String recipeId) async {
+    if (_userId == null) {
+      throw InvalidStateError(
+          "RecipeController._userId is expected to be non-null when bookmark is called.");
+    }
+    await viewManager.set(
+        recipeId: recipeId, userId: _userId!, hasRelation: true);
     notifyListeners();
   }
 
