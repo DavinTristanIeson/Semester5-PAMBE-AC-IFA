@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
@@ -175,11 +177,18 @@ class ImagePickMethodDialog extends StatelessWidget {
           child: const Text('Gallery'),
           onPressed: () async {
             final navigator = Navigator.of(context);
-            final permissioResponse = await Permission.photos.request();
-            if (permissioResponse.isPermanentlyDenied) {
+            PermissionStatus permissionResponse;
+            if (Platform.isAndroid &&
+                (await DeviceInfoPlugin().androidInfo).version.sdkInt <= 32) {
+              permissionResponse = await Permission.storage.request();
+            } else {
+              permissionResponse = await Permission.photos.request();
+            }
+
+            if (permissionResponse.isPermanentlyDenied) {
               await openAppSettings();
             }
-            if (permissioResponse.isGranted) {
+            if (permissionResponse.isGranted) {
               onPickSource(ImageSource.gallery);
               navigator.pop();
             }

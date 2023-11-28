@@ -64,8 +64,8 @@ void main() async {
       ),
       ChangeNotifierProxyProvider<AuthProvider, RecipeController>(
         create: (context) => RecipeController(
-            bookmarkManager: FirebaseRecipeBookmarkManager(),
-            viewManager: FirebaseRecipeViewManager(),
+            bookmarkManager: recipeManager.bookmarkManager,
+            viewManager: recipeManager.viewManager,
             recipeManager: recipeManager,
             userId: null),
         update: AuthProvider.registerUidToProvider,
