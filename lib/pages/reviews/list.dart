@@ -2,9 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+import 'package:pambe_ac_ifa/components/app/confirmation.dart';
+import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/pagination.dart';
 import 'package:pambe_ac_ifa/controllers/review.dart';
 import 'package:pambe_ac_ifa/database/interfaces/common.dart';
+import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
 import 'package:pambe_ac_ifa/pages/reviews/components/review_item.dart';
 import 'package:provider/provider.dart';
@@ -59,6 +62,25 @@ class _ReviewsListState extends State<ReviewsList> {
     super.dispose();
   }
 
+  Future<void> deleteReview(ReviewModel review) {
+    final reviewManager = context.read<ReviewController>();
+    final messenger = AcSnackbarMessenger.of(context);
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleConfirmationDialog.delete(
+              onConfirm: () async {
+                await reviewManager.remove(
+                    review.id, widget.searchState.recipeId);
+                _pagination.refresh();
+                messenger.sendSuccess("Your review was successfully deleted");
+              },
+              message:
+                  Either.right("Are you sure you want to delete your review?"),
+              context: context);
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return AcPageListCompute(
@@ -66,7 +88,10 @@ class _ReviewsListState extends State<ReviewsList> {
         itemBuilder: (context, item, index) => Padding(
             padding: const EdgeInsets.symmetric(
                 vertical: AcSizes.sm, horizontal: AcSizes.space),
-            child: ReviewItem(review: item)),
+            child: ReviewItem(
+              review: item,
+              onDeleted: deleteReview,
+            )),
         builder: (context, props) {
           return PagedSliverList(
               pagingController: props.pagingController,

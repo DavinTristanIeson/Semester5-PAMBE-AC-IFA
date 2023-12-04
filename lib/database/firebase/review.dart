@@ -170,7 +170,7 @@ class FirebaseReviewManager
       return;
     }
     try {
-      await getCollection(reviewId).doc(reviewId).delete();
+      await getCollection(recipeId).doc(reviewId).delete();
       cache.markStale(key: getKey(recipeId: recipeId, reviewId: reviewId));
       queryCache.markStale(prefix: recipeId);
     } catch (e) {

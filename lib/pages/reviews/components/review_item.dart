@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/display/review_card.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
+import 'package:provider/provider.dart';
 
 class ReviewItem extends StatefulWidget {
   final ReviewModel review;
-  const ReviewItem({super.key, required this.review});
+  final Future<void> Function(ReviewModel review) onDeleted;
+  const ReviewItem({super.key, required this.review, required this.onDeleted});
   static const int maximumShownReviewLength = 300;
 
   @override
@@ -64,6 +68,7 @@ class _ReviewItemState extends State<ReviewItem> {
 
   @override
   Widget build(BuildContext context) {
+    final uid = context.read<AuthProvider>().user!.uid;
     return Container(
         decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(AcSizes.br),
@@ -87,12 +92,24 @@ class _ReviewItemState extends State<ReviewItem> {
                 widget.review.content!.length >
                     ReviewItem.maximumShownReviewLength)
               TextButton(
+                  style: TextButton.styleFrom(
+                      foregroundColor: context.colors.secondary),
                   onPressed: () {
                     setState(() {
                       isShown = !isShown;
                     });
                   },
-                  child: Text(isShown ? "Hide" : "Show More"))
+                  child: Text(isShown ? "Hide" : "Show More")),
+            if (widget.review.user?.id == uid)
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                Tooltip(
+                  message: "Delete Your Review",
+                  child: FutureIconButton(
+                    onPressed: () => widget.onDeleted(widget.review),
+                    icon: Icon(Icons.delete, color: context.colors.error),
+                  ),
+                )
+              ]),
           ],
         ));
   }
