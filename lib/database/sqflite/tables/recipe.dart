@@ -109,6 +109,7 @@ class RecipeTable {
       required List<RecipeStepFormType> steps,
       XFile? image,
       int? id,
+      String? remoteId,
       required String userId}) async {
     LocalRecipeModel? former;
     if (id != null) {
@@ -124,6 +125,7 @@ class RecipeTable {
         _RecipeColumns.userId.name: userId,
         _RecipeColumns.createdAt.name: DateTime.now().millisecondsSinceEpoch,
         _RecipeColumns.imagePath.name: recipeImage,
+        _RecipeColumns.remoteId.name: remoteId,
       };
       if (id == null) {
         lastId = await txn.insert(tableName, data);
@@ -176,5 +178,47 @@ class RecipeTable {
         },
         where: "${_RecipeColumns.id.name} = ?",
         whereArgs: [localId]);
+  }
+
+  Future<LocalRecipeModel> sync(
+      {required RecipeModel recipe,
+      int? localId,
+      required String userId}) async {
+    final reservedImages = await imageManager.prepareImagesForLocalCopy(recipe);
+    final putRecipe = await put(
+        title: recipe.title,
+        image: recipe.imageStoragePath == null
+            ? null
+            : XFile(recipe.imageStoragePath!),
+        description: recipe.description,
+        steps: recipe.steps
+            .map((e) => RecipeStepFormType(
+                type: e.type,
+                content: e.content,
+                image: e.imageStoragePath == null
+                    ? null
+                    : XFile(e.imageStoragePath!),
+                timer: e.timer))
+            .toList(),
+        remoteId: recipe.id,
+        id: localId,
+        userId: userId);
+    final savedImages =
+        await imageManager.saveImagesForLocalCopy(reservedImages);
+    await imageManager.imageManager.process(savedImages);
+    return putRecipe;
+  }
+
+  Future<void> syncAll(Iterable<RecipeModel> recipes,
+      {required String userId}) async {
+    final localRecipes = await getAll();
+    final recipeMap = Map.fromEntries(localRecipes
+        .where((e) => e.remoteId != null)
+        .map((e) => MapEntry(e.remoteId, e)));
+    final missingRemoteRecipes =
+        recipes.where((e) => !recipeMap.containsKey(e));
+    for (final recipe in missingRemoteRecipes) {
+      await sync(recipe: recipe, userId: userId);
+    }
   }
 }

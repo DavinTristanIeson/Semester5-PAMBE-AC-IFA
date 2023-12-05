@@ -212,6 +212,53 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
     }
   }
 
+  Future<void> sync() async {
+    final localController = context.read<LocalRecipeController>();
+    final remoteController = context.read<RecipeController>();
+    final messenger = AcSnackbarMessenger.of(context);
+    bool isAccept = false;
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleConfirmationDialog(
+            onConfirm: () {
+              isAccept = true;
+            },
+            context: context,
+            message: Either.right(
+                "Are you sure you want to sync changes with the published version of this recipe? Any unpublished changes will be erased!"),
+            positiveText: Either.right("Sync"),
+          );
+        });
+    if (!isAccept) return;
+    // ignore: use_build_context_synchronously
+    await showDialog(
+        context: context,
+        builder: (context) {
+          final navigator = Navigator.of(context);
+          Future(() async {
+            try {
+              final recipe =
+                  await remoteController.get(widget.recipe!.remoteId!);
+              if (recipe == null) {
+                messenger.sendError(
+                    "Failed to find any published recipe with that ID. Your local recipe may have been terribly out of sync with the published version.");
+                return;
+              }
+              await localController.syncLocal(recipe);
+              messenger.sendSuccess(
+                  "Successfully synced changes with published version");
+            } catch (e) {
+              messenger.sendError(e);
+            }
+            navigator.pop();
+          });
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -223,8 +270,8 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
                     message: "Publish Recipe",
                     child: FutureIconButton(
                         onPressed: publish,
-                        icon: Icon(Icons.upload,
-                            color: Theme.of(context).colorScheme.tertiary)),
+                        icon:
+                            Icon(Icons.upload, color: context.colors.tertiary)),
                   ),
                   if (widget.recipe!.remoteId != null)
                     Tooltip(
@@ -233,6 +280,14 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
                         onPressed: unpublish,
                         icon: Icon(Icons.file_upload_off,
                             color: context.colors.error),
+                      ),
+                    ),
+                  if (widget.recipe!.remoteId != null)
+                    Tooltip(
+                      message: "Sync Changes",
+                      child: FutureIconButton(
+                        onPressed: sync,
+                        icon: Icon(Icons.sync, color: context.colors.tertiary),
                       ),
                     ),
                   Tooltip(

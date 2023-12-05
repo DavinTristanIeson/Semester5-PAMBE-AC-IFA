@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/confirmation.dart';
+import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
+import 'package:pambe_ac_ifa/components/display/some_items_scroll.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
@@ -67,6 +69,50 @@ class LibraryBookmarkedRecipesSection extends StatelessWidget {
 class LibraryLocalRecipesSection extends StatelessWidget {
   const LibraryLocalRecipesSection({super.key});
 
+  Future<void> syncAll(BuildContext context) async {
+    bool isAccept = false;
+    final localController = context.read<LocalRecipeController>();
+    final controller = context.read<RecipeController>();
+    final messenger = AcSnackbarMessenger.of(context);
+    final uid = context.read<AuthProvider>().user!.uid;
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleConfirmationDialog(
+              onConfirm: () {
+                isAccept = true;
+              },
+              context: context,
+              message: Either.right(
+                  "This action will fetch recipes from your account that are not available locally on your device. This will not remove or update existing recipes. To synchronize changes for individual recipes, consider clicking the sync button in each recipe."),
+              positiveText: Either.right("Sync Recipes"));
+        });
+    if (!isAccept) return;
+    // ignore: use_build_context_synchronously
+    await showDialog(
+        context: context,
+        builder: (context) {
+          final navigator = Navigator.of(context);
+          Future(() async {
+            try {
+              final remoteRecipes = await controller.getAll(RecipeSearchState(
+                  limit: 999999, filterBy: RecipeFilterBy.createdByUser(uid)));
+              await localController
+                  .syncAllLocal(remoteRecipes.cast<RecipeModel>());
+              messenger.sendSuccess(
+                  "Local recipes were successfully synchronized with your published recipes.");
+            } catch (e) {
+              messenger.sendError(e);
+            }
+            navigator.pop();
+          });
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+        barrierDismissible: false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<LocalRecipeController>();
@@ -93,12 +139,23 @@ class LibraryLocalRecipesSection extends StatelessWidget {
         itemConstraints:
             BoxConstraints.tight(RecipeCard.getDefaultImageSize(context)),
         header: Either.right("Your Recipes"),
-        viewMoreButton: Either.right(() {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => SearchScreen(
-                    sortBy: SortBy.descending(RecipeSortBy.createdDate),
-                    filterBy: RecipeFilterBy.local,
-                  )));
-        }));
+        viewMoreButton: Either.left(Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            SampleScrollSection.buildDefaultSecondaryAction(
+                context: context,
+                onPressed: () {
+                  context.navigator.push(MaterialPageRoute(
+                      builder: (context) => SearchScreen(
+                            sortBy: SortBy.descending(RecipeSortBy.createdDate),
+                            filterBy: RecipeFilterBy.local,
+                          )));
+                }),
+            FutureIconButton(
+              icon: const Icon(Icons.sync),
+              onPressed: () => syncAll(context),
+            ),
+          ],
+        )));
   }
 }

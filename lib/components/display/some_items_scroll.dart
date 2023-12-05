@@ -41,6 +41,15 @@ class SampleScrollSection extends StatelessWidget {
     );
   }
 
+  static Widget buildDefaultSecondaryAction(
+      {required BuildContext context, required void Function() onPressed}) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: const Icon(Icons.arrow_right_alt),
+      color: Theme.of(context).colorScheme.primary,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double itemHeight = clampDouble(context.screenHeight / 2.5, 360.0, 480.0);
@@ -55,11 +64,8 @@ class SampleScrollSection extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: context.colors.primary))),
             viewMoreButton != null
-                ? viewMoreButton!.leftOr((right) => IconButton(
-                      onPressed: right,
-                      icon: const Icon(Icons.arrow_right_alt),
-                      color: Theme.of(context).colorScheme.primary,
-                    ))
+                ? viewMoreButton!.leftOr((right) => buildDefaultSecondaryAction(
+                    context: context, onPressed: right))
                 : const SizedBox(
                     height: AcSizes.xl + AcSizes.lg,
                   )
