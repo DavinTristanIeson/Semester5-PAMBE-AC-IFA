@@ -245,9 +245,13 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
                     "Failed to find any published recipe with that ID. Your local recipe may have been terribly out of sync with the published version.");
                 return;
               }
-              await localController.syncLocal(recipe);
+              final result = await localController.syncLocal(
+                recipe,
+                id: widget.recipe!.id,
+              );
               messenger.sendSuccess(
                   "Successfully synced changes with published version");
+              widget.onChanged(result);
             } catch (e) {
               messenger.sendError(e);
             }

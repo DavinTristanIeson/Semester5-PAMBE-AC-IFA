@@ -33,7 +33,9 @@ class FirebaseImageManager implements INetworkImageResourceManager {
   @override
   Future<void> process(Map<String, XFile?> resources,
       {required String userId}) async {
-    await FutureChunkDistributor(resources.entries.map((resource) async {
+    final resourceEntries = resources.entries.toList();
+    await FutureChunkDistributor((index) async {
+      final resource = resourceEntries[index];
       try {
         if (resource.value == null) {
           await remove(resource.key);
@@ -44,7 +46,7 @@ class FirebaseImageManager implements INetworkImageResourceManager {
       } catch (e) {
         debugPrint("ERROR WITH ${resource.key} - ${resource.value?.path}");
       }
-    }), chunkSize: 4)
+    }, chunkSize: 4, count: resourceEntries.length)
         .wait();
   }
 

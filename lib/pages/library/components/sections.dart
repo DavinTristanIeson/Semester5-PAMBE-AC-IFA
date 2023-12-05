@@ -11,6 +11,7 @@ import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
+import 'package:pambe_ac_ifa/modules/future.dart';
 import 'package:pambe_ac_ifa/pages/editor/main.dart';
 import 'package:pambe_ac_ifa/pages/home/components/async_scroll_section.dart';
 import 'package:pambe_ac_ifa/pages/search/main.dart';
@@ -83,8 +84,9 @@ class LibraryLocalRecipesSection extends StatelessWidget {
                 isAccept = true;
               },
               context: context,
+              title: Either.right("Sync Confirmation"),
               message: Either.right(
-                  "This action will fetch recipes from your account that are not available locally on your device. This will not remove or update existing recipes. To synchronize changes for individual recipes, consider clicking the sync button in each recipe."),
+                  "This action will fetch recipes from your account that are not available locally on your device.\n\nThis will not remove or update existing recipes. To synchronize changes for individual recipes, consider clicking the sync button in each recipe."),
               positiveText: Either.right("Sync Recipes"));
         });
     if (!isAccept) return;
@@ -96,9 +98,17 @@ class LibraryLocalRecipesSection extends StatelessWidget {
           Future(() async {
             try {
               final remoteRecipes = await controller.getAll(RecipeSearchState(
-                  limit: 999999, filterBy: RecipeFilterBy.createdByUser(uid)));
-              await localController
-                  .syncAllLocal(remoteRecipes.cast<RecipeModel>());
+                limit: 1000,
+                filterBy: RecipeFilterBy.createdByUser(uid),
+              ));
+              final distributor = FutureChunkDistributor(
+                  (idx) => controller.get(remoteRecipes[idx].id),
+                  chunkSize: 4,
+                  count: remoteRecipes.length);
+              final recipes = await distributor.wait();
+              await localController.syncAllLocal(recipes
+                  .where((element) => element != null)
+                  .cast<RecipeModel>());
               messenger.sendSuccess(
                   "Local recipes were successfully synchronized with your published recipes.");
             } catch (e) {
@@ -142,6 +152,12 @@ class LibraryLocalRecipesSection extends StatelessWidget {
         viewMoreButton: Either.left(Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
+            FutureIconButton(
+              icon: const Icon(Icons.sync),
+              style:
+                  IconButton.styleFrom(foregroundColor: context.colors.primary),
+              onPressed: () => syncAll(context),
+            ),
             SampleScrollSection.buildDefaultSecondaryAction(
                 context: context,
                 onPressed: () {
@@ -151,10 +167,6 @@ class LibraryLocalRecipesSection extends StatelessWidget {
                             filterBy: RecipeFilterBy.local,
                           )));
                 }),
-            FutureIconButton(
-              icon: const Icon(Icons.sync),
-              onPressed: () => syncAll(context),
-            ),
           ],
         )));
   }

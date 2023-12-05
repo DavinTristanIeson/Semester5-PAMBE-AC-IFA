@@ -1,15 +1,20 @@
-import 'package:pambe_ac_ifa/common/extensions.dart';
-
 class FutureChunkDistributor<T> {
   final int chunkSize;
-  final Iterable<Future<T>> futures;
-  FutureChunkDistributor(this.futures, {required this.chunkSize});
+  final int count;
+  final Future<T> Function(int index) compute;
+  FutureChunkDistributor(this.compute,
+      {required this.chunkSize, required this.count});
   Future<List<T>> wait() async {
-    final chunkedFutures =
-        futures.chunks(chunkSize).map((chunk) => Future.wait(chunk));
     final List<T> result = [];
-    for (final chunk in chunkedFutures) {
-      result.addAll(await chunk);
+
+    int i = 0;
+    while (i < count) {
+      List<Future<T>> futures = [];
+      while (i < count && futures.length < chunkSize) {
+        futures.add(compute(i));
+        i++;
+      }
+      result.addAll(await Future.wait(futures));
     }
     return result;
   }

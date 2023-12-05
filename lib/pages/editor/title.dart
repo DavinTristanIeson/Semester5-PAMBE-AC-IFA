@@ -68,7 +68,7 @@ class RecipeDetailsEditor extends StatelessWidget {
 
   Widget buildDescriptionField() {
     return ReactiveValueListenableBuilder<String?>(
-        formControlName: "description",
+        formControlName: RecipeFormKeys.description.name,
         builder: (context, control, child) {
           return AcTextInput(
               value: control.value ?? '',

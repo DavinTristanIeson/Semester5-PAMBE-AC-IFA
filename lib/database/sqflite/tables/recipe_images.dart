@@ -139,11 +139,12 @@ class LocalRecipeImageManager {
 
   Future<Map<String, XFile>> saveImagesForLocalCopy(
       Map<String, String> urls) async {
-    final distributor = FutureChunkDistributor(urls.entries.map((entry) async {
-      final MapEntry(key: path, value: url) = entry;
+    final urlEntries = urls.entries.toList();
+    final distributor = FutureChunkDistributor((idx) async {
+      final MapEntry(key: path, value: url) = urlEntries[idx];
       final file = await _downloadImage(url, path);
       return MapEntry(basename(path), file);
-    }), chunkSize: 4);
+    }, chunkSize: 4, count: urls.entries.length);
     final reserved = Map.fromEntries(await distributor.wait());
     return reserved;
   }

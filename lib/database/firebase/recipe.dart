@@ -162,9 +162,9 @@ class FirebaseRecipeManager
   }) async {
     final (data: bookmarks, :nextPage) =
         await bookmarkManager.getAll(userId: userId);
-    final recipeFuture = FutureChunkDistributor(
-            bookmarks.map((e) => get(e.recipeId)),
-            chunkSize: 4)
+    final recipeFuture = FutureChunkDistributor((idx) {
+      return get(bookmarks[idx].recipeId);
+    }, chunkSize: 4, count: bookmarks.length)
         .wait();
     final recipes = (await recipeFuture).notNull<RecipeModel>().toList();
     final result = (data: recipes, nextPage: nextPage);
@@ -213,9 +213,11 @@ class FirebaseRecipeManager
     required String userId,
   }) async {
     final (data: views, :nextPage) = await viewManager.getAll(userId: userId);
-    final recipeFuture =
-        FutureChunkDistributor(views.map((e) => get(e.recipeId)), chunkSize: 4)
-            .wait();
+    final recipeFuture = FutureChunkDistributor(
+            (idx) => get(views[idx].recipeId),
+            chunkSize: 4,
+            count: views.length)
+        .wait();
     final recipes = (await recipeFuture).notNull<RecipeModel>().toList();
     final result = (data: recipes, nextPage: nextPage);
     return result;

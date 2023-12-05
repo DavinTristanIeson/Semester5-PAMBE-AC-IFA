@@ -89,13 +89,17 @@ class LocalRecipeController extends ChangeNotifier implements AuthDependent {
           "LocalRecipeController.userId is expected to be non-null when syncAllLocal is called.");
     }
     await recipeTable.syncAll(recipes, userId: _userId!);
+    notifyListeners();
   }
 
-  Future<LocalRecipeModel> syncLocal(RecipeModel recipe) async {
+  Future<LocalRecipeModel> syncLocal(RecipeModel recipe, {int? id}) async {
     if (_userId == null) {
       throw InvalidStateError(
           "LocalRecipeController.userId is expected to be non-null when syncLocal is called.");
     }
-    return recipeTable.sync(recipe: recipe, userId: _userId!);
+    final result =
+        await recipeTable.sync(recipe: recipe, userId: _userId!, localId: id);
+    notifyListeners();
+    return result;
   }
 }

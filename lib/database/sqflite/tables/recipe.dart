@@ -125,7 +125,7 @@ class RecipeTable {
         _RecipeColumns.userId.name: userId,
         _RecipeColumns.createdAt.name: DateTime.now().millisecondsSinceEpoch,
         _RecipeColumns.imagePath.name: recipeImage,
-        _RecipeColumns.remoteId.name: remoteId,
+        if (remoteId != null) _RecipeColumns.remoteId.name: remoteId,
       };
       if (id == null) {
         lastId = await txn.insert(tableName, data);
@@ -185,6 +185,7 @@ class RecipeTable {
       int? localId,
       required String userId}) async {
     final reservedImages = await imageManager.prepareImagesForLocalCopy(recipe);
+    await imageManager.saveImagesForLocalCopy(reservedImages);
     final putRecipe = await put(
         title: recipe.title,
         image: recipe.imageStoragePath == null
@@ -203,9 +204,6 @@ class RecipeTable {
         remoteId: recipe.id,
         id: localId,
         userId: userId);
-    final savedImages =
-        await imageManager.saveImagesForLocalCopy(reservedImages);
-    await imageManager.imageManager.process(savedImages);
     return putRecipe;
   }
 
@@ -216,7 +214,7 @@ class RecipeTable {
         .where((e) => e.remoteId != null)
         .map((e) => MapEntry(e.remoteId, e)));
     final missingRemoteRecipes =
-        recipes.where((e) => !recipeMap.containsKey(e));
+        recipes.where((recipe) => !recipeMap.containsKey(recipe.id));
     for (final recipe in missingRemoteRecipes) {
       await sync(recipe: recipe, userId: userId);
     }

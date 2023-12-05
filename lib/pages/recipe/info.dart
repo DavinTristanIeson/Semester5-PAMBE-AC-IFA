@@ -236,7 +236,8 @@ class RecipeInfoScreen extends StatelessWidget {
             ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 160.0),
                 child: buildReviewList()),
-          if (recipeId != null) buildSeeReviewsButton(context, recipeId),
+          if (recipeId != null && recipe is RecipeLiteModel)
+            buildSeeReviewsButton(context, recipeId),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: AcSizes.lg),
             child: buildStartButton(context),
