@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
 import 'package:pambe_ac_ifa/components/display/review_card.dart';
@@ -28,7 +29,7 @@ class HomeRecentRecipesSection extends StatelessWidget {
               recipe: data,
               recipeSource: RecipeSource.remote(data.id),
             ),
-        header: Either.right("Recents"),
+        header: Either.right("recents".i18n()),
         viewMoreButton: null,
         itemConstraints:
             BoxConstraints.tight(RecipeCard.getDefaultImageSize(context)));

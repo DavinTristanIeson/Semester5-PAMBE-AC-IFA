@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/recipe/main.dart';
+
+const localePrefix = "components.display.recipe_card";
 
 class ByUserText extends StatelessWidget {
   final UserModel? user;
@@ -15,7 +18,7 @@ class ByUserText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text.rich(
         TextSpan(children: [
-          const TextSpan(text: "by "),
+          TextSpan(text: "$localePrefix.by".i18n()),
           TextSpan(
               text: user?.name ?? '<Deleted User>',
               style: TextStyle(
@@ -70,7 +73,7 @@ class RecipeCard extends StatelessWidget {
                       )));
             },
             icon: const Icon(Icons.remove_red_eye_outlined),
-            label: const Text("View")),
+            label: Text("$localePrefix.view".i18n())),
       ],
     );
   }

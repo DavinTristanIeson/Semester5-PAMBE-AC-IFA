@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
+
+const localePrefix = "components.display.pagination";
 
 class AcPageListCompute<TKey, TValue> extends StatelessWidget {
   final PagingController<TKey, TValue> controller;
@@ -28,7 +31,9 @@ class AcPageListCompute<TKey, TValue> extends StatelessWidget {
           noItemsFoundIndicatorBuilder: (context) {
             return Padding(
               padding: const EdgeInsets.all(AcSizes.space),
-              child: EmptyView(content: Either.right("No items found")),
+              child: EmptyView(
+                  content: Either.right(
+                      "$localePrefix.error_no_items_found".i18n())),
             );
           },
           newPageErrorIndicatorBuilder: (context) {

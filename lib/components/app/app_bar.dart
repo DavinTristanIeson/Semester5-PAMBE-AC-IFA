@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
+
+const localePrefix = "components.app.app_bar";
 
 class OnlyReturnAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
@@ -23,7 +26,7 @@ class OnlyReturnAppBar extends StatelessWidget implements PreferredSizeWidget {
                 Navigator.of(context).pop();
               },
               icon: const Icon(Icons.chevron_left),
-              label: const Text("Back"))
+              label: Text("$localePrefix.back".i18n()))
         ],
       ),
     );

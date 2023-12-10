@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
@@ -8,6 +9,8 @@ enum StarRatingType {
   compact,
   wide,
 }
+
+const localePrefix = "components.display.review_card";
 
 class StarRating extends StatelessWidget {
   final int rating;
@@ -102,7 +105,8 @@ class ReviewCard extends StatelessWidget {
   }
 
   Widget buildUserAndRating(BuildContext context) {
-    Widget reviewerNameWidget = Text(review.user?.name ?? "Deleted User",
+    Widget reviewerNameWidget = Text(
+        review.user?.name ?? "$localePrefix.deleted_user".i18n(),
         style: review.user == null
             ? context.texts.titleMedium!.copyWith(fontStyle: FontStyle.italic)
             : null,
@@ -132,7 +136,8 @@ class ReviewCard extends StatelessWidget {
                   )
                 : reviewerNameWidget,
             recipeName != null
-                ? Text("on $recipeName", style: context.texts.titleSmall)
+                ? Text("$localePrefix.on".i18n() + recipeName!,
+                    style: context.texts.titleSmall)
                 : starRatingWidget
           ],
         ),

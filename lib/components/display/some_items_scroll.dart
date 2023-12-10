@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
+
+const localePrefix = "components.app.some_items_scroll";
 
 class SampleScrollSection extends StatelessWidget {
   final int itemCount;
@@ -33,7 +36,7 @@ class SampleScrollSection extends StatelessWidget {
           borderRadius: BorderRadius.all(AcSizes.br)),
       child: Center(
         child: Text(
-          emptyView?.right ?? "No data",
+          emptyView?.right ?? "$localePrefix.no_data".i18n(),
           style: context.texts.titleMedium!
               .copyWith(color: context.colors.tertiary),
         ),

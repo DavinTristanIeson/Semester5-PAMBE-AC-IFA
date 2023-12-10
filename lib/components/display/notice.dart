@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
@@ -7,6 +8,8 @@ enum NoticeType {
   tip,
   warning,
 }
+
+const localePrefix = "components.display.notice";
 
 class NoticeComponent extends StatelessWidget {
   final NoticeType type;
@@ -53,7 +56,8 @@ class NoticeComponent extends StatelessWidget {
 class EmptyView extends StatelessWidget {
   late final Either<Widget, String> content;
   EmptyView({super.key, Either<Widget, String>? content}) {
-    this.content = content ?? Either.right("Sorry, no data was found");
+    this.content =
+        content ?? Either.right("$localePrefix.error_no_data_found".i18n());
   }
 
   @override
@@ -100,8 +104,7 @@ class ErrorView extends StatelessWidget {
   final Either<Widget, String> error;
   late final Either<Widget, String> message;
   ErrorView({super.key, required this.error, Either<Widget, String>? message}) {
-    this.message =
-        message ?? Either.right("Sorry, an unexpected error has occurred");
+    this.message = message ?? Either.right("$localePrefix.error_unexpected");
   }
 
   @override
@@ -155,7 +158,8 @@ class ActionableErrorMessage extends StatelessWidget {
       required this.error,
       this.action,
       Either<Widget, String>? message})
-      : message = message ?? Either.right("An unexpected error has occurred");
+      : message =
+            message ?? Either.right("$localePrefix.error_unexcpected_2".i18n());
 
   ActionableErrorMessage.refresh({
     super.key,
@@ -166,7 +170,8 @@ class ActionableErrorMessage extends StatelessWidget {
             onPressed: onRefresh,
             color: AcColors.primary,
             icon: const Icon(Icons.refresh)),
-        message = message ?? Either.right("An unexpected error has occurred");
+        message =
+            message ?? Either.right("$localePrefix.error_unexcpected_2".i18n());
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/touchable.dart';
@@ -39,7 +39,7 @@ class ImagePickerField extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("Choose Image",
+          Text("$localePrefix.choose_image".i18n(),
               style: TextStyle(
                 color: Theme.of(context).colorScheme.tertiary,
                 fontSize: AcSizes.fontLarge,

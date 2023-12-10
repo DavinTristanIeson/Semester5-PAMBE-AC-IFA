@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/database/firebase/auth.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';

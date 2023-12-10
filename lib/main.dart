@@ -24,6 +24,8 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:sqflite/sqflite.dart';
 import 'firebase_options.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:localization/localization.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -170,10 +172,17 @@ class RecipeLibApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    LocalJsonLocalization.delegate.directories = ['lib/i18n'];
     return MaterialApp(
       title: 'Recipe.Lib',
       theme: createTheme(),
       home: const RecipeLibSwitch(),
+      localizationsDelegates: [
+        GlobalCupertinoLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        LocalJsonLocalization.delegate,
+      ],
     );
   }
 }
