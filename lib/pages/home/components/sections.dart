@@ -17,6 +17,8 @@ import 'package:pambe_ac_ifa/pages/home/components/async_scroll_section.dart';
 import 'package:pambe_ac_ifa/pages/search/main.dart';
 import 'package:provider/provider.dart';
 
+const String _localePrefix = "screen/home/sections";
+
 class HomeRecentRecipesSection extends StatelessWidget {
   const HomeRecentRecipesSection({super.key});
 
@@ -29,7 +31,7 @@ class HomeRecentRecipesSection extends StatelessWidget {
               recipe: data,
               recipeSource: RecipeSource.remote(data.id),
             ),
-        header: Either.right("recents".i18n()),
+        header: Either.right("$_localePrefix/recents".i18n()),
         viewMoreButton: null,
         itemConstraints:
             BoxConstraints.tight(RecipeCard.getDefaultImageSize(context)));
@@ -49,7 +51,7 @@ class HomeTrendingRecipesSection extends StatelessWidget {
               recipe: data,
               recipeSource: RecipeSource.remote(data.id),
             ),
-        header: Either.right("Trending"),
+        header: Either.right("$_localePrefix/trending"),
         viewMoreButton: Either.right(() {
           context.navigator.push(MaterialPageRoute(
               builder: (context) => SearchScreen(

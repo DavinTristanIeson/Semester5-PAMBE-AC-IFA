@@ -7,6 +7,7 @@ import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/touchable.dart';
 
 class ImagePickerField extends StatelessWidget {
+  static const _localePrefix = "components/field/image_picker";
   final _picker = ImagePicker();
   final XFile? value;
   final void Function(XFile? image) onChanged;
@@ -39,7 +40,7 @@ class ImagePickerField extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("$localePrefix.choose_image".i18n(),
+          Text("$_localePrefix/choose_image".i18n(),
               style: TextStyle(
                 color: Theme.of(context).colorScheme.tertiary,
                 fontSize: AcSizes.fontLarge,

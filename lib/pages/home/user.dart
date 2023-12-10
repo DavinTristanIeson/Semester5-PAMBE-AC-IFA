@@ -10,6 +10,7 @@ import 'package:pambe_ac_ifa/pages/library/main.dart';
 import 'package:pambe_ac_ifa/pages/notification/main.dart';
 import 'package:pambe_ac_ifa/pages/profile/main.dart';
 import 'package:pambe_ac_ifa/pages/search/main.dart';
+import 'package:pambe_ac_ifa/pages/settings/main.dart';
 import 'package:provider/provider.dart';
 
 enum RecipeLibTabs {
@@ -76,12 +77,20 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       });
                 },
                 icon: const Icon(Icons.delete_forever)),
-          if (tab == RecipeLibTabs.profile)
+          if (tab == RecipeLibTabs.profile) ...[
             IconButton(
                 onPressed: () async {
                   context.read<AuthProvider>().logout();
                 },
                 icon: const Icon(Icons.logout)),
+            IconButton(
+              onPressed: () {
+                context.navigator.push(MaterialPageRoute(
+                    builder: (context) => const SettingsScreen()));
+              },
+              icon: const Icon(Icons.settings),
+            )
+          ],
         ],
       ),
       body: buildBody(),

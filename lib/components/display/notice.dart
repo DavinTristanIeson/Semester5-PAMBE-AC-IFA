@@ -9,7 +9,7 @@ enum NoticeType {
   warning,
 }
 
-const localePrefix = "components.display.notice";
+const _localePrefix = "components/display/notice";
 
 class NoticeComponent extends StatelessWidget {
   final NoticeType type;
@@ -57,7 +57,7 @@ class EmptyView extends StatelessWidget {
   late final Either<Widget, String> content;
   EmptyView({super.key, Either<Widget, String>? content}) {
     this.content =
-        content ?? Either.right("$localePrefix.error_no_data_found".i18n());
+        content ?? Either.right("$_localePrefix/error/no_data_found".i18n());
   }
 
   @override
@@ -104,7 +104,7 @@ class ErrorView extends StatelessWidget {
   final Either<Widget, String> error;
   late final Either<Widget, String> message;
   ErrorView({super.key, required this.error, Either<Widget, String>? message}) {
-    this.message = message ?? Either.right("$localePrefix.error_unexpected");
+    this.message = message ?? Either.right("$_localePrefix/error/unexpected");
   }
 
   @override
@@ -159,7 +159,7 @@ class ActionableErrorMessage extends StatelessWidget {
       this.action,
       Either<Widget, String>? message})
       : message =
-            message ?? Either.right("$localePrefix.error_unexcpected_2".i18n());
+            message ?? Either.right("$_localePrefix/error/unexpected_2".i18n());
 
   ActionableErrorMessage.refresh({
     super.key,
@@ -171,7 +171,7 @@ class ActionableErrorMessage extends StatelessWidget {
             color: AcColors.primary,
             icon: const Icon(Icons.refresh)),
         message =
-            message ?? Either.right("$localePrefix.error_unexcpected_2".i18n());
+            message ?? Either.right("$_localePrefix/error/unexpected_2".i18n());
 
   @override
   Widget build(BuildContext context) {

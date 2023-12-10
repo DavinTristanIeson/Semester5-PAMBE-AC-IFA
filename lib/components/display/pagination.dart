@@ -5,9 +5,8 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 
-const localePrefix = "components.display.pagination";
-
 class AcPageListCompute<TKey, TValue> extends StatelessWidget {
+  static const _localePrefix = "components/display/pagination";
   final PagingController<TKey, TValue> controller;
   final Widget Function(BuildContext context, TValue value, int index)
       itemBuilder;
@@ -33,7 +32,7 @@ class AcPageListCompute<TKey, TValue> extends StatelessWidget {
               padding: const EdgeInsets.all(AcSizes.space),
               child: EmptyView(
                   content: Either.right(
-                      "$localePrefix.error_no_items_found".i18n())),
+                      "$_localePrefix/error/no_items_found".i18n())),
             );
           },
           newPageErrorIndicatorBuilder: (context) {

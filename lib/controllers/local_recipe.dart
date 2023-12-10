@@ -8,13 +8,6 @@ import 'package:pambe_ac_ifa/database/sqflite/tables/recipe.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/editor/components/models.dart';
 
-enum AcSharedPrefKeys {
-  isAppOpenedBefore('initScreen');
-
-  final String key;
-  const AcSharedPrefKeys(this.key);
-}
-
 class LocalRecipeController extends ChangeNotifier implements AuthDependent {
   RecipeTable recipeTable;
   String? _userId;

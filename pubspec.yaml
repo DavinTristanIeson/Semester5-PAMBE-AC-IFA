@@ -84,7 +84,7 @@ flutter:
     - assets/images/image-not-available.jpg
     - assets/images/logo.png
     - assets/images/
-    - lib/i18n/
+    - assets/i18n/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

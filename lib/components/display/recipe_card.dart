@@ -7,7 +7,7 @@ import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
 import 'package:pambe_ac_ifa/pages/recipe/main.dart';
 
-const localePrefix = "components.display.recipe_card";
+const _localePrefix = "components/display/recipe_card";
 
 class ByUserText extends StatelessWidget {
   final UserModel? user;
@@ -18,9 +18,9 @@ class ByUserText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text.rich(
         TextSpan(children: [
-          TextSpan(text: "$localePrefix.by".i18n()),
+          TextSpan(text: "$_localePrefix/by".i18n()),
           TextSpan(
-              text: user?.name ?? '<Deleted User>',
+              text: user?.name ?? 'Deleted User',
               style: TextStyle(
                 fontStyle: user == null ? FontStyle.italic : FontStyle.normal,
               ))
@@ -73,7 +73,7 @@ class RecipeCard extends StatelessWidget {
                       )));
             },
             icon: const Icon(Icons.remove_red_eye_outlined),
-            label: Text("$localePrefix.view".i18n())),
+            label: Text("$_localePrefix/view".i18n())),
       ],
     );
   }

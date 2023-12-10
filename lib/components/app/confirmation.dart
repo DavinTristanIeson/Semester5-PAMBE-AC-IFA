@@ -11,7 +11,7 @@ import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-const localePrefix = "components.app.confirmation";
+const _localePrefix = "components/app/confirmation";
 
 /// Default confirmation dialog. Used with showDialog
 class SimpleConfirmationDialog extends StatelessWidget {
@@ -37,7 +37,7 @@ class SimpleConfirmationDialog extends StatelessWidget {
     return positiveText != null && positiveText.left != null
         ? positiveText.left!
         : Text(
-            positiveText?.right ?? "$localePrefix.confirm".i18n(),
+            positiveText?.right ?? "$_localePrefix/confirm".i18n(),
             style: TextStyle(
               color: textColor,
               fontWeight: FontWeight.w500,
@@ -49,7 +49,7 @@ class SimpleConfirmationDialog extends StatelessWidget {
       String defaultText, BuildContext context) {
     return negativeText != null && negativeText.left != null
         ? negativeText.left!
-        : Text(negativeText?.right ?? "$localePrefix.cancel".i18n(),
+        : Text(negativeText?.right ?? "$_localePrefix/cancel".i18n(),
             style: TextStyle(
               color: Theme.of(context).colorScheme.secondary,
             ));
@@ -69,12 +69,12 @@ class SimpleConfirmationDialog extends StatelessWidget {
       Either<Widget, String>? positiveText,
       Either<Widget, String>? negativeText}) {
     this.title =
-        _buildTitle(context, title, "$localePrefix.confirmation".i18n());
+        _buildTitle(context, title, "$_localePrefix/confirmation".i18n());
     this.message = _buildMessage(message);
     this.positiveText = _buildPositiveText(positiveText,
-        "$localePrefix.confirm".i18n(), Theme.of(context).colorScheme.primary);
+        "$_localePrefix/confirm".i18n(), Theme.of(context).colorScheme.primary);
     this.negativeText = _buildNegativeText(
-        negativeText, "$localePrefix.cancel".i18n(), context);
+        negativeText, "$_localePrefix/cancel".i18n(), context);
   }
   SimpleConfirmationDialog.delete(
       {super.key,
@@ -86,12 +86,12 @@ class SimpleConfirmationDialog extends StatelessWidget {
       Either<Widget, String>? positiveText,
       Either<Widget, String>? negativeText}) {
     this.title =
-        _buildTitle(context, title, "$localePrefix.confirm_deletion".i18n());
+        _buildTitle(context, title, "$_localePrefix/confirm_deletion".i18n());
     this.message = _buildMessage(message);
     this.positiveText = _buildPositiveText(positiveText,
-        "$localePrefix.delete".i18n(), Theme.of(context).colorScheme.error);
+        "$_localePrefix/delete".i18n(), Theme.of(context).colorScheme.error);
     this.negativeText = _buildNegativeText(
-        negativeText, "$localePrefix.cancel".i18n(), context);
+        negativeText, "$_localePrefix/cancel".i18n(), context);
   }
 
   @override
@@ -150,11 +150,11 @@ class ImagePickMethodDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: title?.leftOr((right) => Text(right)) ??
-          Text("$localePrefix.select_picture_source".i18n(),
+          Text("$_localePrefix/select_picture_source".i18n(),
               style: context.texts.titleLarge),
       content: message?.leftOr((right) => Text(right)) ??
-          const Text(
-            "$localePrefix.confirmation_body",
+          Text(
+            "$_localePrefix/confirmation_body".i18n(),
           ),
       backgroundColor: AcColors.white,
       actions: <Widget>[
@@ -162,13 +162,13 @@ class ImagePickMethodDialog extends StatelessWidget {
           style: TextButton.styleFrom(
             foregroundColor: context.colors.secondary,
           ),
-          child: Text("$localePrefix.cancel".i18n()),
+          child: Text("$_localePrefix/cancel".i18n()),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
         TextButton(
-          child: Text("$localePrefix.camera".i18n()),
+          child: Text("$_localePrefix/camera".i18n()),
           onPressed: () async {
             final navigator = Navigator.of(context);
             final permissionResponse = await Permission.camera.request();
@@ -182,7 +182,7 @@ class ImagePickMethodDialog extends StatelessWidget {
           },
         ),
         TextButton(
-          child: Text("$localePrefix.gallery".i18n()),
+          child: Text("$_localePrefix/gallery".i18n()),
           onPressed: () async {
             final navigator = Navigator.of(context);
             PermissionStatus permissionResponse;

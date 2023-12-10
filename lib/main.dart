@@ -15,10 +15,12 @@ import 'package:pambe_ac_ifa/database/firebase/notification.dart';
 import 'package:pambe_ac_ifa/database/firebase/recipe.dart';
 import 'package:pambe_ac_ifa/database/firebase/review.dart';
 import 'package:pambe_ac_ifa/database/firebase/user.dart';
+import 'package:pambe_ac_ifa/database/shared_preferences/keys.dart';
 import 'package:pambe_ac_ifa/database/sqflite/lib/image.dart';
 import 'package:pambe_ac_ifa/database/sqflite/tables/recipe.dart';
 import 'package:pambe_ac_ifa/database/sqflite/tables/recipe_images.dart';
 import 'package:pambe_ac_ifa/init.dart';
+import 'package:pambe_ac_ifa/locale.dart';
 import 'package:pambe_ac_ifa/switch.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -83,7 +85,8 @@ void main() async {
         update: AuthProvider.registerUidToProvider,
       )
     ],
-    child: const AcReactiveFormConfig(child: RecipeLibApp()),
+    child:
+        const AcReactiveFormConfig(child: LocaleManager(child: RecipeLibApp())),
   ));
 }
 
@@ -172,11 +175,14 @@ class RecipeLibApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LocalJsonLocalization.delegate.directories = ['lib/i18n'];
+    LocalJsonLocalization.delegate.directories = ['assets/i18n'];
+    final language = LocaleService.of(context).language;
     return MaterialApp(
       title: 'Recipe.Lib',
       theme: createTheme(),
       home: const RecipeLibSwitch(),
+      locale: language.locale,
+      supportedLocales: PreferredLanguage.values.map((e) => e.locale),
       localizationsDelegates: [
         GlobalCupertinoLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

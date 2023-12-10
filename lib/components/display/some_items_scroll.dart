@@ -5,8 +5,6 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 
-const localePrefix = "components.app.some_items_scroll";
-
 class SampleScrollSection extends StatelessWidget {
   final int itemCount;
   final Widget Function(BuildContext context, int index) itemBuilder;
@@ -36,7 +34,7 @@ class SampleScrollSection extends StatelessWidget {
           borderRadius: BorderRadius.all(AcSizes.br)),
       child: Center(
         child: Text(
-          emptyView?.right ?? "$localePrefix.no_data".i18n(),
+          emptyView?.right ?? "common.no_data".i18n(),
           style: context.texts.titleMedium!
               .copyWith(color: context.colors.tertiary),
         ),

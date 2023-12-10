@@ -10,8 +10,6 @@ enum StarRatingType {
   wide,
 }
 
-const localePrefix = "components.display.review_card";
-
 class StarRating extends StatelessWidget {
   final int rating;
   final StarRatingType type;
@@ -53,6 +51,7 @@ class StarRating extends StatelessWidget {
 }
 
 class ReviewCard extends StatelessWidget {
+  static const _localePrefix = "components/display/review_card";
   final ReviewModel review;
   final String? recipeId;
   final String? recipeName;
@@ -106,7 +105,7 @@ class ReviewCard extends StatelessWidget {
 
   Widget buildUserAndRating(BuildContext context) {
     Widget reviewerNameWidget = Text(
-        review.user?.name ?? "$localePrefix.deleted_user".i18n(),
+        review.user?.name ?? "$_localePrefix/deleted_user".i18n(),
         style: review.user == null
             ? context.texts.titleMedium!.copyWith(fontStyle: FontStyle.italic)
             : null,
@@ -136,7 +135,7 @@ class ReviewCard extends StatelessWidget {
                   )
                 : reviewerNameWidget,
             recipeName != null
-                ? Text("$localePrefix.on".i18n() + recipeName!,
+                ? Text("$_localePrefix/on".i18n() + recipeName!,
                     style: context.texts.titleSmall)
                 : starRatingWidget
           ],
