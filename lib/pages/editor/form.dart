@@ -6,7 +6,9 @@ import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/components/function/future.dart';
+import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/controllers/sync_recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
@@ -213,9 +215,9 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
   }
 
   Future<void> sync() async {
-    final localController = context.read<LocalRecipeController>();
-    final remoteController = context.read<RecipeController>();
+    final syncService = context.read<SyncRecipeService>();
     final messenger = AcSnackbarMessenger.of(context);
+    final uid = context.read<AuthProvider>().user!.uid;
     bool isAccept = false;
     await showDialog(
         context: context,
@@ -238,17 +240,11 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
           final navigator = Navigator.of(context);
           Future(() async {
             try {
-              final recipe =
-                  await remoteController.get(widget.recipe!.remoteId!);
-              if (recipe == null) {
-                messenger.sendError(
-                    "Failed to find any published recipe with that ID. Your local recipe may have been terribly out of sync with the published version.");
-                return;
-              }
-              final result = await localController.syncLocal(
-                recipe,
-                id: widget.recipe!.id,
-              );
+              final result = await syncService.run((
+                localId: widget.recipe!.id,
+                remoteId: widget.recipe!.remoteId!,
+                uid: uid,
+              ));
               messenger.sendSuccess(
                   "Successfully synced changes with published version");
               widget.onChanged(result);

@@ -14,7 +14,7 @@ const String globalFirebaseImageStoragePathRoot = "images";
 class FirebaseImageManager implements INetworkImageResourceManager {
   FirebaseStorage db;
   final String storagePath;
-  CacheClient cache;
+  CacheClient<String> cache;
   FirebaseImageManager({required this.storagePath})
       : cache = CacheClient(staleTime: const Duration(minutes: 5)),
         db = FirebaseStorage.instance;

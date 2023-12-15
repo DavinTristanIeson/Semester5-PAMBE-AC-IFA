@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:pambe_ac_ifa/common/context_manager.dart';
+
 class CacheItem<T> {
   final T value;
   final DateTime cachedAt;
@@ -27,12 +29,12 @@ class CacheItem<T> {
 
 class CacheClient<T> {
   final Map<String, CacheItem<T>> _cache = {};
-  late final Timer timer;
+  Timer? _timer;
   Duration defaultStaleTime;
   static Duration defaultCleanupInterval = const Duration(minutes: 3);
   CacheClient({Duration? staleTime, Duration? cleanupInterval})
       : defaultStaleTime = staleTime ?? CacheItem.defaultStaleTime {
-    timer = Timer.periodic(cleanupInterval ?? defaultCleanupInterval, (timer) {
+    _timer = Timer.periodic(cleanupInterval ?? defaultCleanupInterval, (timer) {
       cleanupCache();
     });
   }
@@ -41,7 +43,6 @@ class CacheClient<T> {
     String key,
     T value, {
     Duration? staleTime,
-    Duration? cacheTime,
   }) {
     _cache[key] = CacheItem(
       value: value,
@@ -70,7 +71,11 @@ class CacheClient<T> {
   /// If ``keys`` exists, mark all items with that key as stale.
   ///
   /// If ``prefix`` exists, Mark all items whose keys start with the specified prefix as stale
-  void markStale({Iterable<String>? keys, String? prefix, String? key}) {
+  void markStale(
+      {Iterable<String>? keys,
+      String? prefix,
+      String? key,
+      bool Function(String key, CacheItem<T> element)? where}) {
     if (key != null) {
       _cache.remove(key);
     }
@@ -81,6 +86,9 @@ class CacheClient<T> {
     }
     if (prefix != null) {
       _cache.removeWhere((key, value) => key.startsWith(prefix));
+    }
+    if (where != null) {
+      _cache.removeWhere(where);
     }
   }
 
@@ -94,6 +102,19 @@ class CacheClient<T> {
 
   void dispose() {
     _cache.clear();
-    timer.cancel();
+    _timer?.cancel();
+  }
+
+  ContextManager get noTimerContext {
+    return ContextManager<Timer?>(
+        id: "Cache-${_timer.hashCode}-${_cache.hashCode}-NoTimer",
+        onOpen: () {
+          final tempTimer = _timer;
+          _timer = null;
+          return Future.value(tempTimer);
+        },
+        onClose: (initial) async {
+          _timer = initial;
+        });
   }
 }

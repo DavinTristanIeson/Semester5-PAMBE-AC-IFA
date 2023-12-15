@@ -6,8 +6,7 @@ import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
-import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
-import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/controllers/delete_account.dart';
 import 'package:pambe_ac_ifa/controllers/user.dart';
 import 'package:pambe_ac_ifa/database/interfaces/user.dart';
 import 'package:pambe_ac_ifa/pages/home/main.dart';
@@ -133,13 +132,10 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
     }
   }
 
-  Future<void> deleteAccount() async {
+  Future<void> confirmDeleteAccount() async {
     final messenger = AcSnackbarMessenger.of(context);
-    final auth = context.read<AuthProvider>();
+    final uid = context.read<AuthProvider>().user!.uid;
     final navigator = Navigator.of(context);
-    final localRecipeController = context.read<LocalRecipeController>();
-    final recipeController = context.read<RecipeController>();
-    final userController = context.read<UserController>();
     LoginPayload? credentials;
     await showDialog(
         context: context,
@@ -155,20 +151,25 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
     if (credentials == null) {
       return;
     }
-    try {
-      await localRecipeController.removeAll();
-      await recipeController.removeAll();
-    } catch (e) {
-      messenger.sendError(e);
-      return;
-    }
-    try {
-      await userController.remove(credentials: credentials!);
-      await auth.deleteAccount(credentials: credentials!);
-    } catch (e) {
-      messenger.sendError(e);
-      return;
-    }
+    // ignore: use_build_context_synchronously
+    await showDialog(
+      builder: (context) {
+        final navigator = Navigator.of(context);
+        final deleteAccountService = context.read<DeleteAccountService>();
+        Future(() {
+          try {
+            deleteAccountService.run((credentials: credentials!, uid: uid));
+          } catch (e) {
+            messenger.sendError(e);
+          } finally {
+            navigator.pop();
+          }
+        });
+        return const Center(child: CircularProgressIndicator());
+      },
+      context: context,
+    );
+
     navigator.pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const HomeScreen()),
         (route) => false);
@@ -184,7 +185,7 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
                 foregroundColor: context.colors.error,
                 side: BorderSide(color: context.colors.error),
               ),
-              onPressed: deleteAccount,
+              onPressed: confirmDeleteAccount,
               progressIndicatorColor: context.colors.error,
               child: const Text("Delete Account"))
         ],

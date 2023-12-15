@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:pambe_ac_ifa/common/context_manager.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
+import 'package:pambe_ac_ifa/database/firebase/bookmark.dart';
+import 'package:pambe_ac_ifa/database/firebase/lib/images.dart';
 import 'package:pambe_ac_ifa/database/firebase/recipe_images.dart';
 import 'package:pambe_ac_ifa/database/firebase/user.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
@@ -41,10 +45,10 @@ class FirebaseRecipeManager
   static const String collectionPath = "recipes";
   FirebaseFirestore db;
   FirebaseUserManager userManager;
-  INetworkImageResourceManager imageManager;
+  FirebaseImageManager imageManager;
   RemoteRecipeImageManager recipeImageHelper;
-  IRecipeRelationshipResourceManager bookmarkManager;
-  IRecipeRelationshipResourceManager viewManager;
+  FirebaseRecipeBookmarkManager bookmarkManager;
+  FirebaseRecipeViewManager viewManager;
   CacheClient<RecipeModel?> cache;
   CacheClient<PaginatedQueryResult<RecipeLiteModel>> queryCache;
   FirebaseRecipeManager(
@@ -73,7 +77,8 @@ class FirebaseRecipeManager
   }
 
   Future<RecipeModel> _transform(
-      Map<String, Object?> json, DocumentSnapshot<Object?> snapshot) async {
+      Map<String, Object?> json, DocumentSnapshot<Object?> snapshot,
+      {bool noUrl = false}) async {
     final imagePath = json[RecipeFirestoreKeys.imagePath.name] as String?;
     final steps = (json[RecipeFirestoreKeys.steps.name] as List)
         .cast<Map<String, Object?>>();
@@ -82,8 +87,9 @@ class FirebaseRecipeManager
       "id": snapshot.id,
       "user": await userManager
           .get(json[RecipeFirestoreKeys.userId.name] as String),
-      "imagePath":
-          imagePath == null ? null : await imageManager.urlof(imagePath),
+      "imagePath": imagePath == null || noUrl
+          ? null
+          : await imageManager.urlof(imagePath),
       "imageStoragePath": imagePath,
       "steps": await Future.wait(steps.map((step) async {
         final imagePath =
@@ -91,8 +97,9 @@ class FirebaseRecipeManager
         return {
           ...step,
           "imageStoragePath": imagePath,
-          "imagePath":
-              imagePath == null ? null : await imageManager.urlof(imagePath)
+          "imagePath": imagePath == null || noUrl
+              ? null
+              : await imageManager.urlof(imagePath)
         };
       }))
     });
@@ -177,6 +184,7 @@ class FirebaseRecipeManager
     SortBy<RecipeSortBy>? sort,
     RecipeFilterBy? filter,
     String? search,
+    bool lite = true,
   }) async {
     final queryKey = getQueryKey(
         page: page, limit: limit, sort: sort, filter: filter, search: search);
@@ -197,7 +205,7 @@ class FirebaseRecipeManager
     }
 
     final (:data, :snapshot) = await processQuerySnapshot(() => query.get(),
-        transform: _transformLite);
+        transform: lite ? _transformLite : _transform);
     final result = (data: data, nextPage: snapshot.docs.lastOrNull);
 
     queryCache.put(queryKey, result);
@@ -326,9 +334,54 @@ class FirebaseRecipeManager
     }
   }
 
+  Future<void> removeAllByUser(String uid) async {
+    final (data: userRecipes, :snapshot) = await processQuerySnapshot(() {
+      return db
+          .collection(collectionPath)
+          .where(RecipeFirestoreKeys.userId, isEqualTo: uid)
+          .get();
+    }, transform: (json, snapshot) {
+      return _transform(json, snapshot, noUrl: true);
+    });
+    final Map<String, XFile?> reserved = {};
+    for (final recipe in userRecipes) {
+      reserved.addAll(recipeImageHelper.markRecipeImagesForDeletion(
+          userId: uid, recipe: recipe));
+    }
+
+    final batch = db.batch();
+    for (final doc in snapshot.docs) {
+      batch.delete(doc.reference);
+    }
+    try {
+      await batch.commit();
+      queryCache.clear();
+      cache.markStale(where: (key, value) {
+        return value.value?.user?.id == uid;
+      });
+    } catch (e) {
+      throw ApiError(ApiErrorType.deleteFailure, inner: e);
+    }
+    try {
+      await imageManager.process(reserved, userId: uid);
+    } catch (e) {
+      throw ApiError(ApiErrorType.imageManagementFailure, inner: e);
+    }
+  }
+
   @override
   void dispose() {
     cache.dispose();
     queryCache.dispose();
+  }
+
+  ContextManager get noTimerContext {
+    return cache.noTimerContext.merge([
+      queryCache.noTimerContext,
+      userManager.noTimerContext,
+      bookmarkManager.noTimerContext,
+      viewManager.noTimerContext,
+      imageManager.cache.noTimerContext
+    ]);
   }
 }

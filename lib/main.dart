@@ -1,12 +1,16 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
+import 'package:pambe_ac_ifa/controllers/delete_account.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/notification.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/controllers/review.dart';
+import 'package:pambe_ac_ifa/controllers/sync_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/user.dart';
 import 'package:pambe_ac_ifa/database/firebase/auth.dart';
 import 'package:pambe_ac_ifa/database/firebase/bookmark.dart';
@@ -41,7 +45,10 @@ void main() async {
     imageManager:
         LocalRecipeImageManager(imageManager: LocalFileImageManager()),
   );
-  recipeTable.cleanupUnusedImages();
+  compute((token) {
+    BackgroundIsolateBinaryMessenger.ensureInitialized(token);
+    recipeTable.cleanupUnusedImages();
+  }, ServicesBinding.rootIsolateToken!);
 
   final userManager = FirebaseUserManager(
       imageManager: FirebaseImageManager(storagePath: 'user'));
@@ -50,44 +57,66 @@ void main() async {
       bookmarkManager: FirebaseRecipeBookmarkManager(),
       viewManager: FirebaseRecipeViewManager(),
       imageManager: FirebaseImageManager(storagePath: "recipes"));
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(
-          create: (context) =>
-              AuthProvider(authManager: FirebaseAuthManager())),
-      ProxyProvider<AuthProvider, NotificationController>(
-        create: (context) => NotificationController(
-            notificationManager: FirebaseNotificationManager(), userId: null),
-        update: AuthProvider.registerUidToProvider,
-      ),
-      ChangeNotifierProxyProvider<AuthProvider, UserController>(
-        create: (context) => UserController(
-            userManager: FirebaseUserManager(
-                imageManager: FirebaseImageManager(storagePath: "user"))),
-        update: AuthProvider.registerUidToProvider,
-      ),
-      ChangeNotifierProxyProvider<AuthProvider, RecipeController>(
-        create: (context) => RecipeController(
-            bookmarkManager: recipeManager.bookmarkManager,
-            viewManager: recipeManager.viewManager,
-            recipeManager: recipeManager,
-            userId: null),
-        update: AuthProvider.registerUidToProvider,
-      ),
-      ChangeNotifierProxyProvider<AuthProvider, LocalRecipeController>(
-        create: (context) => LocalRecipeController(recipeTable: recipeTable),
-        update: AuthProvider.registerUidToProvider,
-      ),
-      ChangeNotifierProxyProvider<AuthProvider, ReviewController>(
-        create: (context) => ReviewController(
-            reviewManager: FirebaseReviewManager(
-                userManager: userManager, recipeManager: recipeManager)),
-        update: AuthProvider.registerUidToProvider,
-      )
-    ],
-    child:
-        const AcReactiveFormConfig(child: LocaleManager(child: RecipeLibApp())),
-  ));
+  final authManager = FirebaseAuthManager();
+  runApp(
+    MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+              create: (context) => AuthProvider(authManager: authManager)),
+          ProxyProvider<AuthProvider, NotificationController>(
+            create: (context) => NotificationController(
+                notificationManager: FirebaseNotificationManager(),
+                userId: null),
+            update: AuthProvider.registerUidToProvider,
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, UserController>(
+            create: (context) => UserController(userManager: userManager),
+            update: AuthProvider.registerUidToProvider,
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, RecipeController>(
+            create: (context) => RecipeController(
+                bookmarkManager: recipeManager.bookmarkManager,
+                viewManager: recipeManager.viewManager,
+                recipeManager: recipeManager,
+                userId: null),
+            update: AuthProvider.registerUidToProvider,
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, LocalRecipeController>(
+            create: (context) =>
+                LocalRecipeController(recipeTable: recipeTable),
+            update: AuthProvider.registerUidToProvider,
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, ReviewController>(
+            create: (context) => ReviewController(
+                reviewManager: FirebaseReviewManager(
+                    userManager: userManager, recipeManager: recipeManager)),
+            update: AuthProvider.registerUidToProvider,
+          ),
+          Provider(create: (context) {
+            return DeleteAccountService(
+                recipeManager: recipeManager,
+                localRecipeManager: recipeTable,
+                userManager: userManager,
+                authManager: authManager);
+          }),
+          Provider(
+            create: (context) {
+              return SyncRecipeService(
+                  recipeManager: recipeManager,
+                  localRecipeManager: recipeTable);
+            },
+          ),
+          Provider(
+            create: (context) {
+              return SyncAllRecipesService(
+                  recipeManager: recipeManager,
+                  localRecipeManager: recipeTable);
+            },
+          ),
+        ],
+        child: const AcReactiveFormConfig(
+            child: LocaleManager(child: RecipeLibApp()))),
+  );
 }
 
 class RecipeLibApp extends StatelessWidget {

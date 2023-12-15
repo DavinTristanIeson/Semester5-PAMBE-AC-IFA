@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pambe_ac_ifa/common/context_manager.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
+import 'package:pambe_ac_ifa/database/firebase/lib/images.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
-import 'package:pambe_ac_ifa/database/interfaces/common.dart';
 import 'package:pambe_ac_ifa/database/interfaces/user.dart';
 import 'package:pambe_ac_ifa/database/mixins/firebase.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
@@ -25,7 +26,7 @@ class FirebaseUserManager
     implements IUserResourceManager {
   static const String collectionPath = "users";
   FirebaseFirestore db;
-  INetworkImageResourceManager imageManager;
+  FirebaseImageManager imageManager;
   CacheClient<UserModel?> cache;
   FirebaseUserManager({required this.imageManager})
       : cache = CacheClient(
@@ -134,5 +135,9 @@ class FirebaseUserManager
     if (prev.imagePath != null) {
       await imageManager.remove(prev.imagePath!);
     }
+  }
+
+  ContextManager get noTimerContext {
+    return cache.noTimerContext.merge([imageManager.cache.noTimerContext]);
   }
 }

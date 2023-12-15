@@ -146,21 +146,6 @@ class RecipeController extends ChangeNotifier implements AuthDependent {
     notifyListeners();
   }
 
-  Future<void> removeAll() async {
-    if (_userId == null) {
-      throw InvalidStateError(
-          "RecipeController._userId is expected to be non-null when removeAll is called.");
-    }
-    final yourRecipes = await getRecipesByUser(_userId!);
-    // To make sure we don't get rate limited
-    await Future.wait(yourRecipes.chunks(4).map((chunk) async {
-      for (final item in chunk) {
-        await recipeManager.remove(item.id);
-      }
-    }));
-    notifyListeners();
-  }
-
   Future<void> bookmark(String recipeId, bool isBookmarked) async {
     if (_userId == null) {
       throw InvalidStateError(

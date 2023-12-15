@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pambe_ac_ifa/common/context_manager.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/interfaces/common.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
@@ -131,6 +132,10 @@ abstract class FirebaseRecipeRelationshipManager
         throw ApiError(ApiErrorType.deleteFailure, inner: e);
       }
     }
+  }
+
+  ContextManager get noTimerContext {
+    return cache.noTimerContext.merge([queryCache.noTimerContext]);
   }
 }
 

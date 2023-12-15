@@ -63,15 +63,6 @@ class LocalRecipeController extends ChangeNotifier implements AuthDependent {
     notifyListeners();
   }
 
-  Future<void> removeAll() async {
-    if (_userId == null) {
-      throw InvalidStateError(
-          "LocalRecipeController.userId is expected to be non-null when removeAll is called.");
-    }
-    await recipeTable.removeAllByUser(_userId!);
-    notifyListeners();
-  }
-
   Future<void> setRemoteId(int localId, String? remoteId) async {
     await recipeTable.setRemoteId(localId, remoteId);
   }

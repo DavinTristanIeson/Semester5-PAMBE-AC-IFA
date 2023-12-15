@@ -8,10 +8,10 @@ import 'package:pambe_ac_ifa/components/display/some_items_scroll.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/controllers/local_recipe.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
+import 'package:pambe_ac_ifa/controllers/sync_recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
-import 'package:pambe_ac_ifa/modules/future.dart';
 import 'package:pambe_ac_ifa/pages/editor/main.dart';
 import 'package:pambe_ac_ifa/pages/home/components/async_scroll_section.dart';
 import 'package:pambe_ac_ifa/pages/search/main.dart';
@@ -72,8 +72,6 @@ class LibraryLocalRecipesSection extends StatelessWidget {
 
   Future<void> syncAll(BuildContext context) async {
     bool isAccept = false;
-    final localController = context.read<LocalRecipeController>();
-    final controller = context.read<RecipeController>();
     final messenger = AcSnackbarMessenger.of(context);
     final uid = context.read<AuthProvider>().user!.uid;
     await showDialog(
@@ -95,20 +93,10 @@ class LibraryLocalRecipesSection extends StatelessWidget {
         context: context,
         builder: (context) {
           final navigator = Navigator.of(context);
+          final syncRecipeService = context.read<SyncAllRecipesService>();
           Future(() async {
             try {
-              final remoteRecipes = await controller.getAll(RecipeSearchState(
-                limit: 1000,
-                filterBy: RecipeFilterBy.createdByUser(uid),
-              ));
-              final distributor = FutureChunkDistributor(
-                  (idx) => controller.get(remoteRecipes[idx].id),
-                  chunkSize: 4,
-                  count: remoteRecipes.length);
-              final recipes = await distributor.wait();
-              await localController.syncAllLocal(recipes
-                  .where((element) => element != null)
-                  .cast<RecipeModel>());
+              await syncRecipeService.run((uid: uid));
               messenger.sendSuccess(
                   "Local recipes were successfully synchronized with your published recipes.");
             } catch (e) {
