@@ -338,7 +338,7 @@ class FirebaseRecipeManager
     final (data: userRecipes, :snapshot) = await processQuerySnapshot(() {
       return db
           .collection(collectionPath)
-          .where(RecipeFirestoreKeys.userId, isEqualTo: uid)
+          .where(RecipeFirestoreKeys.userId.name, isEqualTo: uid)
           .get();
     }, transform: (json, snapshot) {
       return _transform(json, snapshot, noUrl: true);

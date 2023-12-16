@@ -4,10 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/firebase/recipe.dart';
+import 'package:pambe_ac_ifa/database/firebase/user.dart';
 import 'package:pambe_ac_ifa/database/interfaces/errors.dart';
 import 'package:pambe_ac_ifa/database/interfaces/common.dart';
 import 'package:pambe_ac_ifa/database/interfaces/review.dart';
-import 'package:pambe_ac_ifa/database/interfaces/user.dart';
 import 'package:pambe_ac_ifa/database/mixins/firebase.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
 
@@ -22,7 +22,7 @@ class FirebaseReviewManager
     with FirebaseResourceManagerMixin
     implements IReviewResourceManager {
   FirebaseFirestore db;
-  IUserResourceManager userManager;
+  FirebaseUserManager userManager;
   FirebaseRecipeManager recipeManager;
   CacheClient<ReviewModel?> cache;
   CacheClient<PaginatedQueryResult<ReviewModel>> queryCache;

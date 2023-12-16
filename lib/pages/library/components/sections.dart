@@ -74,6 +74,7 @@ class LibraryLocalRecipesSection extends StatelessWidget {
     bool isAccept = false;
     final messenger = AcSnackbarMessenger.of(context);
     final uid = context.read<AuthProvider>().user!.uid;
+    final syncRecipeService = context.read<SyncAllRecipesService>();
     await showDialog(
         context: context,
         builder: (context) {
@@ -89,26 +90,11 @@ class LibraryLocalRecipesSection extends StatelessWidget {
         });
     if (!isAccept) return;
     // ignore: use_build_context_synchronously
-    await showDialog(
-        context: context,
-        builder: (context) {
-          final navigator = Navigator.of(context);
-          final syncRecipeService = context.read<SyncAllRecipesService>();
-          Future(() async {
-            try {
-              await syncRecipeService.run((uid: uid));
-              messenger.sendSuccess(
-                  "Local recipes were successfully synchronized with your published recipes.");
-            } catch (e) {
-              messenger.sendError(e);
-            }
-            navigator.pop();
-          });
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-        barrierDismissible: false);
+    await showBlockingDialog(context, () async {
+      await syncRecipeService.run((uid: uid));
+      messenger.sendSuccess(
+          "Local recipes were successfully synchronized with your published recipes.");
+    });
   }
 
   @override

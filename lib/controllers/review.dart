@@ -32,7 +32,14 @@ class ReviewController extends ChangeNotifier implements AuthDependent {
     final limit = searchState.reviewId != null ? 1 : searchState.limit;
     final (:data, :nextPage) = await reviewManager.getAll(
         page: page, recipeId: searchState.recipeId, limit: limit);
-    return (data: data, nextPage: data.length < limit ? null : nextPage);
+    return (
+      data: data,
+      nextPage: searchState.reviewId != null
+          ? null
+          : data.length < limit
+              ? null
+              : nextPage
+    );
   }
 
   Future<List<ReviewModel>> getAll(

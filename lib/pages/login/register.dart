@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
-import 'package:pambe_ac_ifa/components/app/snackbar.dart';
+import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/controllers/user.dart';
@@ -124,15 +124,15 @@ class RegisterScreen extends StatelessWidget {
     final navigator = Navigator.of(context);
     final authProvider = context.read<AuthProvider>();
     final userController = context.read<UserController>();
-    final messenger = AcSnackbarMessenger.of(context);
-    try {
+
+    final result = await showBlockingDialog(context, () async {
       final User(:uid) = await authProvider.register(payload);
       await userController.register(uid, payload);
+    });
+    if (result.hasValue) {
       navigator.pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
           (route) => false);
-    } catch (e) {
-      messenger.sendError(e);
     }
   }
 

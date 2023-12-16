@@ -14,8 +14,10 @@ class NotificationTile extends StatelessWidget {
       NotificationType.system => null,
       NotificationType.review => () {
           context.navigator.push(MaterialPageRoute(
-              builder: (context) =>
-                  ReviewsScreen(recipeId: notification.reviewId!)));
+              builder: (context) => ReviewsScreen(
+                    recipeId: notification.recipeId!,
+                    reviewId: notification.reviewId!,
+                  )));
         },
     };
   }

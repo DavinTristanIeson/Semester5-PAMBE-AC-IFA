@@ -41,6 +41,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final notificationController = context.watch<NotificationController>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Recipe.Lib"),
@@ -105,13 +106,26 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               tab = RecipeLibTabs.values[value];
             });
           },
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-            BottomNavigationBarItem(
+          items: [
+            const BottomNavigationBarItem(
+                icon: Icon(Icons.home), label: "Home"),
+            const BottomNavigationBarItem(
                 icon: Icon(Icons.library_books), label: "Library"),
             BottomNavigationBarItem(
-                icon: Icon(Icons.notifications), label: "Notifications"),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+                icon: FutureBuilder(
+                    future: notificationController.hasUnread(),
+                    builder: (context, snapshot) {
+                      final hasUnread = snapshot.data ?? false;
+                      const icon = Icon(Icons.notifications);
+                      return hasUnread
+                          ? Badge(
+                              backgroundColor: context.colors.error,
+                              child: icon)
+                          : icon;
+                    }),
+                label: "Notifications"),
+            const BottomNavigationBarItem(
+                icon: Icon(Icons.person), label: "Profile"),
           ],
         ),
       ),

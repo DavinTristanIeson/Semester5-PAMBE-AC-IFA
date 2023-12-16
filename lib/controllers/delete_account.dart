@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:pambe_ac_ifa/database/firebase/auth.dart';
@@ -5,11 +6,11 @@ import 'package:pambe_ac_ifa/database/firebase/recipe.dart';
 import 'package:pambe_ac_ifa/database/firebase/user.dart';
 import 'package:pambe_ac_ifa/database/interfaces/user.dart';
 import 'package:pambe_ac_ifa/database/sqflite/tables/recipe.dart';
+import 'package:pambe_ac_ifa/firebase_options.dart';
 
 typedef DeleteAccountPayload = ({String uid, LoginPayload credentials});
 typedef _DeleteAccountIsolatePayload = ({
   String uid,
-  LoginPayload credentials,
   DeleteAccountService service,
   RootIsolateToken isolateToken,
 });
@@ -28,12 +29,14 @@ class DeleteAccountService {
   });
 
   static void _run(_DeleteAccountIsolatePayload payload) async {
-    final (:service, :uid, :credentials, :isolateToken) = payload;
+    final (:service, :uid, :isolateToken) = payload;
     BackgroundIsolateBinaryMessenger.ensureInitialized(isolateToken);
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     await service.localRecipeManager.removeAllByUser(uid);
     await service.recipeManager.removeAllByUser(uid);
     await service.userManager.remove(uid);
-    await service.authManager.deleteAccount(uid, credentials: credentials);
   }
 
   Future<void> cleanup(DeleteAccountPayload payload) async {
@@ -48,10 +51,11 @@ class DeleteAccountService {
     await recipeManager.noTimerContext.run((_) async {
       await compute(_run, (
         uid: payload.uid,
-        credentials: payload.credentials,
         service: this,
         isolateToken: ServicesBinding.rootIsolateToken!
       ));
+      await authManager.deleteAccount(payload.uid,
+          credentials: payload.credentials);
       await cleanup(payload);
     });
   }

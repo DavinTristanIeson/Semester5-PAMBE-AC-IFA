@@ -48,8 +48,10 @@ class AuthProvider extends ChangeNotifier {
     return FirebaseAuth.instance.currentUser!;
   }
 
-  Future<void> logout() {
-    return authManager.logout();
+  Future<void> logout() async {
+    await authManager.logout();
+    user = null;
+    notifyListeners();
   }
 
   Future<void> updateAuth({

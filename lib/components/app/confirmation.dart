@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -205,4 +206,33 @@ class ImagePickMethodDialog extends StatelessWidget {
       ],
     );
   }
+}
+
+Future<Optional<T>> showBlockingDialog<T>(
+    BuildContext context, Future<T> Function() fn) async {
+  T? value;
+  dynamic error;
+  final messenger = AcSnackbarMessenger.of(context);
+  await showDialog(
+    builder: (context) {
+      final navigator = Navigator.of(context);
+      Future(() async {
+        try {
+          value = await fn();
+        } catch (e) {
+          messenger.sendError(e);
+          error = e;
+        } finally {
+          navigator.pop();
+        }
+      });
+      return const Center(child: CircularProgressIndicator());
+    },
+    barrierDismissible: false,
+    context: context,
+  );
+  if (error != null) {
+    return Optional.none();
+  }
+  return Optional.some(value as T);
 }

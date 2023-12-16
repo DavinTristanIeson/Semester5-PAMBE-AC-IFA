@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
-import 'package:pambe_ac_ifa/components/app/snackbar.dart';
+import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/database/interfaces/user.dart';
 import 'package:pambe_ac_ifa/pages/home/main.dart';
@@ -72,14 +72,14 @@ class LoginScreen extends StatelessWidget {
     final navigator = Navigator.of(context);
     final auth = context.read<AuthProvider>();
 
-    final messenger = AcSnackbarMessenger.of(context);
-    try {
-      await auth.login(payload);
+    final result = await showBlockingDialog(context, () {
+      return auth.login(payload);
+    });
+
+    if (result.hasValue) {
       navigator.pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
           (route) => false);
-    } catch (e) {
-      messenger.sendError(e);
     }
   }
 

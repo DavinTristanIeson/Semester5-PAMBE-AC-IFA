@@ -3,6 +3,7 @@ import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
+import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
 import 'package:pambe_ac_ifa/components/display/future.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
@@ -133,8 +134,8 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
   }
 
   Future<void> confirmDeleteAccount() async {
-    final messenger = AcSnackbarMessenger.of(context);
-    final uid = context.read<AuthProvider>().user!.uid;
+    final authProvider = context.read<AuthProvider>();
+    final deleteAccountService = context.read<DeleteAccountService>();
     final navigator = Navigator.of(context);
     LoginPayload? credentials;
     await showDialog(
@@ -152,27 +153,16 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
       return;
     }
     // ignore: use_build_context_synchronously
-    await showDialog(
-      builder: (context) {
-        final navigator = Navigator.of(context);
-        final deleteAccountService = context.read<DeleteAccountService>();
-        Future(() {
-          try {
-            deleteAccountService.run((credentials: credentials!, uid: uid));
-          } catch (e) {
-            messenger.sendError(e);
-          } finally {
-            navigator.pop();
-          }
-        });
-        return const Center(child: CircularProgressIndicator());
-      },
-      context: context,
-    );
-
-    navigator.pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-        (route) => false);
+    final result = await showBlockingDialog(context, () {
+      return deleteAccountService
+          .run((credentials: credentials!, uid: authProvider.user!.uid));
+    });
+    if (result.hasValue) {
+      await authProvider.logout();
+      navigator.pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (route) => false);
+    }
   }
 
   @override
