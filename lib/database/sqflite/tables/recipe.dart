@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
 import 'package:pambe_ac_ifa/database/sqflite/tables/recipe_images.dart';
@@ -72,6 +74,7 @@ class RecipeTable {
     final steps = await stepsController.getAllFromRecipe(recipeId: id);
     Map<String, dynamic> json = Map.from(data);
     json["steps"] = steps;
+    json["tags"] = jsonDecode(json["tags"]);
     return LocalRecipeModel.fromJson(json);
   }
 
@@ -86,10 +89,13 @@ class RecipeTable {
     List<Object?>? queryArgs = [];
     if (search != null) {
       query +=
-          "${_RecipeColumns.title.name} LIKE ? OR ${_RecipeColumns.tags.name} LIKE ?";
-      queryArgs.addAll([search, search]);
+          "${_RecipeColumns.title.name} LIKE ? OR ${_RecipeColumns.tags.name} LIKE ? ";
+      queryArgs.addAll(["$search%", "%$search%"]);
     }
     if (filter != null && filter.type == RecipeFilterByType.createdByUser) {
+      if (queryArgs.isNotEmpty) {
+        query += " AND ";
+      }
       query += "${_RecipeColumns.userId.name} = ?";
       queryArgs.add(filter.userId!);
     }
@@ -99,10 +105,12 @@ class RecipeTable {
         limit: limit,
         offset: page == null ? null : (limit ?? 15) * (page - 1),
         orderBy: "${_RecipeColumns.createdAt.name} DESC");
-    return results
-        .map<LocalRecipeLiteModel>(
-            (result) => LocalRecipeLiteModel.fromJson(result))
-        .toList();
+    return results.map<LocalRecipeLiteModel>((result) {
+      return LocalRecipeLiteModel.fromJson({
+        ...result,
+        "tags": jsonDecode(result[_RecipeColumns.tags.name] as String)
+      });
+    }).toList();
   }
 
   Future<LocalRecipeModel> put(
@@ -128,7 +136,7 @@ class RecipeTable {
         _RecipeColumns.userId.name: userId,
         _RecipeColumns.createdAt.name: DateTime.now().millisecondsSinceEpoch,
         _RecipeColumns.imagePath.name: recipeImage,
-        _RecipeColumns.tags.name: tags.toString(),
+        _RecipeColumns.tags.name: jsonEncode(tags),
         if (remoteId != null) _RecipeColumns.remoteId.name: remoteId,
       };
       if (id == null) {

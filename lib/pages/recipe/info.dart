@@ -5,6 +5,7 @@ import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
 import 'package:pambe_ac_ifa/components/display/recipe_card.dart';
 import 'package:pambe_ac_ifa/components/display/review_card.dart';
+import 'package:pambe_ac_ifa/components/field/tags.dart';
 import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
@@ -186,8 +187,25 @@ class RecipeInfoScreen extends StatelessWidget {
           boxShadow: [AcDecoration.shadowRegular]),
       constraints: const BoxConstraints(minHeight: AcSizes.xl * 2),
       padding: const EdgeInsets.all(AcSizes.lg),
-      child: Text(recipe.description,
-          style: Theme.of(context).textTheme.bodyMedium),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(recipe.description,
+              style: Theme.of(context).textTheme.bodyMedium),
+          if (recipe.tags.isNotEmpty) ...[
+            const SizedBox(
+              height: AcSizes.lg,
+            ),
+            Wrap(
+              children: recipe.tags
+                  .map((e) => Padding(
+                      padding: const EdgeInsets.all(AcSizes.xs),
+                      child: TagWidget(tag: e)))
+                  .toList(),
+            )
+          ]
+        ],
+      ),
     );
   }
 

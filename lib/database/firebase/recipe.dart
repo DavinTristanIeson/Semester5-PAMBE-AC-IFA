@@ -171,12 +171,13 @@ class FirebaseRecipeManager
     required String userId,
   }) async {
     final (data: bookmarks, :nextPage) =
-        await bookmarkManager.getAll(userId: userId);
-    final recipeFuture = FutureChunkDistributor((idx) {
+        await bookmarkManager.getAll(userId: userId, limit: limit, page: page);
+    final recipeFuture = await FutureChunkDistributor((idx) {
       return get(bookmarks[idx].recipeId);
     }, chunkSize: 4, count: bookmarks.length)
         .wait();
-    final recipes = (await recipeFuture).notNull<RecipeModel>().toList();
+    final recipes =
+        filterByTags(recipeFuture.notNull<RecipeModel>(), search).toList();
     final result = (data: recipes, nextPage: nextPage);
     return result;
   }
@@ -216,6 +217,14 @@ class FirebaseRecipeManager
     return result;
   }
 
+  Iterable<RecipeModel> filterByTags(
+      Iterable<RecipeModel> recipes, String? search) {
+    if (search == null) return recipes;
+    final searchTag = processTag(search);
+    return recipes.where(
+        (element) => element.tags.exists((element) => element == searchTag));
+  }
+
   Future<PaginatedQueryResult<RecipeLiteModel>> getViewedRecipes({
     QueryDocumentSnapshot? page,
     int? limit,
@@ -223,13 +232,15 @@ class FirebaseRecipeManager
     String? search,
     required String userId,
   }) async {
-    final (data: views, :nextPage) = await viewManager.getAll(userId: userId);
-    final recipeFuture = FutureChunkDistributor(
+    final (data: views, :nextPage) =
+        await viewManager.getAll(userId: userId, limit: limit, page: page);
+    final recipeFuture = await FutureChunkDistributor(
             (idx) => get(views[idx].recipeId),
             chunkSize: 4,
             count: views.length)
         .wait();
-    final recipes = (await recipeFuture).notNull<RecipeModel>().toList();
+    final recipes =
+        filterByTags(recipeFuture.notNull<RecipeModel>(), search).toList();
     final result = (data: recipes, nextPage: nextPage);
     return result;
   }

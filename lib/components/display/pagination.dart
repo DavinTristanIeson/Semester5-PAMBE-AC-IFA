@@ -36,11 +36,13 @@ class AcPageListCompute<TKey, TValue> extends StatelessWidget {
             );
           },
           newPageErrorIndicatorBuilder: (context) {
+            debugPrint(controller.error.toString());
             return ActionableErrorMessage.refresh(
                 error: Either.right(controller.error),
                 onRefresh: controller.refresh);
           },
           firstPageErrorIndicatorBuilder: (context) {
+            debugPrint(controller.error.toString());
             return ActionableErrorMessage.refresh(
                 error: Either.right(controller.error),
                 onRefresh: controller.refresh);

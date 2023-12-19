@@ -55,10 +55,11 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
           FormControl<String>(value: recipe?.description, validators: [
         Validators.required,
       ]),
-      RecipeFormKeys.tags.name:
-          FormControl<String>(value: recipe?.description, validators: [
-        AcValidators.minCount(1),
-      ]),
+      RecipeFormKeys.tags.name: FormControl<Set<String>>(
+          value: recipe?.tags.toSet() ?? <String>{},
+          validators: [
+            AcValidators.minCount(1),
+          ]),
       RecipeFormKeys.image.name: FormControl<XFile?>(
           value: recipe?.imagePath == null ? null : XFile(recipe!.imagePath!)),
       RecipeFormKeys.steps.name: FormArray(

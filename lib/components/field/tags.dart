@@ -4,12 +4,12 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/field/field_wrapper.dart';
 import 'package:pambe_ac_ifa/components/field/text_input.dart';
 
-class _Tag extends StatelessWidget {
+class TagWidget extends StatelessWidget {
   final void Function(String tag)? onDismiss;
   final String tag;
-  const _Tag({this.onDismiss, required this.tag});
+  const TagWidget({super.key, this.onDismiss, required this.tag});
 
-  static const tagRadius = Radius.circular(AcSizes.sm);
+  static const tagRadius = Radius.circular(AcSizes.sm + AcSizes.xs);
 
   @override
   Widget build(BuildContext context) {
@@ -18,14 +18,23 @@ class _Tag extends StatelessWidget {
         borderRadius: const BorderRadius.all(tagRadius),
         color: context.colors.tertiary,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(tag),
-          if (onDismiss != null)
-            IconButton(
-                onPressed: () => onDismiss!(tag), icon: const Icon(Icons.close))
-        ],
+      child: Padding(
+        padding: onDismiss != null
+            ? const EdgeInsets.only(left: AcSizes.md)
+            : const EdgeInsets.symmetric(
+                vertical: AcSizes.xs, horizontal: AcSizes.md),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(tag),
+            if (onDismiss != null)
+              IconButton(
+                  iconSize: AcSizes.lg,
+                  onPressed: () => onDismiss!(tag),
+                  icon: const Icon(Icons.close))
+          ],
+        ),
       ),
     );
   }
@@ -59,16 +68,19 @@ class AcTagsInput extends StatelessWidget {
   }
 
   Widget buildTags(BuildContext context) {
-    return Wrap(
-      children: value
-          .map((e) => Padding(
-                padding: const EdgeInsets.all(AcSizes.xs),
-                child: _Tag(
-                  tag: e,
-                  onDismiss: onDismiss,
-                ),
-              ))
-          .toList(),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AcSizes.md),
+      child: Wrap(
+        children: value
+            .map((e) => Padding(
+                  padding: const EdgeInsets.all(AcSizes.xs),
+                  child: TagWidget(
+                    tag: e,
+                    onDismiss: onDismiss,
+                  ),
+                ))
+            .toList(),
+      ),
     );
   }
 
@@ -86,7 +98,7 @@ class AcTagsInput extends StatelessWidget {
         onSubmitted: (controller, textValue) {
           final tag = processTag(textValue);
           controller.clear();
-          if (value.contains(tag)) {
+          if (value.contains(tag) || textValue.isEmpty) {
             return;
           }
           if (canMutate) {

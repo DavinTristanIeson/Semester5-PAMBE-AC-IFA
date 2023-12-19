@@ -37,7 +37,6 @@ class AcFieldWrapper extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         buildLabel(context),
-        if (underLabel != null) underLabel!,
         Container(
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.only(
@@ -51,6 +50,7 @@ class AcFieldWrapper extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (underLabel != null) underLabel!,
               child,
               if (error != null)
                 Padding(

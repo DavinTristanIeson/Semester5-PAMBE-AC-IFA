@@ -96,7 +96,7 @@ class RecipeDetailsEditor extends StatelessWidget {
             },
             placeholder: "Which tags suit your recipe?",
             value: control.value!,
-            canMutate: true,
+            canMutate: false,
           );
         });
   }

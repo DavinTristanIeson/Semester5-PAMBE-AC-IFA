@@ -67,9 +67,16 @@ class LibraryBookmarkedRecipesSection extends StatelessWidget {
   }
 }
 
-class LibraryLocalRecipesSection extends StatelessWidget {
+class LibraryLocalRecipesSection extends StatefulWidget {
   const LibraryLocalRecipesSection({super.key});
 
+  @override
+  State<LibraryLocalRecipesSection> createState() =>
+      _LibraryLocalRecipesSectionState();
+}
+
+class _LibraryLocalRecipesSectionState
+    extends State<LibraryLocalRecipesSection> {
   Future<void> syncAll(BuildContext context) async {
     bool isAccept = false;
     final messenger = AcSnackbarMessenger.of(context);
@@ -95,6 +102,7 @@ class LibraryLocalRecipesSection extends StatelessWidget {
       messenger.sendSuccess(
           "Local recipes were successfully synchronized with your published recipes.");
     });
+    setState(() {});
   }
 
   @override
