@@ -9,6 +9,7 @@ enum RecipeFormKeys {
   description,
   image,
   steps,
+  tags,
 }
 
 enum RecipeStepFormKeys {

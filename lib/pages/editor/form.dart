@@ -55,6 +55,10 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
           FormControl<String>(value: recipe?.description, validators: [
         Validators.required,
       ]),
+      RecipeFormKeys.tags.name:
+          FormControl<String>(value: recipe?.description, validators: [
+        AcValidators.minCount(1),
+      ]),
       RecipeFormKeys.image.name: FormControl<XFile?>(
           value: recipe?.imagePath == null ? null : XFile(recipe!.imagePath!)),
       RecipeFormKeys.steps.name: FormArray(
@@ -96,11 +100,13 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
       final description =
           form.value[RecipeFormKeys.description.name] as String?;
       final image = form.value[RecipeFormKeys.image.name] as XFile?;
+      final tags = form.value[RecipeFormKeys.tags.name] as Set<String>;
       final recipe = await controller.put(
           title: title,
           description: description,
           steps: steps,
           image: image,
+          tags: tags.toList(),
           id: widget.recipe?.id);
       form.markAsPristine();
       widget.onChanged(recipe);

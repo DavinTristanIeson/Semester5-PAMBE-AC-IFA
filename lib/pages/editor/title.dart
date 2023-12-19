@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/field/field_wrapper.dart';
 import 'package:pambe_ac_ifa/components/field/image_picker.dart';
+import 'package:pambe_ac_ifa/components/field/tags.dart';
 import 'package:pambe_ac_ifa/components/field/text_input.dart';
 import 'package:pambe_ac_ifa/pages/editor/components/models.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -84,6 +85,22 @@ class RecipeDetailsEditor extends StatelessWidget {
         });
   }
 
+  Widget buildTagsInput() {
+    return ReactiveValueListenableBuilder<Set<String>>(
+        formControlName: RecipeFormKeys.tags.name,
+        builder: (context, control, child) {
+          return AcTagsInput(
+            label: "Tags",
+            onChanged: (value) {
+              control.value = value;
+            },
+            placeholder: "Which tags suit your recipe?",
+            value: control.value!,
+            canMutate: true,
+          );
+        });
+  }
+
   Widget buildTitleEditor() {
     return Column(
       children: [
@@ -128,6 +145,10 @@ class RecipeDetailsEditor extends StatelessWidget {
               height: AcSizes.space,
             ),
             buildDescriptionField(),
+            const SizedBox(
+              height: AcSizes.space,
+            ),
+            buildTagsInput(),
           ],
         ));
   }

@@ -22,6 +22,8 @@ class AcReactiveFormConfig extends StatelessWidget {
         ValidationMessage.email: (error) =>
             "Field must contain a valid email address",
         AcValidationMessage.imageRequired: (error) => "Image is required",
+        AcValidationMessage.minCount: (min) =>
+            "Field must contain at least $min item(s)",
       },
       child: child,
     );
@@ -53,10 +55,24 @@ extension AcValidators on Validators {
     return Validators.pattern(RegExp(r'^[a-zA-Z0-9 ]+$'),
         validationMessage: AcValidationMessage.acceptedChars);
   }
+
+  static Validator<dynamic> minCount(int min) {
+    return Validators.delegate((control) {
+      if (control.value is! Iterable) {
+        return null;
+      }
+      final count = (control.value as Iterable).length;
+      if (min > count) {
+        return {AcValidationMessage.minCount: min};
+      }
+      return null;
+    });
+  }
 }
 
 extension AcValidationMessage on ValidationMessage {
   static const acceptedChars = "acceptedChars";
   static const passwordConfirmationMismatch = "passwordConfirmationMismatch";
   static const imageRequired = "imageRequired";
+  static const minCount = "minCount";
 }

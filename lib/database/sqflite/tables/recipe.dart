@@ -14,6 +14,7 @@ enum _RecipeColumns {
   title,
   description,
   createdAt,
+  tags,
   imagePath;
 
   @override
@@ -39,7 +40,8 @@ class RecipeTable {
             ${_RecipeColumns.title} VARCHAR(255) NOT NULL,
             ${_RecipeColumns.description} TEXT, 
             ${_RecipeColumns.createdAt} INTEGER NOT NULL,
-            ${_RecipeColumns.imagePath} TEXT
+            ${_RecipeColumns.imagePath} TEXT,
+            ${_RecipeColumns.tags} TEXT
         );
     ''');
   }
@@ -84,7 +86,7 @@ class RecipeTable {
     List<Object?>? queryArgs = [];
     if (search != null) {
       query +=
-          "${_RecipeColumns.title.name} LIKE ? OR ${_RecipeColumns.description.name} LIKE ?";
+          "${_RecipeColumns.title.name} LIKE ? OR ${_RecipeColumns.tags.name} LIKE ?";
       queryArgs.addAll([search, search]);
     }
     if (filter != null && filter.type == RecipeFilterByType.createdByUser) {
@@ -107,6 +109,7 @@ class RecipeTable {
       {required String title,
       String? description,
       required List<RecipeStepFormType> steps,
+      required List<String> tags,
       XFile? image,
       int? id,
       String? remoteId,
@@ -125,6 +128,7 @@ class RecipeTable {
         _RecipeColumns.userId.name: userId,
         _RecipeColumns.createdAt.name: DateTime.now().millisecondsSinceEpoch,
         _RecipeColumns.imagePath.name: recipeImage,
+        _RecipeColumns.tags.name: tags.toString(),
         if (remoteId != null) _RecipeColumns.remoteId.name: remoteId,
       };
       if (id == null) {
@@ -192,6 +196,7 @@ class RecipeTable {
             ? null
             : XFile(recipe.imageStoragePath!),
         description: recipe.description,
+        tags: recipe.tags,
         steps: recipe.steps
             .map((e) => RecipeStepFormType(
                 type: e.type,

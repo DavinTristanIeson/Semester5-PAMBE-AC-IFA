@@ -37,7 +37,7 @@ class _RecipeStepEditorInternal extends StatelessWidget {
                   placeholder: "What should the cook do?",
                   value: control.value,
                   multiline: true,
-                  onChanged: (value) {
+                  onChanged: (controller, value) {
                     control.value = value;
                     control.markAsDirty();
                   }),

@@ -21,9 +21,15 @@ class RecipeSource {
   RecipeSource.local(this.localId) : type = RecipeSourceType.local;
 }
 
+List<String> _defaultTags() {
+  return [];
+}
+
 abstract class AbstractRecipeLiteModel with SupportsLocalAndOnlineImagesMixin {
   String title;
   String description;
+  @JsonKey(defaultValue: _defaultTags)
+  List<String> tags;
   @JsonEpochConverter()
   DateTime createdAt;
   @override
@@ -34,6 +40,7 @@ abstract class AbstractRecipeLiteModel with SupportsLocalAndOnlineImagesMixin {
     required this.title,
     required this.description,
     required this.createdAt,
+    required this.tags,
     this.imagePath,
   });
 }
@@ -54,6 +61,7 @@ class LocalRecipeLiteModel extends AbstractRecipeLiteModel {
     required super.description,
     required super.createdAt,
     super.imagePath,
+    required super.tags,
   });
 
   factory LocalRecipeLiteModel.fromJson(Map<String, dynamic> json) {
@@ -103,6 +111,7 @@ class RecipeLiteModel extends AbstractRecipeLiteModel {
     this.imageStoragePath,
     this.totalRating,
     this.reviewCount,
+    required super.tags,
   });
 
   factory RecipeLiteModel.fromJson(Map<String, dynamic> json) {
@@ -130,6 +139,7 @@ class LocalRecipeModel extends LocalRecipeLiteModel {
     super.imagePath,
     super.remoteId,
     required this.steps,
+    required super.tags,
   });
 
   LocalRecipeModel withRemoteId(String? remoteId) {
@@ -140,7 +150,8 @@ class LocalRecipeModel extends LocalRecipeLiteModel {
         title: title,
         description: description,
         createdAt: createdAt,
-        steps: steps);
+        steps: steps,
+        tags: []);
   }
 
   factory LocalRecipeModel.fromJson(Map<String, dynamic> json) {
@@ -166,6 +177,7 @@ class RecipeModel extends RecipeLiteModel {
     super.imageStoragePath,
     required super.user,
     required this.steps,
+    required super.tags,
   });
 
   factory RecipeModel.fromJson(Map<String, dynamic> json) {

@@ -15,6 +15,9 @@ LocalRecipeLiteModel _$LocalRecipeLiteModelFromJson(
       description: json['description'] as String,
       createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
       imagePath: json['imagePath'] as String?,
+      tags:
+          (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+              _defaultTags(),
     );
 
 Map<String, dynamic> _$LocalRecipeLiteModelToJson(
@@ -22,6 +25,7 @@ Map<String, dynamic> _$LocalRecipeLiteModelToJson(
     <String, dynamic>{
       'title': instance.title,
       'description': instance.description,
+      'tags': instance.tags,
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'imagePath': instance.imagePath,
       'id': instance.id,
@@ -38,12 +42,16 @@ RecipeLiteModel _$RecipeLiteModelFromJson(Map<String, dynamic> json) =>
       imageStoragePath: json['imageStoragePath'] as String?,
       totalRating: (json['totalRating'] as num?)?.toDouble(),
       reviewCount: json['reviewCount'] as int?,
+      tags:
+          (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+              _defaultTags(),
     );
 
 Map<String, dynamic> _$RecipeLiteModelToJson(RecipeLiteModel instance) =>
     <String, dynamic>{
       'title': instance.title,
       'description': instance.description,
+      'tags': instance.tags,
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'imagePath': instance.imagePath,
       'user': $userPropertyToJson(instance.user),
@@ -62,12 +70,16 @@ LocalRecipeModel _$LocalRecipeModelFromJson(Map<String, dynamic> json) =>
       steps: (json['steps'] as List<dynamic>)
           .map((e) => LocalRecipeStepModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      tags:
+          (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+              _defaultTags(),
     );
 
 Map<String, dynamic> _$LocalRecipeModelToJson(LocalRecipeModel instance) =>
     <String, dynamic>{
       'title': instance.title,
       'description': instance.description,
+      'tags': instance.tags,
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'imagePath': instance.imagePath,
       'id': instance.id,
@@ -85,6 +97,9 @@ RecipeModel _$RecipeModelFromJson(Map<String, dynamic> json) => RecipeModel(
       steps: (json['steps'] as List<dynamic>)
           .map((e) => RecipeStepModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      tags:
+          (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+              _defaultTags(),
     )
       ..totalRating = (json['totalRating'] as num?)?.toDouble()
       ..reviewCount = json['reviewCount'] as int?;
@@ -93,6 +108,7 @@ Map<String, dynamic> _$RecipeModelToJson(RecipeModel instance) =>
     <String, dynamic>{
       'title': instance.title,
       'description': instance.description,
+      'tags': instance.tags,
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'imagePath': instance.imagePath,
       'user': $userPropertyToJson(instance.user),

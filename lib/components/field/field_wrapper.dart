@@ -6,12 +6,14 @@ class AcFieldWrapper extends StatelessWidget {
   final String? error;
   final bool required;
   final Widget child;
+  final Widget? underLabel;
   const AcFieldWrapper(
       {super.key,
       required this.label,
       required this.child,
       this.error,
-      this.required = false});
+      this.required = false,
+      this.underLabel});
 
   Widget buildLabel(BuildContext context) {
     return Container(
@@ -35,6 +37,7 @@ class AcFieldWrapper extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         buildLabel(context),
+        if (underLabel != null) underLabel!,
         Container(
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.only(

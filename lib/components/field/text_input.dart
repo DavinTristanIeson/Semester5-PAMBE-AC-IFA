@@ -36,7 +36,10 @@ class _TextFieldValueProviderState extends State<TextFieldValueProvider> {
 class BoxTextInput extends StatelessWidget {
   final String? placeholder;
   final String? value;
-  final void Function(String?) onChanged;
+  final void Function(TextEditingController controller, String? value)?
+      onChanged;
+  final void Function(TextEditingController controller, String value)?
+      onSubmitted;
   final bool multiline;
   final bool obscureText;
   const BoxTextInput({
@@ -46,6 +49,7 @@ class BoxTextInput extends StatelessWidget {
     required this.onChanged,
     this.multiline = false,
     this.obscureText = false,
+    this.onSubmitted,
   });
 
   @override
@@ -63,7 +67,8 @@ class BoxTextInput extends StatelessWidget {
         obscureText: obscureText,
         maxLines: multiline ? null : 1,
         minLines: multiline ? 4 : null,
-        onChanged: onChanged,
+        onChanged: (value) => onChanged?.call(controller, value),
+        onSubmitted: (value) => onSubmitted?.call(controller, value),
       ),
     );
   }
@@ -98,7 +103,7 @@ class AcTextInput extends StatelessWidget {
         child: BoxTextInput(
           value: value,
           placeholder: placeholder,
-          onChanged: onChanged,
+          onChanged: (controller, value) => onChanged(value),
           multiline: multiline,
           obscureText: obscureText,
         ));

@@ -41,6 +41,7 @@ class LocalRecipeController extends ChangeNotifier implements AuthDependent {
       {required String title,
       String? description,
       required List<RecipeStepFormType> steps,
+      required List<String> tags,
       XFile? image,
       int? id}) async {
     if (_userId == null) {
@@ -52,6 +53,7 @@ class LocalRecipeController extends ChangeNotifier implements AuthDependent {
         description: description,
         steps: steps,
         image: image,
+        tags: tags,
         userId: _userId!,
         id: id);
     notifyListeners();

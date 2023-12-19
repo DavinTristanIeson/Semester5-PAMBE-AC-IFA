@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pambe_ac_ifa/common/context_manager.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/components/field/tags.dart';
 import 'package:pambe_ac_ifa/database/cache/cache_client.dart';
 import 'package:pambe_ac_ifa/database/firebase/bookmark.dart';
 import 'package:pambe_ac_ifa/database/firebase/lib/images.dart';
@@ -33,7 +34,8 @@ enum RecipeFirestoreKeys {
   totalRating,
   reviewCount,
   steps,
-  description;
+  description,
+  tags;
 
   @override
   toString() => name;
@@ -140,7 +142,8 @@ class FirebaseRecipeManager
   }) {
     RecipeFirestoreKeys? key;
     if (search != null) {
-      query = query.where(RecipeFirestoreKeys.title.name, isEqualTo: search);
+      query = query.where(RecipeFirestoreKeys.tags.name,
+          arrayContains: processTag(search));
     }
     if (sort != null) {
       key = switch (sort.factor) {
@@ -285,6 +288,12 @@ class FirebaseRecipeManager
         former: recipe.remoteId == null ? null : await get(recipe.remoteId!));
 
     final json = recipeCopy.toJson();
+    final titleAsTag = processTag(recipe.title);
+    // Add title to tags so it's possible to search for title
+    if (!(json["tags"] as List<String>)
+        .exists((element) => element == titleAsTag)) {
+      (json["tags"] as List<String>).add(titleAsTag);
+    }
     json.remove("user");
     json.remove("id");
     json[RecipeFirestoreKeys.userId.name] = userId;
