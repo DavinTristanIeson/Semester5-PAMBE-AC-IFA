@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/display/notice.dart';
@@ -29,7 +30,7 @@ class OtherUserProfileScreen extends StatelessWidget {
             }
             if (!snapshot.hasData) {
               return EmptyView(
-                content: Either.right("Cannot find user with ID $userId"),
+                content: Either.right("screen/profile/main/cannot_find_user".i18n([userId])),
               );
             }
             return ProfileScreenBody(user: snapshot.data!, editable: false);
@@ -60,7 +61,7 @@ class ProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.all(AcSizes.space),
               child: EmptyView(
                 content: Either.right(
-                    "Sorry, we cannot find any user matching you!"),
+                    "screen/profile/main/cannot_find_user_extra".i18n()),
               ),
             );
           }

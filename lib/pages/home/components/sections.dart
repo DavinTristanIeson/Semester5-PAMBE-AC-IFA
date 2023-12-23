@@ -96,7 +96,7 @@ class LatestReviewsSection extends StatelessWidget {
       itemConstraints: constraints,
       constraints: constraints.copyWith(
           minWidth: context.screenWidth, maxWidth: context.screenWidth),
-      header: Either.right("Latest Reviews"),
+      header: Either.right("screen/home/components/sections/latest_review".i18n()),
       viewMoreButton: null,
       itemBuilder: (context, item) {
         final width = ReviewCard.getWidth(context);

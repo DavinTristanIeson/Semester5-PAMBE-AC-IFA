@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
@@ -56,7 +57,7 @@ class _AddReviewSectionState extends State<AddReviewSection> {
     final messenger = AcSnackbarMessenger.of(context);
     if (form.invalid) {
       messenger
-          .sendError("Please resolve all errors before posting this review");
+          .sendError("screen/reviews/add_review/resolve_error_posting".i18n());
       return;
     }
     final reviewController = context.read<ReviewController>();
@@ -68,7 +69,7 @@ class _AddReviewSectionState extends State<AddReviewSection> {
           recipeId: widget.recipe.id,
           rating: value[_AddReviewFormKeys.rating.name] as int,
           content: value[_AddReviewFormKeys.content.name] as String?);
-      messenger.sendSuccess("Your review was successfully posted!");
+      messenger.sendSuccess("screen/reviews/add_review/review_posted".i18n());
       form.reset();
     } catch (e) {
       messenger.sendError(e);
@@ -83,7 +84,8 @@ class _AddReviewSectionState extends State<AddReviewSection> {
           targetUserId: widget.recipe.user!.id,
           notification: NotificationPayload.review(
               title:
-                  "${review.user?.name ?? 'A user'} reviewed your recipe, ${widget.recipe.title}",
+                  // "${review.user?.name ?? 'A user'} reviewed your recipe, ${widget.recipe.title}"
+                  "screen/reviews/add_review/reviewed_recipe".i18n([review.user?.name ?? 'A user', widget.recipe.title]),
               reviewId: review.id,
               recipeId: widget.recipe.id,
               content: review.content,
@@ -127,8 +129,8 @@ class _AddReviewSectionState extends State<AddReviewSection> {
                     onChanged: (value) {
                       control.value = value;
                     },
-                    label: "Review",
-                    placeholder: "What are your thoughts on this recipe?",
+                    label: "screen/reviews/add_review/review".i18n(),
+                    placeholder: "screen/reviews/add_review/your_thoughts_recipe".i18n(),
                   );
                 }),
             const SizedBox(height: AcSizes.space),
@@ -138,10 +140,10 @@ class _AddReviewSectionState extends State<AddReviewSection> {
                 ReactiveFormConsumer(builder: (context, control, child) {
                   final button = FutureButton(
                       onPressed: control.invalid ? null : postReview,
-                      child: const Text("Post Review"));
+                      child:  Text("screen/reviews/add_review/post_review".i18n()));
                   if (control.hasErrors) {
                     return Tooltip(
-                        message: "Please select a rating", child: button);
+                        message: "screen/reviews/add_review/rating".i18n(), child: button);
                   } else {
                     return button;
                   }

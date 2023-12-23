@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/components/function/future.dart';
@@ -95,13 +96,13 @@ class _RecipeStepRendererState extends State<RecipeStepRenderer> {
                       );
                     }),
                 if (remote.call != null)
-                  const Positioned(
+                   Positioned(
                       bottom: AcSizes.space,
                       left: 0,
                       right: 0,
-                      child: Text("Click anywhere to continue",
+                      child: Text("screen/recipe/renderer/click_to_continue".i18n(),
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: AcSizes.fontEmphasis,
                               color: AcColors.hoverColor,
                               fontWeight: FontWeight.w400))),

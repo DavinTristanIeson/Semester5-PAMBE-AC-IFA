@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/field/field_wrapper.dart';
 import 'package:pambe_ac_ifa/components/field/image_picker.dart';
@@ -51,7 +52,7 @@ class _TitleEditorTitleFieldState extends State<_TitleEditorTitleField> {
             focusedBorder: const UnderlineInputBorder(
                 borderSide:
                     BorderSide(color: Colors.black, width: AcSizes.xs + 0.5)),
-            hintText: "Title",
+            hintText: "screen/editor/title/title".i18n(),
             error: widget.error != null
                 ? Text(widget.error!, style: AcTypography.errorRegular)
                 : null,
@@ -77,8 +78,8 @@ class RecipeDetailsEditor extends StatelessWidget {
               onChanged: (String? value) {
                 control.value = value ?? '';
               },
-              label: "Description",
-              placeholder: "Describe your recipe!",
+              label: "screen/editor/title/description".i18n(),
+              placeholder: "screen/editor/title/description_extra".i18n(),
               multiline: true,
               required: true);
         });

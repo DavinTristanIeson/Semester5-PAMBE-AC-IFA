@@ -7,6 +7,7 @@ import 'package:pambe_ac_ifa/locale.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/pages/settings/settings_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:localization/localization.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -31,12 +32,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return ListView(
       children: [
         SettingsItemSelect(
-            title: Either.right("Language"),
+            title: Either.right("screen/settings/main/language".i18n()),
             onChanged: (String? preferredLanguage) async {
               localeService
                   .setLanguage(PreferredLanguage.fromString(preferredLanguage));
             },
-            subtitle: Either.right("Choose your preferred language"),
+            subtitle: Either.right("screen/settings/main/preferred_language".i18n()),
             value: localeService.language.name,
             options: [
               PreferredLanguage.english.selectOption,
@@ -53,7 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: OnlyReturnAppBar(actions: [
         if (_pref != null)
           Tooltip(
-            message: "Reset settings",
+            message: "screen/settings/main/reset_settings".i18n(),
             child: FutureIconButton(
                 onPressed: () async {
                   localeService.setLanguage(PreferredLanguage.english);

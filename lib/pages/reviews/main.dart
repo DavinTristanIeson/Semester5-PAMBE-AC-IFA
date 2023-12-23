@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
@@ -47,7 +48,7 @@ class ReviewsScreen extends StatelessWidget {
               if (!snapshot.hasData) {
                 return EmptyView(
                   content:
-                      Either.right("Cannot find recipe with ID: $recipeId"),
+                      Either.right("screen/reviews/main/find_recipe".i18n([recipeId]),)
                 );
               }
               return _ReviewsScreen(
@@ -127,7 +128,7 @@ class _ReviewsScreenState extends State<_ReviewsScreen> {
                     _showAll = true;
                   });
                 },
-                child: const Text("Show Other Reviews")),
+                child:  Text("screen/reviews/main/other_review".i18n())),
           )),
       ],
     );

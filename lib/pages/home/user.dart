@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
@@ -66,13 +67,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                     .read<NotificationController>()
                                     .clear();
                                 messenger.sendSuccess(
-                                    "Notification successfully deleted");
+                                    "screen/home/user/notification_delete".i18n());
                               } catch (e) {
                                 messenger.sendError(e);
                               }
                             },
                             message:
-                                Either.right("Notifications can't be deleted"),
+                                Either.right("screen/home/user/notification_delete_extra".i18n()),
                             context: context);
                       });
                 },
@@ -105,13 +106,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               tab = RecipeLibTabs.values[value];
             });
           },
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          items:  [
+            BottomNavigationBarItem(icon:const Icon(Icons.home), label: "screen/home/user/home".i18n()),
             BottomNavigationBarItem(
-                icon: Icon(Icons.library_books), label: "Library"),
+                icon: const Icon(Icons.library_books), label: "screen/home/user/library".i18n()),
             BottomNavigationBarItem(
-                icon: Icon(Icons.notifications), label: "Notifications"),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+                icon: const Icon(Icons.notifications), label: "screen/home/user/notification".i18n()),
+            BottomNavigationBarItem(icon:const  Icon(Icons.person), label: "screen/home/user/profile".i18n()),
           ],
         ),
       ),

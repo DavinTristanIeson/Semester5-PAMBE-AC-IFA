@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
@@ -82,7 +83,7 @@ class RecipeScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(AcSizes.space),
                 child: EmptyView(
                     content: Either.right(
-                        "We were unable to find any recipe associated with ID: ${source.localId ?? source.remoteId}")),
+                        "screen/recipe/main/unable_find_recipe".i18n([(source.localId ?? source.remoteId).toString()]))),
               );
             }
             List<AbstractRecipeStepModel> steps =
@@ -118,7 +119,7 @@ class _RecipeBookmarkButton extends StatelessWidget {
           bool isBookmarked = snapshot.data!;
           if (isBookmarked) {
             return Tooltip(
-                message: "Remove Bookmark",
+                message: "screen/library/components/sections/remove_bookmark".i18n(),
                 child: FutureIconButton(
                   icon:
                       Icon(Icons.bookmark_remove, color: context.colors.error),
@@ -128,7 +129,7 @@ class _RecipeBookmarkButton extends StatelessWidget {
                 ));
           } else {
             return Tooltip(
-                message: "Add Bookmark",
+                message: "screen/recipe/main/add_bookmark".i18n(),
                 child: FutureIconButton(
                   icon: Icon(Icons.bookmark_add, color: context.colors.primary),
                   onPressed: () {

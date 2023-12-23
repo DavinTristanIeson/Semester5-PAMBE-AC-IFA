@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/future.dart';
@@ -41,7 +42,7 @@ class _ReviewItemState extends State<ReviewItem> {
             Column(
               children: [
                 Text(
-                  widget.review.user?.name ?? "Deleted User",
+                  widget.review.user?.name ?? "common/deleted_user".i18n(),
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: AcSizes.fontEmphasis,
@@ -99,11 +100,11 @@ class _ReviewItemState extends State<ReviewItem> {
                       isShown = !isShown;
                     });
                   },
-                  child: Text(isShown ? "Hide" : "Show More")),
+                  child: Text(isShown ? "screen/reviews/components/hide".i18n() : "screen/reviews/components/show_more".i18n())),
             if (widget.review.user?.id == uid)
               Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                 Tooltip(
-                  message: "Delete Your Review",
+                  message: "screen/reviews/components/delete_review".i18n(),
                   child: FutureIconButton(
                     onPressed: () => widget.onDeleted(widget.review),
                     icon: Icon(Icons.delete, color: context.colors.error),

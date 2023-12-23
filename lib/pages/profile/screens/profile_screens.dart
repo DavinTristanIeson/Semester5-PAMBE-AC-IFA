@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
@@ -74,7 +75,7 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> {
               );
             },
             icon: const Icon(Icons.edit),
-            label: const Text("Edit Profile")),
+            label:  Text("screen/profile/screens/profile_screens/edit_profile".i18n())),
         const SizedBox(
           height: AcSizes.md,
         ),
@@ -87,7 +88,7 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> {
               );
             },
             icon: const Icon(Icons.email_outlined),
-            label: const Text("Edit Credentials")),
+            label:  Text("screen/profile/screens/profile_screens/edit_credentials".i18n())),
       ],
     );
   }
@@ -111,7 +112,7 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> {
               padding:
                   const EdgeInsets.only(top: AcSizes.space, bottom: AcSizes.md),
               child: TextItem(
-                  firstText: "Date of Birth",
+                  firstText: "screen/profile/screens/edit_profile_screen/date_of_birth".i18n(),
                   secondText: widget.user.birthdate!.toLocaleDateString()),
             ),
           const SizedBox(
