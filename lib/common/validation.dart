@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:localization/localization.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 class AcReactiveFormConfig extends StatelessWidget {
@@ -9,19 +10,20 @@ class AcReactiveFormConfig extends StatelessWidget {
   Widget build(BuildContext context) {
     return ReactiveFormConfig(
       validationMessages: {
-        ValidationMessage.required: (error) => "Field must not be empty",
-        ValidationMessage.equals: (error) => "Field should be equal to $error",
-        ValidationMessage.maxLength: (error) =>
-            "Field has a maximum length of ${(error as Map<String, Object>)["requiredLength"]} characters",
-        ValidationMessage.minLength: (error) =>
-            "Field has a minimum length of ${(error as Map<String, Object>)["requiredLength"]} characters",
+        ValidationMessage.required: (error) => "validation/required".i18n(),
+        ValidationMessage.equals: (error) =>
+            "validation/equals_extra".i18n([error.toString()]),
+        ValidationMessage.maxLength: (error) => "validation/max_length".i18n(
+            [(error as Map<String, Object>)["requiredLength"].toString()]),
+        ValidationMessage.minLength: (error) => "validation/min_length".i18n(
+            [(error as Map<String, Object>)["requiredLength"].toString()]),
         AcValidationMessage.acceptedChars: (error) =>
-            "Field only accepts spaces, numbers, and alphabetic characters",
+            "validation/accepted_chars".i18n(),
         AcValidationMessage.passwordConfirmationMismatch: (error) =>
-            "Password confirmation must be the same as password",
-        ValidationMessage.email: (error) =>
-            "Field must contain a valid email address",
-        AcValidationMessage.imageRequired: (error) => "Image is required",
+            "validation/password_confirmation_mismatch".i18n(),
+        ValidationMessage.email: (error) => "validation/email".i18n(),
+        AcValidationMessage.imageRequired: (error) =>
+            "validation/image_required".i18n(),
       },
       child: child,
     );
@@ -33,7 +35,7 @@ extension ReactiveFormTranslateError on ReactiveFormConfig {
     if (validationMessages.containsKey(type)) {
       return validationMessages[type]!(payload);
     } else {
-      return "Error: $type";
+      return "${'Error'.i18n()}: $type";
     }
   }
 

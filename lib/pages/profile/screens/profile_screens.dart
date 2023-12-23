@@ -75,20 +75,22 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> {
               );
             },
             icon: const Icon(Icons.edit),
-            label:  Text("screen/profile/screens/profile_screens/edit_profile".i18n())),
+            label: Text(
+                "common/edit_extra".i18n(["screen/home/user/profile".i18n()]))),
         const SizedBox(
           height: AcSizes.md,
         ),
         OutlinedButton.icon(
-            style: buttonStyle,
-            onPressed: () {
-              context.navigator.push(
-                MaterialPageRoute(
-                    builder: (context) => const ChangeAuthScreen()),
-              );
-            },
-            icon: const Icon(Icons.email_outlined),
-            label:  Text("screen/profile/screens/profile_screens/edit_credentials".i18n())),
+          style: buttonStyle,
+          onPressed: () {
+            context.navigator.push(
+              MaterialPageRoute(builder: (context) => const ChangeAuthScreen()),
+            );
+          },
+          icon: const Icon(Icons.email_outlined),
+          label: Text("common/edit_extra".i18n(
+              ["screen/profile/screens/profile_screens/credentials".i18n()])),
+        ),
       ],
     );
   }
@@ -112,7 +114,9 @@ class _ProfileScreenBodyState extends State<ProfileScreenBody> {
               padding:
                   const EdgeInsets.only(top: AcSizes.space, bottom: AcSizes.md),
               child: TextItem(
-                  firstText: "screen/profile/screens/edit_profile_screen/date_of_birth".i18n(),
+                  firstText:
+                      "screen/profile/screens/edit_profile_screen/date_of_birth"
+                          .i18n(),
                   secondText: widget.user.birthdate!.toLocaleDateString()),
             ),
           const SizedBox(

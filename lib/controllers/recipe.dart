@@ -173,8 +173,7 @@ class RecipeController extends ChangeNotifier implements AuthDependent {
 
   Future<void> view(String recipeId) async {
     if (_userId == null) {
-      throw InvalidStateError(
-          "RecipeController._userId is expected to be non-null when bookmark is called.");
+      return;
     }
     await viewManager.set(
         recipeId: recipeId, userId: _userId!, hasRelation: true);

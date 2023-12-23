@@ -78,13 +78,14 @@ class _RegisterScreenFormState extends State<_RegisterScreenForm> {
               name: _RegisterFormKeys.email.name,
               label: "Email",
               required: true,
-              placeholder: "screen/login/enter_email".i18n()),
+              placeholder: "common/enter_extra".i18n(["common/email".i18n()])),
           buildGenericTextInput(
               name: _RegisterFormKeys.password.name,
               label: "Password",
               required: true,
               obscureText: true,
-              placeholder: "screen/login/register/enter_password".i18n()),
+              placeholder:
+                  "common/enter_extra".i18n(["common/password".i18n()])),
           buildGenericTextInput(
               name: _RegisterFormKeys.passwordConfirmation.name,
               label: "screen/login/register/confirm_password".i18n(),
@@ -95,7 +96,7 @@ class _RegisterScreenFormState extends State<_RegisterScreenForm> {
               name: _RegisterFormKeys.name.name,
               label: "Name",
               required: true,
-              placeholder: "screen/login/register/enter_name".i18n()),
+              placeholder: "common/enter_extra".i18n(["common/name".i18n()])),
           buildGenericTextInput(
               name: _RegisterFormKeys.bio.name,
               label: "screen/login/register/about_me".i18n(),

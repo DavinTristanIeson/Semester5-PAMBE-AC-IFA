@@ -45,13 +45,14 @@ class _LoginScreenFormState extends State<_LoginScreenForm> {
               name: "email",
               label: "Email",
               required: true,
-              placeholder: "screen/login/enter_email".i18n()),
+              placeholder: "common/enter_extra".i18n(["common/email".i18n()])),
           buildGenericTextInput(
               name: "password",
               label: "Password",
               required: true,
               obscureText: true,
-              placeholder: "screen/login/enter_password".i18n()),
+              placeholder:
+                  "common/enter_extra".i18n(["common/password".i18n()])),
           LoginSubmitButton(
               onPressed: () {
                 return widget.onSubmit((

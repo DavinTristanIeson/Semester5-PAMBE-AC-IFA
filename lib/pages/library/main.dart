@@ -38,7 +38,7 @@ class LibraryScreen extends StatelessWidget {
                   builder: (context) => const RecipeEditorScreen()));
             },
             icon: const Icon(Icons.add),
-            label:  Text("screen/library/main/create_recipe".i18n()),
+            label: Text("common/create_extra".i18n(["common/recipe".i18n()])),
           ),
         )
       ],

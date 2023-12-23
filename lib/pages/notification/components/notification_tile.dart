@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/components/display/review_card.dart';
 import 'package:pambe_ac_ifa/models/notification.dart';
 import 'package:pambe_ac_ifa/pages/reviews/main.dart';
 
@@ -41,6 +42,15 @@ class NotificationTile extends StatelessWidget {
                   style: context.texts.bodySmall),
             ],
           ),
+          trailing: notification.rating == null
+              ? null
+              : Column(
+                  children: [
+                    StarRating(
+                        rating: notification.rating!,
+                        type: StarRatingType.compact),
+                  ],
+                ),
           subtitle:
               notification.content == null ? null : Text(notification.content!),
         ),

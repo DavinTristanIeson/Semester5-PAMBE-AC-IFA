@@ -32,6 +32,7 @@ class _ReviewItemState extends State<ReviewItem> {
           children: [
             CircleAvatar(
               radius: AcSizes.avatarRadius,
+              backgroundColor: context.colors.tertiary,
               backgroundImage: widget.review.user == null
                   ? MaybeImage.fallbackUserImage
                   : widget.review.user!.image,
@@ -40,6 +41,7 @@ class _ReviewItemState extends State<ReviewItem> {
               width: AcSizes.space,
             ),
             Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   widget.review.user?.name ?? "common/deleted_user".i18n(),
@@ -61,15 +63,15 @@ class _ReviewItemState extends State<ReviewItem> {
         ),
         StarRating(
           rating: widget.review.rating,
-          type: StarRatingType.wide,
-        )
+          type: StarRatingType.compact,
+        ),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final uid = context.read<AuthProvider>().user!.uid;
+    final uid = context.read<AuthProvider>().user?.uid;
     return Container(
         decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(AcSizes.br),
@@ -100,8 +102,10 @@ class _ReviewItemState extends State<ReviewItem> {
                       isShown = !isShown;
                     });
                   },
-                  child: Text(isShown ? "screen/reviews/components/hide".i18n() : "screen/reviews/components/show_more".i18n())),
-            if (widget.review.user?.id == uid)
+                  child: Text(isShown
+                      ? "screen/reviews/components/hide".i18n()
+                      : "screen/reviews/components/show_more".i18n())),
+            if (uid != null && widget.review.user?.id == uid)
               Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                 Tooltip(
                   message: "screen/reviews/components/delete_review".i18n(),

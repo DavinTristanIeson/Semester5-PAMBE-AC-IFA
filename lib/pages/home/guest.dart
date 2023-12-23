@@ -10,7 +10,6 @@ import 'package:pambe_ac_ifa/pages/login/register.dart';
 import 'package:pambe_ac_ifa/pages/search/main.dart';
 import 'package:pambe_ac_ifa/pages/settings/main.dart';
 
-
 class GuestHomeScreen extends StatelessWidget {
   const GuestHomeScreen({super.key});
 
@@ -19,7 +18,11 @@ class GuestHomeScreen extends StatelessWidget {
       children: [
         const Icon(Icons.check, color: AcColors.black),
         const SizedBox(width: AcSizes.md),
-        Text(text),
+        Expanded(
+          child: Text(
+            text,
+          ),
+        ),
       ],
     );
   }
@@ -44,7 +47,7 @@ class GuestHomeScreen extends StatelessWidget {
                 context.navigator.push(MaterialPageRoute(
                     builder: (context) => const RegisterScreen()));
               },
-              child:  Text("screen/home/guest/register".i18n())),
+              child: Text("screen/home/guest/register".i18n())),
         ],
       ),
     );

@@ -103,7 +103,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
           id: widget.recipe?.id);
       form.markAsPristine();
       widget.onChanged(recipe);
-      messenger.sendSuccess("$title (screen/editor/form/saved_locally)".i18n());
+      messenger.sendSuccess("screen/editor/form/saved_locally".i18n([title]));
     } catch (e) {
       messenger.sendError(e);
     }
@@ -143,7 +143,8 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
               },
               context: context,
               positiveText: Either.right("screen/editor/form/publish".i18n()),
-              title: Either.right(" screen/editor/form/publish_extra".i18n([widget.recipe!.title])),
+              title: Either.right("screen/editor/form/publish_extra"
+                  .i18n([widget.recipe!.title])),
               message: Either.right(
                   "screen/editor/form/want_publish_your_recipe".i18n()));
         });
@@ -165,7 +166,8 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
                   }
                   await localController.setRemoteId(widget.recipe!.id, null);
                   messenger.sendSuccess(
-                      "screen/editor/form/available_to_the_public".i18n([widget.recipe!.title]));
+                      "screen/editor/form/available_to_the_public"
+                          .i18n([widget.recipe!.title]));
                   widget.onChanged(widget.recipe!.withRemoteId(null));
                 } catch (e) {
                   messenger.sendError(e);
@@ -198,13 +200,14 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
                     await recipeController.remove(widget.recipe!.remoteId!);
                   }
                   close = true;
-                  messenger.sendSuccess(
-                      "screen/editor/form/success_delete".i18n([widget.recipe!.title]));
+                  messenger.sendSuccess("screen/editor/form/success_delete"
+                      .i18n([widget.recipe!.title]));
                 } catch (e) {
                   messenger.sendError(e);
                 }
               },
-              positiveText: Either.right("components/app/confirmation/delete".i18n()),
+              positiveText:
+                  Either.right("components/app/confirmation/delete".i18n()),
               message: Either.right(
                   "screen/editor/form/want_delete_this_recipe".i18n()),
               context: context);
@@ -227,8 +230,8 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
               isAccept = true;
             },
             context: context,
-            message: Either.right(
-                "screen/editor/form/want_to_sync_changes".i18n()),
+            message:
+                Either.right("screen/editor/form/want_to_sync_changes".i18n()),
             positiveText: Either.right("screen/editor/form/sync".i18n()),
           );
         });
@@ -251,8 +254,8 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
                 recipe,
                 id: widget.recipe!.id,
               );
-              messenger.sendSuccess(
-                  "screen/editor/form/success_sync_change".i18n());
+              messenger
+                  .sendSuccess("screen/editor/form/success_sync_change".i18n());
               widget.onChanged(result);
             } catch (e) {
               messenger.sendError(e);
@@ -297,7 +300,8 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
                       ),
                     ),
                   Tooltip(
-                    message: "screen/editor/form/delete_recipe".i18n(),
+                    message:
+                        "common/delete_extra".i18n(["common/recipe".i18n()]),
                     child: FutureIconButton(
                         onPressed: delete,
                         icon: Icon(Icons.delete, color: context.colors.error)),
@@ -305,7 +309,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
                 ],
         ),
         floatingActionButton: Tooltip(
-          message: "screen/editor/form/save".i18n(),
+          message: "common/save".i18n(),
           child: FutureButtonCompute(
               onPressed: save,
               icon: const Icon(Icons.save),

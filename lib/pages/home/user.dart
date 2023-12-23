@@ -67,16 +67,21 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                     .read<NotificationController>()
                                     .clear();
                                 messenger.sendSuccess(
-                                    "screen/home/user/notification_delete".i18n());
+                                    "screen/home/user/notification_delete"
+                                        .i18n());
                               } catch (e) {
                                 messenger.sendError(e);
                               }
                             },
-                            message:
-                                Either.right("screen/home/user/notification_delete_extra".i18n()),
+                            title: Either.right(
+                                "screen/home/user/clear_notifications".i18n()),
+                            message: Either.right(
+                                "screen/home/user/clear_notifications_desc"
+                                    .i18n()),
                             context: context);
                       });
                 },
+                color: context.colors.error,
                 icon: const Icon(Icons.delete_forever)),
           if (tab == RecipeLibTabs.profile) ...[
             IconButton(
@@ -106,13 +111,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               tab = RecipeLibTabs.values[value];
             });
           },
-          items:  [
-            BottomNavigationBarItem(icon:const Icon(Icons.home), label: "screen/home/user/home".i18n()),
+          items: [
             BottomNavigationBarItem(
-                icon: const Icon(Icons.library_books), label: "screen/home/user/library".i18n()),
+                icon: const Icon(Icons.home),
+                label: "screen/home/user/home".i18n()),
             BottomNavigationBarItem(
-                icon: const Icon(Icons.notifications), label: "screen/home/user/notification".i18n()),
-            BottomNavigationBarItem(icon:const  Icon(Icons.person), label: "screen/home/user/profile".i18n()),
+                icon: const Icon(Icons.library_books),
+                label: "screen/home/user/library".i18n()),
+            BottomNavigationBarItem(
+                icon: const Icon(Icons.notifications),
+                label: "screen/home/user/notification".i18n()),
+            BottomNavigationBarItem(
+                icon: const Icon(Icons.person),
+                label: "screen/home/user/profile".i18n()),
           ],
         ),
       ),

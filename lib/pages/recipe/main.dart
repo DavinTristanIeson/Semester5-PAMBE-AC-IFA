@@ -57,7 +57,7 @@ class RecipeScreen extends StatelessWidget {
         reviews: await reviewsFuture,
       );
     });
-    final authProvider = context.read<AuthProvider>();
+    final authProvider = context.watch<AuthProvider>();
     return Scaffold(
       appBar: OnlyReturnAppBar(
         actions: [
@@ -83,7 +83,8 @@ class RecipeScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(AcSizes.space),
                 child: EmptyView(
                     content: Either.right(
-                        "screen/recipe/main/unable_find_recipe".i18n([(source.localId ?? source.remoteId).toString()]))),
+                        "screen/recipe/main/unable_find_recipe".i18n(
+                            [(source.localId ?? source.remoteId).toString()]))),
               );
             }
             List<AbstractRecipeStepModel> steps =
@@ -119,7 +120,8 @@ class _RecipeBookmarkButton extends StatelessWidget {
           bool isBookmarked = snapshot.data!;
           if (isBookmarked) {
             return Tooltip(
-                message: "screen/library/components/sections/remove_bookmark".i18n(),
+                message:
+                    "screen/library/components/sections/remove_bookmark".i18n(),
                 child: FutureIconButton(
                   icon:
                       Icon(Icons.bookmark_remove, color: context.colors.error),

@@ -108,6 +108,7 @@ class _RecipeStepEditorInternal extends StatelessWidget {
 }
 
 class _RecipeStepEditorMenuButton extends StatelessWidget {
+  static const _localePrefix = "screen/editor/step_editor";
   const _RecipeStepEditorMenuButton();
 
   Widget iconWithText(IconData icon, String text) {
@@ -160,30 +161,37 @@ class _RecipeStepEditorMenuButton extends StatelessWidget {
                   child: iconWithText(
                       Icons.add_photo_alternate,
                       thumbnailControl.value!.toggle
-                          ? "screen/editor/step_editor/remove_image".i18n()
-                          : "screen/editor/step_editor/add_image".i18n())),
+                          ? "common/remove_extra".i18n(["common/image".i18n()])
+                          : "common/add_extra".i18n(["common/image".i18n()]))),
               PopupMenuItem(
                   value: _RecipeStepEditorAction.toggleTimer,
                   child: iconWithText(
                       Icons.timer,
                       timerControl.value!.toggle
-                          ? "screen/editor/step_editor/remove_timer".i18n()
-                          : "screen/editor/step_editor/add_timer".i18n())),
+                          ? "common/remove_extra".i18n(["common/timer".i18n()])
+                          : "common/add_extra".i18n(["common/timer".i18n()]))),
               const PopupMenuDivider(),
               if (variantControl.value != RecipeStepVariant.regular)
                 PopupMenuItem(
                     value: _RecipeStepEditorAction.toRegular,
-                    child:
-                        iconWithText(Icons.chat_bubble, "screen/editor/step_editor/change_regular".i18n())),
+                    child: iconWithText(
+                        Icons.chat_bubble,
+                        "common/change_to_extra"
+                            .i18n(["$_localePrefix/regular".i18n()]))),
               if (variantControl.value != RecipeStepVariant.tip)
                 PopupMenuItem(
                     value: _RecipeStepEditorAction.toTip,
-                    child: iconWithText(Icons.error_outline, "screen/editor/step_editor/change_tip".i18n())),
+                    child: iconWithText(
+                        Icons.error_outline,
+                        "common/change_to_extra"
+                            .i18n(["$_localePrefix/tip".i18n()]))),
               if (variantControl.value != RecipeStepVariant.warning)
                 PopupMenuItem(
                     value: _RecipeStepEditorAction.toWarning,
-                    child:
-                        iconWithText(Icons.warning_amber, "screen/editor/step_editor/change_warning".i18n())),
+                    child: iconWithText(
+                        Icons.warning_amber,
+                        "common/change_to_extra"
+                            .i18n(["$_localePrefix/warning".i18n()]))),
             ];
           },
         ),
@@ -254,7 +262,8 @@ class _RecipeStepEditorFieldWrapper extends StatelessWidget {
                           onConfirm: () {
                             removeFormItem(controller);
                           },
-                          title: Either.right("screen/editor/step_editor/step_delete_extra"),
+                          title: Either.right(
+                              "screen/editor/step_editor/step_delete_extra"),
                           message: Either.right(
                               "screen/editor/step_editor/step_delete_extra_extra"),
                           context: context);

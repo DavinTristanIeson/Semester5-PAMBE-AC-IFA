@@ -34,7 +34,7 @@ class SampleScrollSection extends StatelessWidget {
           borderRadius: BorderRadius.all(AcSizes.br)),
       child: Center(
         child: Text(
-          emptyView?.right ?? "common.no_data".i18n(),
+          emptyView?.right ?? "common/no_data".i18n(),
           style: context.texts.titleMedium!
               .copyWith(color: context.colors.tertiary),
         ),

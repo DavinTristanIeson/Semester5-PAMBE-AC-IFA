@@ -75,7 +75,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void save() async {
     final messenger = AcSnackbarMessenger.of(context);
     if (form.invalid) {
-      messenger.sendError("screen/profile/screens/edit_profile_screen/resolve_all_error".i18n());
+      messenger.sendError("errors/resolve_all_errors".i18n());
       return;
     }
     final userController = context.read<UserController>();
@@ -90,7 +90,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         birthdate: value[_EditProfileFormKeys.birthdate.name] as DateTime?,
         bio: value[_EditProfileFormKeys.bio.name] as String?,
       ));
-      messenger.sendSuccess("screen/profile/screens/edit_profile_screen/profile_updated".i18n());
+      messenger.sendSuccess(
+          "screen/profile/screens/edit_profile_screen/profile_updated".i18n());
     } catch (e) {
       messenger.sendError(e);
     }
@@ -123,7 +124,9 @@ class EditProfileScreenBody extends StatelessWidget {
           builder: (context, control, child) {
             final value = control.value as DateTime?;
             return AcFieldWrapper(
-                label: "screen/profile/screens/edit_profile_screen/date_of_birth".i18n(),
+                label:
+                    "screen/profile/screens/edit_profile_screen/date_of_birth"
+                        .i18n(),
                 error: ReactiveFormConfig.of(context)
                     ?.translateAny(control.errors),
                 child: Row(
@@ -160,7 +163,8 @@ class EditProfileScreenBody extends StatelessWidget {
             return CountrySelect(
               error:
                   ReactiveFormConfig.of(context)?.translateAny(control.errors),
-              label: "screen/profile/screens/edit_profile_screen/country_region".i18n(),
+              label: "screen/profile/screens/edit_profile_screen/country_region"
+                  .i18n(),
               value: control.value as String?,
               onChanged: (value) {
                 control.value = value;
@@ -208,7 +212,8 @@ class EditProfileScreenBody extends StatelessWidget {
             placeholder: "screen/login/register/enter_name".i18n()),
         buildGenericTextInput(
             name: _EditProfileFormKeys.bio.name,
-            label: "screen/profile/screens/edit_profile_screen/about_yourself".i18n(),
+            label: "screen/profile/screens/edit_profile_screen/about_yourself"
+                .i18n(),
             multiline: true),
         buildBirthdateInput(),
         buildCountrySelect(),
@@ -219,7 +224,7 @@ class EditProfileScreenBody extends StatelessWidget {
             child: ElevatedButton.icon(
               icon: const Icon(Icons.save),
               onPressed: onSave,
-              label:  Text(
+              label: Text(
                 "screen/profile/screens/change_auth_screen/save_change".i18n(),
               ),
             ),

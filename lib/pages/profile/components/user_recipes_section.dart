@@ -28,7 +28,8 @@ class LocalUserRecipesSection extends StatelessWidget {
               recipeSource: RecipeSource.local(data.id),
               secondaryAction: null,
             ),
-        header: Either.right("screen/library/components/sections/your_recipe".i18n()),
+        header: Either.right(
+            "screen/library/components/sections/your_recipe".i18n()),
         viewMoreButton: Either.right(() {
           context.navigator.push(MaterialPageRoute(
               builder: (context) => SearchScreen(
@@ -58,13 +59,16 @@ class UserRecipesSection extends StatelessWidget {
             future: userController.get(userId),
             builder: (context, snapshot) {
               String text;
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                text = "screen/profile/components/user_recipes_section/recipe_by".i18n();
-              } else if (!snapshot.hasData) {
-                text = "screen/profile/components/user_recipes_section/recipe_by_unknown".i18n();
-              } else {
-                text = "screen/profile/components/user_recipes_section/recipe_by_extra".i18n([snapshot.data!.name]);
-              }
+              text =
+                  "screen/profile/components/user_recipes_section/recipe_by_extra"
+                      .i18n([
+                snapshot.connectionState == ConnectionState.waiting
+                    ? '...'
+                    : !snapshot.hasData
+                        ? 'screen/profile/components/user_recipes_section/an_unknown_user'
+                            .i18n()
+                        : snapshot.data!.name
+              ]);
               return Text(text,
                   style: TextStyle(
                       fontSize: AcSizes.fontLarge,

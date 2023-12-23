@@ -43,7 +43,7 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
         final Map<String, dynamic> errors = {};
         if (value.length < 8) {
           errors[ValidationMessage.minLength] = {
-            "screen/profile/screens/change_auth_screen/required_length".i18n(): 8,
+            "requiredLength": 8,
           };
         }
         return errors;
@@ -85,14 +85,16 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
   Future<void> save() async {
     final messenger = AcSnackbarMessenger.of(context);
     if (form.invalid) {
-      messenger.sendError("screen/profile/screens/change_auth_screen/resolve_all_error".i18n());
+      messenger.sendError("errors/resolve_all_errors".i18n());
       return;
     }
     final email = form.value[_ChangeAuthFormKeys.email.name] as String?;
     final password = form.value[_ChangeAuthFormKeys.password.name] as String?;
     if ((email == null || email.isEmpty) &&
         (password == null || password.isEmpty)) {
-      messenger.sendError("screen/profile/screens/change_auth_screen/email_password_unchanged".i18n());
+      messenger.sendError(
+          "screen/profile/screens/change_auth_screen/email_password_unchanged"
+              .i18n());
       return;
     }
 
@@ -109,7 +111,9 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
                 credentials = payload;
                 Navigator.pop(context);
               },
-              reason: "screen/profile/screens/change_auth_screen/email_password_will_be_updated".i18n());
+              reason:
+                  "screen/profile/screens/change_auth_screen/email_password_will_be_updated"
+                      .i18n());
         });
     if (credentials == null) {
       return;
@@ -122,10 +126,14 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
       ), credentials: credentials!);
       if (email != null) {
         await userController.updateEmail(email);
-        messenger.sendSuccess("screen/profile/screens/change_auth_screen/email_updated".i18n());
+        messenger.sendSuccess(
+            "screen/profile/screens/change_auth_screen/your_extra_updated"
+                .i18n(["common/email".i18n()]));
       }
       if (password != null) {
-        messenger.sendSuccess("screen/profile/screens/change_auth_screen/password_updated".i18n());
+        messenger.sendSuccess(
+            "screen/profile/screens/change_auth_screen/your_extra_updated"
+                .i18n(["common/password".i18n()]).i18n());
       }
       navigator.pop();
     } catch (e) {
@@ -151,7 +159,8 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
                 Navigator.pop(context);
               },
               reason:
-                  "screen/profile/screens/change_auth_screen/your_account_will_be_deleted".i18n());
+                  "screen/profile/screens/change_auth_screen/your_account_will_be_deleted"
+                      .i18n());
         });
     if (credentials == null) {
       return;
@@ -187,7 +196,9 @@ class _ChangeAuthScreenState extends State<ChangeAuthScreen> {
               ),
               onPressed: deleteAccount,
               progressIndicatorColor: context.colors.error,
-              child:  Text("screen/profile/screens/change_auth_screen/delete_account".i18n()))
+              child: Text(
+                  "screen/profile/screens/change_auth_screen/delete_account"
+                      .i18n()))
         ],
       ),
       body: ReactiveForm(
@@ -243,24 +254,32 @@ class _ChangeAuthDialogState extends State<ChangeAuthDialog> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           Text(
-              "screen/profile/screens/change_auth_screen/email_password_required_authenticate".i18n()),
+          Text(
+              "screen/profile/screens/change_auth_screen/email_password_required_authenticate"
+                  .i18n()),
           Text(
             widget.reason,
             style: AcTypography.importantDescription
                 .copyWith(color: context.colors.error),
           ),
           buildGenericTextInput(
-              name: _ChangeAuthFormKeys.email.name,
-              label: "screen/profile/screens/change_auth_screen/email".i18n(),
-              required: true,
-              padding: const EdgeInsets.symmetric(vertical: AcSizes.md),
-              placeholder: "screen/profile/screens/change_auth_screen/current_email".i18n()),
+            name: _ChangeAuthFormKeys.email.name,
+            label: "common/email".i18n(),
+            required: true,
+            padding: const EdgeInsets.symmetric(vertical: AcSizes.md),
+            placeholder: "common/enter_your_extra".i18n([
+              "screen/profile/screens/change_auth_screen/current_extra"
+                  .i18n(["common/email".i18n().toLowerCase()]),
+            ]),
+          ),
           buildGenericTextInput(
               name: _ChangeAuthFormKeys.password.name,
-              label: "screen/profile/screens/change_auth_screen/password".i18n(),
+              label: "common/password".i18n(),
               required: true,
-              placeholder: "screen/profile/screens/change_auth_screen/current_password".i18n(),
+              placeholder: "common/enter_your_extra".i18n([
+                "screen/profile/screens/change_auth_screen/current_extra"
+                    .i18n(["common/password".i18n().toLowerCase()]),
+              ]),
               padding: const EdgeInsets.symmetric(vertical: AcSizes.md),
               obscureText: true),
         ],
@@ -273,7 +292,10 @@ class _ChangeAuthDialogState extends State<ChangeAuthDialog> {
     return ReactiveForm(
       formGroup: form,
       child: AlertDialog(
-        title: Text("screen/profile/screens/change_auth_screen/authentication_required".i18n(), style: context.texts.titleLarge),
+        title: Text(
+            "screen/profile/screens/change_auth_screen/authentication_required"
+                .i18n(),
+            style: context.texts.titleLarge),
         content: ReactiveForm(formGroup: form, child: buildBody(context)),
         backgroundColor: AcColors.white,
         actions: [
@@ -315,8 +337,11 @@ class ChangeAuthScreenBody extends StatelessWidget {
         //     placeholder: "Leave empty if email won't be changed"),
         buildGenericTextInput(
             name: _ChangeAuthFormKeys.password.name,
-            label: "screen/profile/screens/change_auth_screen/new_password".i18n(),
-            placeholder: "screen/profile/screens/change_auth_screen/leave_empty_password".i18n()),
+            label:
+                "screen/profile/screens/change_auth_screen/new_password".i18n(),
+            placeholder:
+                "screen/profile/screens/change_auth_screen/leave_empty_password"
+                    .i18n()),
         ReactiveValueListenableBuilder(
           formControlName: _ChangeAuthFormKeys.password.name,
           child: buildGenericTextInput(
@@ -336,7 +361,7 @@ class ChangeAuthScreenBody extends StatelessWidget {
             child: FutureButton(
               icon: const Icon(Icons.save),
               onPressed: onSave,
-              child:  Text(
+              child: Text(
                 "screen/profile/screens/change_auth_screen/save_change".i18n(),
               ),
             ),
