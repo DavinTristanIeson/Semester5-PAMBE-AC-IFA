@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
@@ -104,7 +105,7 @@ class RecipeInfoScreen extends StatelessWidget {
     if (reviews!.isEmpty) {
       return EmptyView(
         content: Either.right(
-            "This recipe hadn't had any reviews.\nBe the first to comment!"),
+            "screen/recipe/info/recipe_reviews".i18n()),
       );
     }
     return ListView(
@@ -164,7 +165,7 @@ class RecipeInfoScreen extends StatelessWidget {
             children: [
               const SizedBox(width: AcSizes.lg + AcSizes.sm),
               Text(
-                "SEE WHAT OTHERS THINK",
+                "screen/recipe/info/other_think".i18n(),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.bold,
@@ -221,7 +222,7 @@ class RecipeInfoScreen extends StatelessWidget {
             fixedSize: Size(MediaQuery.of(context).size.width / 2, AcSizes.lg),
             textStyle: const TextStyle(
                 fontSize: AcSizes.fontEmphasis, fontWeight: FontWeight.w600)),
-        child: const Text("Start"),
+        child:  Text("screen/recipe/components/timer/start".i18n()),
       ),
     );
   }
@@ -245,7 +246,7 @@ class RecipeInfoScreen extends StatelessWidget {
             children: [
               NoticeComponent(
                   child: Either.right(
-                      "This tutorial has ${AbstractRecipeStepModel.countSteps(steps)} steps"),
+                      "screen/recipe/info/this_tutorial".i18n([AbstractRecipeStepModel.countSteps(steps).toString()])),
                   type: NoticeType.tip)
             ],
           ),

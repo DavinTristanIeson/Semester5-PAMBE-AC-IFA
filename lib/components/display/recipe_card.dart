@@ -5,6 +5,7 @@ import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/user.dart';
+import 'package:pambe_ac_ifa/pages/profile/main.dart';
 import 'package:pambe_ac_ifa/pages/recipe/main.dart';
 
 const _localePrefix = "components/display/recipe_card";
@@ -137,11 +138,22 @@ class RecipeCard extends StatelessWidget {
                         color: Theme.of(context).colorScheme.surface,
                         width: AcSizes.md),
                   ),
-                  child: CircleAvatar(
-                      radius: AcSizes.avatarRadius,
-                      backgroundColor: Theme.of(context).colorScheme.tertiary,
-                      backgroundImage:
-                          (recipe as RecipeLiteModel).user?.image)),
+                  child: GestureDetector(
+                    onTap: (recipe as RecipeLiteModel).user != null
+                        ? () {
+                            final uid = (recipe as RecipeLiteModel).user!.id;
+                            context.navigator
+                                .push(MaterialPageRoute(builder: (context) {
+                              return OtherUserProfileScreen(userId: uid);
+                            }));
+                          }
+                        : null,
+                    child: CircleAvatar(
+                        radius: AcSizes.avatarRadius,
+                        backgroundColor: Theme.of(context).colorScheme.tertiary,
+                        backgroundImage:
+                            (recipe as RecipeLiteModel).user?.image),
+                  )),
             )
         ],
       ),

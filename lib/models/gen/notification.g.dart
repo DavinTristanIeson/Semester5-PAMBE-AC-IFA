@@ -15,7 +15,7 @@ NotificationModel _$NotificationModelFromJson(Map<String, dynamic> json) =>
       createdAt: const JsonEpochConverter().fromJson(json['createdAt'] as int),
       reviewId: json['reviewId'] as String?,
       recipeId: json['recipeId'] as String?,
-    );
+    )..rating = json['rating'] as int?;
 
 Map<String, dynamic> _$NotificationModelToJson(NotificationModel instance) =>
     <String, dynamic>{
@@ -25,6 +25,7 @@ Map<String, dynamic> _$NotificationModelToJson(NotificationModel instance) =>
       'createdAt': const JsonEpochConverter().toJson(instance.createdAt),
       'reviewId': instance.reviewId,
       'recipeId': instance.recipeId,
+      'rating': instance.rating,
     };
 
 const _$NotificationTypeEnumMap = {

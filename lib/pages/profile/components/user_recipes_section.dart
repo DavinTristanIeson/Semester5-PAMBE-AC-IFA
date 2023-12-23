@@ -11,6 +11,7 @@ import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/pages/home/components/async_scroll_section.dart';
 import 'package:pambe_ac_ifa/pages/search/main.dart';
 import 'package:provider/provider.dart';
+import 'package:localization/localization.dart';
 
 class LocalUserRecipesSection extends StatelessWidget {
   const LocalUserRecipesSection({super.key});
@@ -27,7 +28,8 @@ class LocalUserRecipesSection extends StatelessWidget {
               recipeSource: RecipeSource.local(data.id),
               secondaryAction: null,
             ),
-        header: Either.right("Your Recipes"),
+        header: Either.right(
+            "screen/library/components/sections/your_recipe".i18n()),
         viewMoreButton: Either.right(() {
           context.navigator.push(MaterialPageRoute(
               builder: (context) => SearchScreen(
@@ -57,13 +59,16 @@ class UserRecipesSection extends StatelessWidget {
             future: userController.get(userId),
             builder: (context, snapshot) {
               String text;
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                text = "Recipes by ...";
-              } else if (!snapshot.hasData) {
-                text = "Recipes by an unknown user";
-              } else {
-                text = "Recipes by ${snapshot.data!.name}";
-              }
+              text =
+                  "screen/profile/components/user_recipes_section/recipe_by_extra"
+                      .i18n([
+                snapshot.connectionState == ConnectionState.waiting
+                    ? '...'
+                    : !snapshot.hasData
+                        ? 'screen/profile/components/user_recipes_section/an_unknown_user'
+                            .i18n()
+                        : snapshot.data!.name
+              ]);
               return Text(text,
                   style: TextStyle(
                       fontSize: AcSizes.fontLarge,

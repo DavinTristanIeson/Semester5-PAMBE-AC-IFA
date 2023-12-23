@@ -51,7 +51,7 @@ class HomeTrendingRecipesSection extends StatelessWidget {
               recipe: data,
               recipeSource: RecipeSource.remote(data.id),
             ),
-        header: Either.right("$_localePrefix/trending"),
+        header: Either.right("$_localePrefix/trending".i18n()),
         viewMoreButton: Either.right(() {
           context.navigator.push(MaterialPageRoute(
               builder: (context) => SearchScreen(
@@ -96,7 +96,8 @@ class LatestReviewsSection extends StatelessWidget {
       itemConstraints: constraints,
       constraints: constraints.copyWith(
           minWidth: context.screenWidth, maxWidth: context.screenWidth),
-      header: Either.right("Latest Reviews"),
+      header:
+          Either.right("screen/home/components/sections/latest_review".i18n()),
       viewMoreButton: null,
       itemBuilder: (context, item) {
         final width = ReviewCard.getWidth(context);

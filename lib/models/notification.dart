@@ -30,6 +30,7 @@ class NotificationModel {
 
   String? reviewId;
   String? recipeId;
+  int? rating;
 
   NotificationModel({
     required this.id,

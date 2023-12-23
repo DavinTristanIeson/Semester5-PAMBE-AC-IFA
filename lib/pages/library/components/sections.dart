@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
@@ -31,14 +32,17 @@ class LibraryBookmarkedRecipesSection extends StatelessWidget {
                   onConfirm: () {
                     controller.bookmark(data.id, false);
                   },
-                  positiveText: Either.right("Remove Bookmark"),
+                  positiveText: Either.right(
+                      "screen/library/components/sections/remove_bookmark"
+                          .i18n()),
                   message: Either.right(
-                      "Are you sure you want to remove this bookmark?"),
+                      "screen/library/components/sections/remove_bookmark_extra"
+                          .i18n()),
                   context: context);
             });
       },
       icon: const Icon(Icons.bookmark_remove),
-      child: const Text("Remove"),
+      child: Text("screen/library/components/sections/remove".i18n()),
     );
   }
 
@@ -56,7 +60,8 @@ class LibraryBookmarkedRecipesSection extends StatelessWidget {
         },
         itemConstraints:
             BoxConstraints.tight(RecipeCard.getDefaultImageSize(context)),
-        header: Either.right("Bookmarks"),
+        header:
+            Either.right("screen/library/components/sections/bookmark".i18n()),
         viewMoreButton: Either.right(() {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => SearchScreen(
@@ -90,10 +95,15 @@ class _LibraryLocalRecipesSectionState
                 isAccept = true;
               },
               context: context,
-              title: Either.right("Sync Confirmation"),
+              title: Either.right(
+                  "screen/library/components/sections/sync_confirmation"
+                      .i18n()),
               message: Either.right(
-                  "This action will fetch recipes from your account that are not available locally on your device.\n\nThis will not remove or update existing recipes. To synchronize changes for individual recipes, consider clicking the sync button in each recipe."),
-              positiveText: Either.right("Sync Recipes"));
+                  "screen/library/components/sections/sync_confirmation_extra"
+                      .i18n()),
+              positiveText: Either.right(
+                  "screen/library/components/sections/sync_confirmation_extra_extra"
+                      .i18n()));
         });
     if (!isAccept) return;
     // ignore: use_build_context_synchronously
@@ -124,13 +134,14 @@ class _LibraryLocalRecipesSectionState
                         )));
               },
               icon: const Icon(Icons.edit),
-              label: const Text("Edit"),
+              label: Text("screen/library/components/sections/edit".i18n()),
             ),
           );
         },
         itemConstraints:
             BoxConstraints.tight(RecipeCard.getDefaultImageSize(context)),
-        header: Either.right("Your Recipes"),
+        header: Either.right(
+            "screen/library/components/sections/your_recipe".i18n()),
         viewMoreButton: Either.left(Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
@@ -73,10 +74,10 @@ class _ReviewsListState extends State<ReviewsList> {
                 await reviewManager.remove(
                     review.id, widget.searchState.recipeId);
                 _pagination.refresh();
-                messenger.sendSuccess("Your review was successfully deleted");
+                messenger.sendSuccess("screen/reviews/list/review_delete".i18n());
               },
               message:
-                  Either.right("Are you sure you want to delete your review?"),
+                  Either.right("screen/reviews/list/review_delete_extra".i18n()),
               context: context);
         });
   }

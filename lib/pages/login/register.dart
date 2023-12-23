@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/confirmation.dart';
@@ -77,29 +78,30 @@ class _RegisterScreenFormState extends State<_RegisterScreenForm> {
               name: _RegisterFormKeys.email.name,
               label: "Email",
               required: true,
-              placeholder: "Enter your email"),
+              placeholder: "common/enter_extra".i18n(["common/email".i18n()])),
           buildGenericTextInput(
               name: _RegisterFormKeys.password.name,
               label: "Password",
               required: true,
               obscureText: true,
-              placeholder: "Enter password (min. 8 characters)"),
+              placeholder:
+                  "common/enter_extra".i18n(["common/password".i18n()])),
           buildGenericTextInput(
               name: _RegisterFormKeys.passwordConfirmation.name,
-              label: "Confirm Password",
+              label: "screen/login/register/confirm_password".i18n(),
               required: true,
               obscureText: true,
-              placeholder: "Enter your password again"),
+              placeholder: "screen/login/register/enter_password_extra".i18n()),
           buildGenericTextInput(
               name: _RegisterFormKeys.name.name,
               label: "Name",
               required: true,
-              placeholder: "Enter your name"),
+              placeholder: "common/enter_extra".i18n(["common/name".i18n()])),
           buildGenericTextInput(
               name: _RegisterFormKeys.bio.name,
-              label: "About Me",
+              label: "screen/login/register/about_me".i18n(),
               multiline: true,
-              placeholder: "Tell us about you!"),
+              placeholder: "screen/login/register/about_you".i18n()),
           LoginSubmitButton(
               onPressed: () {
                 return widget.onSubmit((
@@ -110,7 +112,7 @@ class _RegisterScreenFormState extends State<_RegisterScreenForm> {
                   bio: form.value[_RegisterFormKeys.bio.name] as String?,
                 ));
               },
-              label: "Register")
+              label: "screen/home/guest/register".i18n())
         ],
       ),
     );

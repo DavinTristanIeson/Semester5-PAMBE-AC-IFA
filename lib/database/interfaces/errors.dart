@@ -1,51 +1,31 @@
 import 'package:flutter/foundation.dart';
+import 'package:localization/localization.dart';
 
 enum ApiErrorType {
   // Http-based server errors
   uncategorizedServerError(
-      name: "Uncategorized",
-      message:
-          "An unexpected error has occurred while performing a network request."),
-  invalidJson(
-      name: "Invalid JSON",
-      message: "Response from the server cannot be parsed into valid JSON."),
-  shapeMismatch(
-      name: "Shape Mismatch",
-      message: "JSON response from backend doesn't match expected model."),
+      name: "Uncategorized", message: "errors/uncategorized"),
+  invalidJson(name: "Invalid JSON", message: "errors/invalid_json"),
+  shapeMismatch(name: "Shape Mismatch", message: "errors/shape_mismatch"),
   serverUnreachable(
-      name: "Server Unreachable", message: "Unable to reach server"),
-  serverIssues(
-      name: "Server Issues",
-      message: "The server is currently experiencing issues."),
-  fromServer(
-      name: "Server-Sent Error",
-      message: "The server has returned an error response."),
+      name: "Server Unreachable", message: "errors/server_unreachable"),
+  serverIssues(name: "Server Issues", message: "errors/server_issues"),
+  fromServer(name: "Server-Sent Error", message: "errors/server_sent_error"),
 
   // Auth errors
   authenticationError(
-      name: "Authentication Error",
-      message: "An error has occurred while authenticating user."),
+      name: "Authentication Error", message: "errors/authentication_error"),
 
   // Resource errors
-  storeFailure(
-      name: "Store Failure",
-      message: "An error occurred while storing the resource"),
+  storeFailure(name: "Store Failure", message: "errors/store_failure"),
   imageManagementFailure(
       name: "Image Management Failure",
-      message:
-          "An error occurred while storing/updating/deleting images on the server"),
-  deleteFailure(
-      name: "Delete Failure",
-      message: "An error occurred while deleting the resource"),
+      message: "errors/image_management_failure"),
+  deleteFailure(name: "Delete Failure", message: "errors/delete_failure"),
   resourceNotFound(
-      name: "Resource Not Found",
-      message: "The resource you're looking for is not available"),
-  cleanupFailure(
-      name: "Cleanup Failure",
-      message: "An error occurred during a scheduled cleanup task"),
-  fetchFailure(
-      name: "Fetch Failure",
-      message: "An error occurred while getting the resource");
+      name: "Resource Not Found", message: "errors/resource_not_found"),
+  cleanupFailure(name: "Cleanup Failure", message: "errors/cleanup_failure"),
+  fetchFailure(name: "Fetch Failure", message: "errors/fetch_failure");
 
   final String defaultMessage;
   final String officialName;
@@ -83,13 +63,15 @@ class ApiError extends _ErrorWrappingError {
   final ApiErrorType type;
 
   ApiError(this.type, {String? message, super.inner}) : customMessage = message;
-  String get message => customMessage ?? type.defaultMessage;
+  String get message => customMessage ?? type.defaultMessage.i18n();
   @override
   toString() =>
-      "Error [Type: $type]: $message${_innerException == null ? '' : "\n$errorMessage"}";
+      "${'common/error'.i18n()} [${'common/type'.i18n()}: $type]: $message${_innerException == null ? '' : "\n$errorMessage"}";
 }
 
 class InvalidStateError implements Exception {
   final String? message;
   InvalidStateError(this.message);
+  @override
+  toString() => "${'common/error'.i18n()}: $message";
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/components/app/confirmation.dart';
@@ -44,13 +45,14 @@ class _LoginScreenFormState extends State<_LoginScreenForm> {
               name: "email",
               label: "Email",
               required: true,
-              placeholder: "Enter your email"),
+              placeholder: "common/enter_extra".i18n(["common/email".i18n()])),
           buildGenericTextInput(
               name: "password",
               label: "Password",
               required: true,
               obscureText: true,
-              placeholder: "Enter your password"),
+              placeholder:
+                  "common/enter_extra".i18n(["common/password".i18n()])),
           LoginSubmitButton(
               onPressed: () {
                 return widget.onSubmit((
@@ -58,7 +60,7 @@ class _LoginScreenFormState extends State<_LoginScreenForm> {
                   password: form.value["password"] as String,
                 ));
               },
-              label: "Login")
+              label: "screen/home/guest/login".i18n())
         ],
       ),
     );

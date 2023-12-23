@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/function/timer.dart';
 
@@ -67,8 +68,8 @@ class RecipeStepTimer extends StatelessWidget {
                   ElevatedButton.icon(
                       onPressed: controller.resume,
                       icon: const Icon(Icons.play_arrow, size: AcSizes.iconBig),
-                      label: const Text(
-                        "Start",
+                      label:  Text(
+                        "screen/recipe/components/timer/start".i18n(),
                       )),
                 if (controller.hasEnded)
                   IconButton(

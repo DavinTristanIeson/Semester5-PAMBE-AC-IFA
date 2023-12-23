@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/components/app/confirmation.dart';
 import 'package:pambe_ac_ifa/components/app/snackbar.dart';
@@ -67,16 +68,21 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                     .read<NotificationController>()
                                     .clear();
                                 messenger.sendSuccess(
-                                    "Notification successfully deleted");
+                                    "screen/home/user/notification_delete"
+                                        .i18n());
                               } catch (e) {
                                 messenger.sendError(e);
                               }
                             },
-                            message:
-                                Either.right("Notifications can't be deleted"),
+                            title: Either.right(
+                                "screen/home/user/clear_notifications".i18n()),
+                            message: Either.right(
+                                "screen/home/user/clear_notifications_desc"
+                                    .i18n()),
                             context: context);
                       });
                 },
+                color: context.colors.error,
                 icon: const Icon(Icons.delete_forever)),
           if (tab == RecipeLibTabs.profile) ...[
             IconButton(

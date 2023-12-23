@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/pages/editor/main.dart';
@@ -37,7 +38,7 @@ class LibraryScreen extends StatelessWidget {
                   builder: (context) => const RecipeEditorScreen()));
             },
             icon: const Icon(Icons.add),
-            label: const Text("Create Recipe"),
+            label: Text("common/create_extra".i18n(["common/recipe".i18n()])),
           ),
         )
       ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/pages/home/main.dart';
@@ -45,7 +46,7 @@ class StartupLoginScreen extends StatelessWidget {
             style: TextButton.styleFrom(
               foregroundColor: Theme.of(context).colorScheme.tertiary,
             ),
-            child: const Text("Skip sign up for now"))
+            child:  Text("screen/startup/login/skip_sign".i18n()))
       ],
     );
   }
@@ -63,9 +64,9 @@ class StartupLoginScreen extends StatelessWidget {
             children: [
               const RecipeLibLogoTitle(),
               const SizedBox(height: 10),
-              const StartupMessageBoard(
+               StartupMessageBoard(
                   text:
-                      "Sign up or log in to share recipes, and bookmark recipes you love"),
+                      "screen/startup/login/share_recipes".i18n()),
               const SizedBox(height: AcSizes.lg),
               buildButtons(context),
               const SizedBox(height: AcSizes.lg),

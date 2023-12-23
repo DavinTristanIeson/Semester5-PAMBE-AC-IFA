@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/pages/startup/components.dart';
@@ -22,15 +23,15 @@ class StartupGetStartedScreen extends StatelessWidget {
               children: [
                 const RecipeLibLogoTitle(),
                 const SizedBox(height: AcSizes.space),
-                const StartupMessageBoard(
+                 StartupMessageBoard(
                     text:
-                        "Share your recipes with people from all over the world with Recipe.Lib"),
-                const StartupMessageBoard(
+                        "screen/startup/get_started/startup_messege".i18n()),
+                 StartupMessageBoard(
                     text:
-                        "View and try out recipes other cooks have uploaded to our database"),
-                const StartupMessageBoard(
+                        "screen/startup/get_started/startup_messege_extra".i18n()),
+                 StartupMessageBoard(
                     text:
-                        "Give feedback to the cooks whose recipes you tried out"),
+                        "screen/startup/get_started/startup_messege_extra_extra".i18n()),
                 const SizedBox(height: AcSizes.lg),
                 OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(

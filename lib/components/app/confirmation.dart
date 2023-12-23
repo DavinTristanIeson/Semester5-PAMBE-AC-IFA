@@ -177,7 +177,7 @@ class ImagePickMethodDialog extends StatelessWidget {
               await openAppSettings();
             }
             if (permissionResponse.isGranted) {
-              onPickSource(ImageSource.camera);
+              await onPickSource(ImageSource.camera);
               navigator.pop();
             }
           },
@@ -198,7 +198,7 @@ class ImagePickMethodDialog extends StatelessWidget {
               await openAppSettings();
             }
             if (permissionResponse.isGranted) {
-              onPickSource(ImageSource.gallery);
+              await onPickSource(ImageSource.gallery);
               navigator.pop();
             }
           },

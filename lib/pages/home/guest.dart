@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
@@ -17,7 +18,11 @@ class GuestHomeScreen extends StatelessWidget {
       children: [
         const Icon(Icons.check, color: AcColors.black),
         const SizedBox(width: AcSizes.md),
-        Text(text),
+        Expanded(
+          child: Text(
+            text,
+          ),
+        ),
       ],
     );
   }
@@ -36,13 +41,13 @@ class GuestHomeScreen extends StatelessWidget {
                 context.navigator.push(MaterialPageRoute(
                     builder: (context) => const LoginScreen()));
               },
-              child: const Text("Login")),
+              child: Text("screen/home/guest/login".i18n())),
           TextButton(
               onPressed: () {
                 context.navigator.push(MaterialPageRoute(
                     builder: (context) => const RegisterScreen()));
               },
-              child: const Text("Register")),
+              child: Text("screen/home/guest/register".i18n())),
         ],
       ),
     );
@@ -58,15 +63,15 @@ class GuestHomeScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Log in or sign up to get the following benefits",
-              style: TextStyle(
+          Text("screen/home/guest/log_or_sign".i18n(),
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
               )),
           const SizedBox(height: AcSizes.space),
-          buildTickPoint("Share your own recipes with the community"),
-          buildTickPoint("Leave constructive feedback on other recipes"),
-          buildTickPoint("Bookmark your favorite recipes"),
-          buildTickPoint("View recipes you've used before"),
+          buildTickPoint("screen/home/guest/share_your_recipe".i18n()),
+          buildTickPoint("screen/home/guest/feedback_recipe".i18n()),
+          buildTickPoint("screen/home/guest/bookmark_recipe".i18n()),
+          buildTickPoint("screen/home/guest/view_recipe".i18n()),
           buildBenefitsCardTextButtons(context),
         ],
       ),

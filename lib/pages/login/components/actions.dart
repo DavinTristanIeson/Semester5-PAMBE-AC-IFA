@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
@@ -21,7 +22,7 @@ class LoginSubmitButton extends StatelessWidget {
       child: Wrapper(
         wrapper: (context, child) {
           return Tooltip(
-            message: "There are errors in the form",
+            message: "screen/login/components/actions/error_form".i18n(),
             textStyle: context.texts.labelMedium,
             decoration: BoxDecoration(color: context.colors.errorContainer),
             child: child,
