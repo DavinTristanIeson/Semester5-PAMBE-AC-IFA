@@ -1,75 +1,124 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-class AdManager {
-  static InterstitialAd? _interstitialAd;
-  static BannerAd? _bannerAd;
-  static bool? isBannerAdReady = false;
-  static DateTime _lastInterstitialTime = DateTime(2000);
+class AdManager extends StatefulWidget {
+  // Test ad unit
+  static const INTERSTITIAL_AD_UNIT_ID =
+      "ca-app-pub-3940256099942544/1033173712";
+  static const BANNER_AD_UNIT_ID = "ca-app-pub-3940256099942544/6300978111";
+  final Widget child;
 
-  static void init() {
-    MobileAds.instance.initialize();
-    _loadInterstitialAd();
-    _loadBannerAd();
-    isBannerAdReady = false;
+  const AdManager({super.key, required this.child});
+
+  @override
+  State<AdManager> createState() => AdManagerState();
+
+  static AdManagerState of(BuildContext context) {
+    return context.findAncestorStateOfType<AdManagerState>()!;
   }
+}
 
-  static void _loadInterstitialAd() {
+class AdManagerState extends State<AdManager> {
+  InterstitialAd? _interstitialAd;
+  BannerAd? _bannerAd;
+  DateTime _lastInterstitialTime = DateTime.fromMillisecondsSinceEpoch(0);
+
+  Future<InterstitialAd?> _loadInterstitialAd() async {
+    final completer = Completer<InterstitialAd>();
     InterstitialAd.load(
-      adUnitId: 'ca-app-pub-3940256099942544/1033173712',
-      request: AdRequest(),
+      adUnitId: AdManager.INTERSTITIAL_AD_UNIT_ID,
+      request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
-          _interstitialAd = ad as InterstitialAd?;
+          _interstitialAd = ad;
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              _lastInterstitialTime = DateTime.now();
+              ad.dispose();
+              _interstitialAd = null;
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              ad.dispose();
+              _interstitialAd = null;
+            },
+          );
+          completer.complete(ad);
         },
         onAdFailedToLoad: (error) {
-          print('Interstitial Ad failed to load: $error');
+          completer.completeError(error);
+          _interstitialAd = null;
         },
       ),
     );
+    return completer.future;
   }
 
-  static void _loadBannerAd() {
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
-      size: AdSize.banner,
-      request: AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (_) {
-          isBannerAdReady = true;
-        },
-        onAdFailedToLoad: (ad, error) {
-          print('Banner Ad failed to load: $error');
-          ad.dispose();
-        },
-      ),
-    );
-
-    _bannerAd!.load();
-  }
-
-  static void showInterstitialAd() {
+  Future<InterstitialAd?> loadInterstitialAd() async {
     DateTime now = DateTime.now();
     Duration difference = now.difference(_lastInterstitialTime);
 
-    if (_interstitialAd != null && difference.inMinutes < 1) {
-      return;
+    if (difference.inMinutes < 5) {
+      return Future.value(null);
     }
-    if (_interstitialAd != null) {
-      _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-        onAdDismissedFullScreenContent: (ad) {
-          _loadInterstitialAd();
-          _lastInterstitialTime = DateTime.now();
-        },
-        onAdFailedToShowFullScreenContent: (ad, error) {
-          print('Interstitial Ad failed to show: $error');
-        },
-      );
-      _interstitialAd!.show();
+    if (_interstitialAd == null) {
+      // don't wait for ad to load to prevent janky navigation
+      _loadInterstitialAd();
+      return Future.value(null);
     }
+    _lastInterstitialTime = now;
+    final ad = _interstitialAd;
+    _loadInterstitialAd();
+    return ad;
   }
 
-  static Widget getBannerAdWidget() {
-    return _bannerAd == null ? SizedBox.shrink() : AdWidget(ad: _bannerAd!);
+  (BannerAd?, Future<BannerAd?>) loadBannerAd() {
+    final completer = Completer<Ad>();
+    final bannerAd = BannerAd(
+      adUnitId: AdManager.BANNER_AD_UNIT_ID,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          completer.complete(ad);
+        },
+        onAdFailedToLoad: (ad, error) {
+          completer.completeError(error);
+          ad.dispose();
+          _bannerAd = null;
+        },
+      ),
+    );
+    bannerAd.load();
+
+    return (
+      _bannerAd,
+      Future(() async {
+        try {
+          await completer.future;
+          _bannerAd = bannerAd;
+          return bannerAd;
+        } catch (e) {
+          return null;
+        }
+      })
+    );
+  }
+
+  Widget buildBanner(BannerAd? ad) {
+    const size = AdSize.banner;
+    return SafeArea(
+      child: SizedBox(
+        width: size.width.toDouble(),
+        height: size.height.toDouble(),
+        child: ad == null ? const SizedBox() : AdWidget(ad: ad),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }

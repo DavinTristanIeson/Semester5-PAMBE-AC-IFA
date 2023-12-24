@@ -105,8 +105,7 @@ class RecipeInfoScreen extends StatelessWidget {
   Widget buildReviewList() {
     if (reviews!.isEmpty) {
       return EmptyView(
-        content: Either.right(
-            "screen/recipe/info/recipe_reviews".i18n()),
+        content: Either.right("screen/recipe/info/recipe_reviews".i18n()),
       );
     }
     return ListView(
@@ -212,11 +211,14 @@ class RecipeInfoScreen extends StatelessWidget {
   }
 
   Widget buildStartButton(BuildContext context) {
+    final adManager = AdManager.of(context);
     return Center(
       child: ElevatedButton(
-        onPressed: () {
-          AdManager.showInterstitialAd();
-          Navigator.of(context).push(MaterialPageRoute(
+        onPressed: () async {
+          final navigator = Navigator.of(context);
+          final ad = await adManager.loadInterstitialAd();
+          await ad?.show();
+          navigator.push(MaterialPageRoute(
               builder: (context) =>
                   RecipeViewerScreen(recipe: recipe, steps: steps)));
         },
@@ -224,7 +226,7 @@ class RecipeInfoScreen extends StatelessWidget {
             fixedSize: Size(MediaQuery.of(context).size.width / 2, AcSizes.lg),
             textStyle: const TextStyle(
                 fontSize: AcSizes.fontEmphasis, fontWeight: FontWeight.w600)),
-        child:  Text("screen/recipe/components/timer/start".i18n()),
+        child: Text("screen/recipe/components/timer/start".i18n()),
       ),
     );
   }
@@ -247,8 +249,8 @@ class RecipeInfoScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               NoticeComponent(
-                  child: Either.right(
-                      "screen/recipe/info/this_tutorial".i18n([AbstractRecipeStepModel.countSteps(steps).toString()])),
+                  child: Either.right("screen/recipe/info/this_tutorial".i18n(
+                      [AbstractRecipeStepModel.countSteps(steps).toString()])),
                   type: NoticeType.tip)
             ],
           ),

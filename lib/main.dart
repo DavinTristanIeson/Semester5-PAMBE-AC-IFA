@@ -42,8 +42,8 @@ void main() async {
   MobileAds.instance.initialize();
   RequestConfiguration configuration =
       RequestConfiguration(testDeviceIds: testDeviceIds);
+  MobileAds.instance.initialize();
   MobileAds.instance.updateRequestConfiguration(configuration);
-  AdManager.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -124,7 +124,7 @@ void main() async {
           ),
         ],
         child: const AcReactiveFormConfig(
-            child: LocaleManager(child: RecipeLibApp()))),
+            child: LocaleManager(child: AdManager(child: RecipeLibApp())))),
   );
 }
 

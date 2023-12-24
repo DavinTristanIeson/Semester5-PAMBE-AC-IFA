@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
@@ -20,11 +21,20 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   late RecipeSearchState searchState;
+  BannerAd? bannerAd;
 
   @override
   void initState() {
     super.initState();
-    AdManager.getBannerAdWidget();
+    final (cachedBannerAd, futureBannerAd) =
+        AdManager.of(context).loadBannerAd();
+    bannerAd = cachedBannerAd;
+    futureBannerAd.then((value) {
+      setState(() {
+        bannerAd = value;
+      });
+    });
+
     searchState = RecipeSearchState(
         search: widget.search,
         sortBy: widget.sortBy ?? SortBy.descending(RecipeSortBy.createdDate),
@@ -33,6 +43,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final adManager = AdManager.of(context);
     return Scaffold(
         appBar: const OnlyReturnAppBar(),
         body: Column(
@@ -52,7 +63,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   }),
             ),
             Expanded(child: SearchScreenBody(searchState: searchState)),
-            Expanded(child: AdManager.getBannerAdWidget()),
+            adManager.buildBanner(bannerAd),
           ],
         ));
   }
