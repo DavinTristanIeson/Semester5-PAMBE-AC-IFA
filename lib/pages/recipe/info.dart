@@ -11,6 +11,7 @@ import 'package:pambe_ac_ifa/controllers/auth.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
+import 'package:pambe_ac_ifa/modules/admanager.dart';
 import 'package:pambe_ac_ifa/pages/profile/main.dart';
 import 'package:pambe_ac_ifa/pages/recipe/viewer.dart';
 import 'package:pambe_ac_ifa/pages/reviews/main.dart';
@@ -214,6 +215,7 @@ class RecipeInfoScreen extends StatelessWidget {
     return Center(
       child: ElevatedButton(
         onPressed: () {
+          AdManager.showInterstitialAd();
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) =>
                   RecipeViewerScreen(recipe: recipe, steps: steps)));

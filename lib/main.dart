@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/validation.dart';
@@ -25,6 +26,7 @@ import 'package:pambe_ac_ifa/database/sqflite/tables/recipe.dart';
 import 'package:pambe_ac_ifa/database/sqflite/tables/recipe_images.dart';
 import 'package:pambe_ac_ifa/init.dart';
 import 'package:pambe_ac_ifa/locale.dart';
+import 'package:pambe_ac_ifa/modules/admanager.dart';
 import 'package:pambe_ac_ifa/switch.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -33,8 +35,15 @@ import 'firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:localization/localization.dart';
 
+List<String> testDeviceIds = ['F28159D58B6A0EDFB83F2050EE7EE431'];
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
+  RequestConfiguration configuration =
+      RequestConfiguration(testDeviceIds: testDeviceIds);
+  MobileAds.instance.updateRequestConfiguration(configuration);
+  AdManager.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

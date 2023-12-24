@@ -4,6 +4,7 @@ import 'package:pambe_ac_ifa/components/app/app_bar.dart';
 import 'package:pambe_ac_ifa/controllers/recipe.dart';
 import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
+import 'package:pambe_ac_ifa/modules/admanager.dart';
 import 'package:pambe_ac_ifa/pages/search/body.dart';
 import 'package:pambe_ac_ifa/pages/search/search_bar.dart';
 
@@ -23,6 +24,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
+    AdManager.getBannerAdWidget();
     searchState = RecipeSearchState(
         search: widget.search,
         sortBy: widget.sortBy ?? SortBy.descending(RecipeSortBy.createdDate),
@@ -49,7 +51,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     });
                   }),
             ),
-            Expanded(child: SearchScreenBody(searchState: searchState))
+            Expanded(child: SearchScreenBody(searchState: searchState)),
+            Expanded(child: AdManager.getBannerAdWidget()),
           ],
         ));
   }
