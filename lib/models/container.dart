@@ -8,12 +8,12 @@ class Either<TLeft, TRight> {
   TRight? _right;
   Either.left(this._left);
   Either.right(this._right);
-  TLeft? get left {
-    return this._left;
+  TLeft get left {
+    return this._left!;
   }
 
-  TRight? get right {
-    return this._right;
+  TRight get right {
+    return this._right!;
   }
 
   get whichever {
@@ -58,7 +58,7 @@ class Optional<T> {
 
   get hasValue => _hasValue;
   T or(T Function() fn) {
-    return hasValue ? value! : fn();
+    return hasValue ? value as T : fn();
   }
 
   Optional<T2> encase<T2>(T2 Function(T value) transform) {
@@ -88,18 +88,15 @@ class Optional<T> {
     required TResult Function(TOptional value) then,
     TResult Function()? otherwise,
   }) {
-    return optionalValues
-        .map((e) {
-          if (e != null && e.hasValue) {
-            return then(e.value as TOptional);
-          } else if (otherwise != null) {
-            return otherwise();
-          } else {
-            return null;
-          }
-        })
-        .where((element) => element != null)
-        .cast<TResult>();
+    final availableValues = otherwise == null
+        ? optionalValues.where((e) => e != null && e.hasValue)
+        : optionalValues;
+    return availableValues.map((e) {
+      if (e == null || !e.hasValue) {
+        return otherwise!();
+      }
+      return then(e.value as TOptional);
+    }).cast<TResult>();
   }
 }
 

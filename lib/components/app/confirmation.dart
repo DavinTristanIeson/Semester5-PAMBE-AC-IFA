@@ -25,8 +25,8 @@ class SimpleConfirmationDialog extends StatelessWidget {
 
   static Widget _buildTitle(
       BuildContext context, Either<Widget, String>? title, String defaultText) {
-    return title != null && title.left != null
-        ? title.left!
+    return title != null && title.hasLeft
+        ? title.left
         : Text(
             title?.right ?? defaultText,
             style: context.texts.titleLarge,
@@ -35,8 +35,8 @@ class SimpleConfirmationDialog extends StatelessWidget {
 
   static Widget _buildPositiveText(Either<Widget, String>? positiveText,
       String defaultText, Color textColor) {
-    return positiveText != null && positiveText.left != null
-        ? positiveText.left!
+    return positiveText != null && positiveText.hasLeft
+        ? positiveText.left
         : Text(
             positiveText?.right ?? "$_localePrefix/confirm".i18n(),
             style: TextStyle(
@@ -48,8 +48,8 @@ class SimpleConfirmationDialog extends StatelessWidget {
 
   static Widget _buildNegativeText(Either<Widget, String>? negativeText,
       String defaultText, BuildContext context) {
-    return negativeText != null && negativeText.left != null
-        ? negativeText.left!
+    return negativeText != null && negativeText.hasLeft
+        ? negativeText.left
         : Text(negativeText?.right ?? "$_localePrefix/cancel".i18n(),
             style: TextStyle(
               color: Theme.of(context).colorScheme.secondary,

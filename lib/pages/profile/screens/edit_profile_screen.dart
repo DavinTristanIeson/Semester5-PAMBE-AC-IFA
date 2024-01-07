@@ -189,9 +189,9 @@ class EditProfileScreenBody extends StatelessWidget {
                   child: CircleAvatar(
                     backgroundColor: context.colors.tertiary,
                     radius: context.relativeWidth(0.25, 60.0, 120.0),
-                    foregroundImage: control.value!.right != null
+                    foregroundImage: control.value!.hasRight
                         ? FileImage(File(control.value!.right!.path))
-                        : (control.value!.left != null
+                        : (control.value!.hasLeft
                             ? CachedNetworkImageProvider(control.value!.left!)
                             : const AssetImage(MaybeImage
                                 .userFallbackImagePath)) as ImageProvider,

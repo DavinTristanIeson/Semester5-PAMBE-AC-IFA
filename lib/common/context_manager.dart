@@ -1,4 +1,7 @@
 // Untuk type checking saja
+import 'dart:async';
+
+// This needs to be a class rather than typedef so we can easily check its type to figure out whether this is a merged context map or just a regular map.
 class MergedContextsMap {
   Map<String, dynamic> map;
   MergedContextsMap(this.map);
@@ -6,11 +9,11 @@ class MergedContextsMap {
 
 class ContextManager<T> {
   String id;
-  Future<T> Function() onOpen;
-  Future<void> Function(T initial) onClose;
+  FutureOr<T> Function() onOpen;
+  FutureOr<void> Function(T initial) onClose;
   ContextManager(
       {required this.id, required this.onOpen, required this.onClose});
-  Future<TResult> run<TResult>(Future<TResult> Function(T initial) fn) async {
+  Future<TResult> run<TResult>(FutureOr<TResult> Function(T initial) fn) async {
     final initial = await onOpen();
     TResult result;
     try {

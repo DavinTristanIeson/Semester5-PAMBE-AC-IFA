@@ -26,7 +26,7 @@ class SampleScrollSection extends StatelessWidget {
 
   Widget buildEmptyView(BuildContext context) {
     if (emptyView != null && emptyView!.hasLeft) {
-      return emptyView!.left!;
+      return emptyView!.left;
     }
     return Container(
       decoration: const BoxDecoration(
