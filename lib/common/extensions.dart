@@ -1,20 +1,24 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
 extension SetUtilities<T> on Set<T> {
+  //1
   bool containsAny(Iterable<T> candidates) {
     return candidates.any((element) => contains(element));
   }
 }
 
 extension MapUtilities<K, V> on Map<K, V> {
+  //2
   void addEntry(MapEntry<K, V> entry) {
     this[entry.key] = entry.value;
   }
 }
 
 extension IterableUtilities<T> on Iterable<T> {
+  //3
   T? find(bool Function(T element) fn) {
     return where((element) => fn(element)).firstOrNull;
   }
@@ -75,7 +79,7 @@ extension DateTimeUtilities on DateTime {
 
 extension StringUtilities on String {
   String ellipsisIfExceed(int length) {
-    return this.length > length
+    return this.length > max(3, length)
         ? replaceRange(this.length - 3, null, "...")
         : this;
   }
