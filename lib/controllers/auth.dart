@@ -37,15 +37,17 @@ class AuthProvider extends ChangeNotifier {
 
   Future<User> login(LoginPayload payload) async {
     await authManager.login(payload);
-
-    return FirebaseAuth.instance.currentUser!;
+    user = FirebaseAuth.instance.currentUser;
+    notifyListeners();
+    return user!;
   }
 
   Future<User> register(RegisterPayload payload) async {
     await authManager
         .register((email: payload.email, password: payload.password));
-
-    return FirebaseAuth.instance.currentUser!;
+    user = FirebaseAuth.instance.currentUser;
+    notifyListeners();
+    return user!;
   }
 
   Future<void> logout() async {

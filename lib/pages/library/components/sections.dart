@@ -110,7 +110,7 @@ class _LibraryLocalRecipesSectionState
     await showBlockingDialog(context, () async {
       await syncRecipeService.run((uid: uid));
       messenger.sendSuccess(
-          "Local recipes were successfully synchronized with your published recipes.");
+          "screen/library/components/sections/sync_successfully".i18n());
     });
     setState(() {});
   }

@@ -328,6 +328,7 @@ class ChangeAuthScreenBody extends StatelessWidget {
         //     placeholder: "Leave empty if email won't be changed"),
         buildGenericTextInput(
             name: _ChangeAuthFormKeys.password.name,
+            obscureText: true,
             label:
                 "screen/profile/screens/change_auth_screen/new_password".i18n(),
             placeholder:
@@ -336,6 +337,7 @@ class ChangeAuthScreenBody extends StatelessWidget {
         ReactiveValueListenableBuilder(
           formControlName: _ChangeAuthFormKeys.password.name,
           child: buildGenericTextInput(
+              obscureText: true,
               name: _ChangeAuthFormKeys.passwordConfirmation.name,
               label: "screen/login/register/enter_password_extra".i18n()),
           builder: (context, control, child) {

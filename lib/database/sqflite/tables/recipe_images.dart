@@ -16,15 +16,15 @@ class LocalRecipeImageManager {
   LocalRecipeImageManager({required this.imageManager});
 
   Future<void> deleteUnusedImagesTask(
-      {required List<String> databaseImagePaths}) async {
-    final availableImages = (await imageManager.getAll()).toSet();
+      {required List<String> databaseImagePaths,
+      required Set<String> existingImagePaths}) async {
     for (final imagePath in databaseImagePaths) {
-      if (availableImages.contains(imagePath)) {
-        availableImages.remove(imagePath);
+      if (existingImagePaths.contains(imagePath)) {
+        existingImagePaths.remove(imagePath);
       }
     }
     try {
-      await Future.wait(availableImages
+      await Future.wait(existingImagePaths
           .map((remainingImage) => File(remainingImage).delete()));
     } catch (e) {
       throw ApiError(ApiErrorType.cleanupFailure, inner: e);

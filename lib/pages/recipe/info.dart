@@ -125,29 +125,29 @@ class RecipeInfoScreen extends StatelessWidget {
     final recipe = this.recipe as RecipeLiteModel;
     return Column(
       children: [
-        if (recipe.rating > 0.0)
-          Padding(
-            padding: const EdgeInsets.only(top: AcSizes.lg),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  recipe.rating.toString(),
-                  style: TextStyle(
-                    color: context.colors.primary,
-                    fontWeight: FontWeight.w500,
-                    fontSize: AcSizes.fontLarge,
-                  ),
-                ),
-                const SizedBox(width: AcSizes.sm),
-                Icon(
-                  Icons.star,
-                  color: context.colors.primary,
-                ),
-              ],
-              // To make sure the text is centered
-            ),
-          ),
+        // if (recipe.rating > 0.0)
+        //   Padding(
+        //     padding: const EdgeInsets.only(top: AcSizes.lg),
+        //     child: Row(
+        //       mainAxisSize: MainAxisSize.min,
+        //       children: [
+        //         Text(
+        //           recipe.rating.toString(),
+        //           style: TextStyle(
+        //             color: context.colors.primary,
+        //             fontWeight: FontWeight.w500,
+        //             fontSize: AcSizes.fontLarge,
+        //           ),
+        //         ),
+        //         const SizedBox(width: AcSizes.sm),
+        //         Icon(
+        //           Icons.star,
+        //           color: context.colors.primary,
+        //         ),
+        //       ],
+        //       // To make sure the text is centered
+        //     ),
+        //   ),
         TextButton(
           onPressed: () {
             context.navigator.push(MaterialPageRoute(

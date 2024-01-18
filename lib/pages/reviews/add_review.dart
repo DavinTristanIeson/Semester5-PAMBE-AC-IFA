@@ -83,9 +83,10 @@ class _AddReviewSectionState extends State<AddReviewSection> {
       await notificationController.notify(
           targetUserId: widget.recipe.user!.id,
           notification: NotificationPayload.review(
+              // Notification message should not be translated by sender, but no time to fix. Just make it all English.
               title:
-                  // "${review.user?.name ?? 'A user'} reviewed your recipe, ${widget.recipe.title}"
-                  "screen/reviews/add_review/reviewed_recipe".i18n([review.user?.name ?? 'A user', widget.recipe.title]),
+                  "${review.user?.name ?? 'A user'} reviewed your recipe, ${widget.recipe.title}",
+              // "screen/reviews/add_review/reviewed_recipe".i18n([review.user?.name ?? 'A user', widget.recipe.title]),
               reviewId: review.id,
               recipeId: widget.recipe.id,
               content: review.content,
@@ -130,7 +131,8 @@ class _AddReviewSectionState extends State<AddReviewSection> {
                       control.value = value;
                     },
                     label: "screen/reviews/add_review/review".i18n(),
-                    placeholder: "screen/reviews/add_review/your_thoughts_recipe".i18n(),
+                    placeholder:
+                        "screen/reviews/add_review/your_thoughts_recipe".i18n(),
                   );
                 }),
             const SizedBox(height: AcSizes.space),
@@ -140,10 +142,12 @@ class _AddReviewSectionState extends State<AddReviewSection> {
                 ReactiveFormConsumer(builder: (context, control, child) {
                   final button = FutureButton(
                       onPressed: control.invalid ? null : postReview,
-                      child:  Text("screen/reviews/add_review/post_review".i18n()));
+                      child:
+                          Text("screen/reviews/add_review/post_review".i18n()));
                   if (control.hasErrors) {
                     return Tooltip(
-                        message: "screen/reviews/add_review/rating".i18n(), child: button);
+                        message: "screen/reviews/add_review/rating".i18n(),
+                        child: button);
                   } else {
                     return button;
                   }

@@ -54,6 +54,11 @@ class _ReviewsListState extends State<ReviewsList> {
   Future<PaginatedQueryResult<ReviewModel>> fetch(
       ReviewSearchState state, QueryDocumentSnapshot? pageKey) async {
     final controller = context.read<ReviewController>();
+    if (state.reviewId != null) {
+      final data = await controller.get(
+          recipeId: state.recipeId, reviewId: state.reviewId!);
+      return (data: [if (data != null) data], nextPage: null);
+    }
     return controller.getAllWithPagination(searchState: state, page: pageKey);
   }
 
@@ -74,10 +79,11 @@ class _ReviewsListState extends State<ReviewsList> {
                 await reviewManager.remove(
                     review.id, widget.searchState.recipeId);
                 _pagination.refresh();
-                messenger.sendSuccess("screen/reviews/list/review_delete".i18n());
+                messenger
+                    .sendSuccess("screen/reviews/list/review_delete".i18n());
               },
-              message:
-                  Either.right("screen/reviews/list/review_delete_extra".i18n()),
+              message: Either.right(
+                  "screen/reviews/list/review_delete_extra".i18n()),
               context: context);
         });
   }

@@ -48,7 +48,8 @@ class RecipeTable {
     ''');
   }
 
-  Future<void> cleanupUnusedImages() async {
+  Future<void> cleanupUnusedImages(
+      {required Set<String> existingImages}) async {
     final allRecipes = await db.query(tableName,
         where: "${_RecipeColumns.imagePath} IS NOT NULL",
         columns: [_RecipeColumns.imagePath.name]);
@@ -58,7 +59,8 @@ class RecipeTable {
     final allStepRecipeImages = await stepsController.getAllImages();
     allRecipeImages.addAll(allStepRecipeImages);
     await imageManager.deleteUnusedImagesTask(
-        databaseImagePaths: allRecipeImages);
+        databaseImagePaths: allRecipeImages,
+        existingImagePaths: existingImages);
   }
 
   Future<LocalRecipeModel?> get(int id) async {

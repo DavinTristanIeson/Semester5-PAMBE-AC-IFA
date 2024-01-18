@@ -226,7 +226,8 @@ Future<Optional<T>> showBlockingDialog<T>(
           navigator.pop();
         }
       });
-      return const Center(child: CircularProgressIndicator());
+      return const PopScope(
+          canPop: false, child: Center(child: CircularProgressIndicator()));
     },
     barrierDismissible: false,
     context: context,

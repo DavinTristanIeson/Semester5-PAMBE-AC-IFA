@@ -9,6 +9,7 @@ import 'package:pambe_ac_ifa/controllers/review.dart';
 import 'package:pambe_ac_ifa/database/interfaces/review.dart';
 import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/models/recipe.dart';
+import 'package:pambe_ac_ifa/pages/recipe/main.dart';
 import 'package:pambe_ac_ifa/pages/reviews/add_review.dart';
 import 'package:pambe_ac_ifa/pages/reviews/list.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +33,21 @@ class ReviewsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final recipeController = context.read<RecipeController>();
     return Scaffold(
-        appBar: const OnlyReturnAppBar(),
+        appBar: OnlyReturnAppBar(
+          actions: [
+            OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                    foregroundColor: context.colors.primary,
+                    side: BorderSide(color: context.colors.primary)),
+                onPressed: () {
+                  context.navigator
+                      .pushReplacement(MaterialPageRoute(builder: (ctx) {
+                    return RecipeScreen(source: RecipeSource.remote(recipeId));
+                  }));
+                },
+                child: Text("screen/reviews/main/view_recipe".i18n()))
+          ],
+        ),
         body: FutureBuilder(
             future: recipeController.get(recipeId),
             builder: (context, snapshot) {
@@ -47,9 +62,9 @@ class ReviewsScreen extends StatelessWidget {
               }
               if (!snapshot.hasData) {
                 return EmptyView(
-                  content:
-                      Either.right("screen/reviews/main/find_recipe".i18n([recipeId]),)
-                );
+                    content: Either.right(
+                  "screen/reviews/main/find_recipe".i18n([recipeId]),
+                ));
               }
               return _ReviewsScreen(
                 permission: permission,
@@ -88,7 +103,7 @@ class _ReviewsScreenState extends State<_ReviewsScreen> {
   ReviewSearchState _initializeSearchState() {
     return ReviewSearchState(
         recipeId: widget.recipe.id,
-        reviewId: widget.reviewId,
+        reviewId: _showAll ? null : widget.reviewId,
         limit: onlyShowOne ? 1 : 15,
         sort: SortBy.descending(ReviewSortBy.ratings));
   }
@@ -126,9 +141,10 @@ class _ReviewsScreenState extends State<_ReviewsScreen> {
                 onPressed: () {
                   setState(() {
                     _showAll = true;
+                    searchState = _initializeSearchState();
                   });
                 },
-                child:  Text("screen/reviews/main/other_review".i18n())),
+                child: Text("screen/reviews/main/other_review".i18n())),
           )),
       ],
     );

@@ -178,6 +178,7 @@
   "screen/reviews/list/review_delete": "Your review was successfully deleted",
   "screen/reviews/list/review_delete_extra": "Are you sure you want to delete your review?",
   "screen/reviews/main/find_recipe": "Cannot find recipe with ID : %s",
+  "screen/reviews/main/view_recipe": "View Recipe",
 
   "screen/reviews/main/other_review": "Show other Reviews",
   "screen/settings/main/language": "Language",

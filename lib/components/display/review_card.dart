@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
+import 'package:pambe_ac_ifa/components/display/image.dart';
 import 'package:pambe_ac_ifa/models/review.dart';
 import 'package:pambe_ac_ifa/pages/reviews/main.dart';
 
@@ -51,7 +52,6 @@ class StarRating extends StatelessWidget {
 }
 
 class ReviewCard extends StatelessWidget {
-  static const _localePrefix = "components/display/review_card";
   final ReviewModel review;
   final String? recipeId;
   final String? recipeName;
@@ -76,6 +76,7 @@ class ReviewCard extends StatelessWidget {
                   builder: (context) => ReviewsScreen(
                         recipeId: recipeId!,
                         reviewId: review.id,
+                        permission: ReviewPermission.deny,
                       )));
             },
       child: Container(
@@ -104,41 +105,46 @@ class ReviewCard extends StatelessWidget {
   }
 
   Widget buildUserAndRating(BuildContext context) {
-    Widget reviewerNameWidget = Text(
-        review.user?.name ?? "$_localePrefix/deleted_user".i18n(),
-        style: review.user == null
-            ? context.texts.titleMedium!.copyWith(fontStyle: FontStyle.italic)
-            : null,
-        overflow: TextOverflow.ellipsis);
-    Widget starRatingWidget =
-        StarRating(rating: review.rating, type: StarRatingType.compact);
-
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CircleAvatar(
-          radius: AcSizes.lg + AcSizes.md,
-          backgroundColor: Theme.of(context).colorScheme.tertiary,
-          backgroundImage: null,
-        ),
-        const SizedBox(width: AcSizes.md),
-        Column(
+        Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            recipeName != null
-                ? Row(
-                    children: [
-                      reviewerNameWidget,
-                      const SizedBox(width: AcSizes.space),
-                      starRatingWidget
-                    ],
-                  )
-                : reviewerNameWidget,
-            recipeName != null
-                ? Text("$_localePrefix/on".i18n() + recipeName!,
-                    style: context.texts.titleSmall)
-                : starRatingWidget
+            CircleAvatar(
+              radius: AcSizes.avatarRadius,
+              backgroundColor: context.colors.tertiary,
+              backgroundImage: review.user == null
+                  ? MaybeImage.fallbackUserImage
+                  : review.user!.image,
+            ),
+            const SizedBox(
+              width: AcSizes.space,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  review.user?.name ?? "common/deleted_user".i18n(),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: AcSizes.fontEmphasis,
+                      fontStyle: review.user == null ? FontStyle.italic : null),
+                ),
+                Text(review.createdAt.toLocaleString(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w300,
+                      fontSize: AcSizes.fontSmall,
+                      fontStyle: FontStyle.italic,
+                    )),
+              ],
+            )
           ],
+        ),
+        StarRating(
+          rating: review.rating,
+          type: StarRatingType.compact,
         ),
       ],
     );

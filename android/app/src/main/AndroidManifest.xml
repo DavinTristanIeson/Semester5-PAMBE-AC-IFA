@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
       <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
-        android:label="pambe_ac_ifa"
+        android:label="Recipe.Lib"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -18,6 +18,7 @@ class NotificationTile extends StatelessWidget {
               builder: (context) => ReviewsScreen(
                     recipeId: notification.recipeId!,
                     reviewId: notification.reviewId!,
+                    permission: ReviewPermission.deny,
                   )));
         },
     };

@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
@@ -49,15 +47,15 @@ void main() async {
   );
 
   Database db = await initializeSqfliteDatabase(override: false);
+  final localFileImageManager = LocalFileImageManager();
   final recipeTable = RecipeTable(
     db,
-    imageManager:
-        LocalRecipeImageManager(imageManager: LocalFileImageManager()),
+    imageManager: LocalRecipeImageManager(imageManager: localFileImageManager),
   );
-  compute((token) {
-    BackgroundIsolateBinaryMessenger.ensureInitialized(token);
-    recipeTable.cleanupUnusedImages();
-  }, ServicesBinding.rootIsolateToken!);
+
+  // Cannot be run in isolate or it will cause crash.
+  final availableImages = (await localFileImageManager.getAll()).toSet();
+  await recipeTable.cleanupUnusedImages(existingImages: availableImages);
 
   final userManager = FirebaseUserManager(
       imageManager: FirebaseImageManager(storagePath: 'user'));
