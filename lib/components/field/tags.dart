@@ -95,6 +95,11 @@ class AcTagsInput extends StatelessWidget {
         placeholder: placeholder,
         value: '',
         onChanged: null,
+        onFocusChange: (controller, focus) {
+          if (!focus.hasFocus) {
+            controller.clear();
+          }
+        },
         onSubmitted: (controller, textValue) {
           final tag = processTag(textValue);
           controller.clear();

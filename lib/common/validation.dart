@@ -24,6 +24,8 @@ class AcReactiveFormConfig extends StatelessWidget {
         ValidationMessage.email: (error) => "validation/email".i18n(),
         AcValidationMessage.imageRequired: (error) =>
             "validation/image_required".i18n(),
+        AcValidationMessage.minCount: (minCount) =>
+            "validation/min_count".i18n([minCount.toString()])
       },
       child: child,
     );

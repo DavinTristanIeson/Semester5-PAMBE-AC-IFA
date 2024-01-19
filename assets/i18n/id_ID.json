@@ -46,6 +46,7 @@
   "validation/password_confirmation_mismatch": "Konfirmasi kata sandi harus sama dengan kata sandi.",
   "validation/email": "Input harus mengandung email yang valid.",
   "validation/image_required": "Foto diperlukan.",
+  "validation/min_count": "Input harus mengandung minimal %s item!",
 
   "components/app/confirmation/confirm": "Konfirmasi",
   "components/app/confirmation/cancel": "Batal",

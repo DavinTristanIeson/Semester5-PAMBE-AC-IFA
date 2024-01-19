@@ -89,7 +89,7 @@ class _RecipeEditorScreenFormState extends State<RecipeEditorScreenForm> {
     final controller = context.read<LocalRecipeController>();
     final messenger = AcSnackbarMessenger.of(context);
     if (form.invalid) {
-      messenger.sendError("screen/editor/form/resolve_all_erorrs".i18n());
+      messenger.sendError("errors/resolve_all_errors".i18n());
       return;
     }
 

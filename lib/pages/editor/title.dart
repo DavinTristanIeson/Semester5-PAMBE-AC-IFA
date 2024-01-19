@@ -95,6 +95,7 @@ class RecipeDetailsEditor extends StatelessWidget {
             onChanged: (value) {
               control.value = value;
             },
+            error: ReactiveFormConfig.of(context)?.translateAny(control.errors),
             placeholder: "Which tags suit your recipe?",
             value: control.value!,
             canMutate: false,

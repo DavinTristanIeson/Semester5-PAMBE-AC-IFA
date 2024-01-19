@@ -237,13 +237,13 @@ class _RecipeStepEditorFieldWrapper extends StatelessWidget {
     return Row(
       children: [
         Tooltip(
-          message: "screen/editor/step_editor/step_up",
+          message: "screen/editor/step_editor/step_up".i18n(),
           child: IconButton(
               onPressed: index == 0 ? null : () => shiftFormItemUp(controller),
               icon: const Icon(Icons.keyboard_arrow_up)),
         ),
         Tooltip(
-          message: "screen/editor/step_editor/step_down",
+          message: "screen/editor/step_editor/step_down".i18n(),
           child: IconButton(
               onPressed: index == formArray.controls.length - 1
                   ? null
@@ -252,7 +252,7 @@ class _RecipeStepEditorFieldWrapper extends StatelessWidget {
         ),
         const Spacer(),
         Tooltip(
-          message: "screen/editor/step_editor/step_delete",
+          message: "screen/editor/step_editor/step_delete".i18n(),
           child: IconButton(
               onPressed: () {
                 showDialog(
@@ -263,9 +263,11 @@ class _RecipeStepEditorFieldWrapper extends StatelessWidget {
                             removeFormItem(controller);
                           },
                           title: Either.right(
-                              "screen/editor/step_editor/step_delete_extra"),
+                              "screen/editor/step_editor/step_delete_extra"
+                                  .i18n()),
                           message: Either.right(
-                              "screen/editor/step_editor/step_delete_extra_extra"),
+                              "screen/editor/step_editor/step_delete_extra_extra"
+                                  .i18n()),
                           context: context);
                     });
               },

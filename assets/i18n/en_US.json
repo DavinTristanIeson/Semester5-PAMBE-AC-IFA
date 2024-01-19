@@ -46,6 +46,7 @@
   "validation/password_confirmation_mismatch": "Password confirmation must be the same as password.",
   "validation/email": "Field must contain a valid email address.",
   "validation/image_required": "Image is required.",
+  "validation/min_count": "Field must contain at least %s item(s)!",
 
   "components/app/confirmation/confirm": "Confirm",
   "components/app/confirmation/cancel": "Cancel",

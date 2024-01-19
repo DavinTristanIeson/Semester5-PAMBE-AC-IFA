@@ -33,13 +33,16 @@ class _TextFieldValueProviderState extends State<TextFieldValueProvider> {
   }
 }
 
-class BoxTextInput extends StatelessWidget {
+class BoxTextInput extends StatefulWidget {
   final String? placeholder;
   final String? value;
   final void Function(TextEditingController controller, String? value)?
       onChanged;
   final void Function(TextEditingController controller, String value)?
       onSubmitted;
+  final void Function(TextEditingController controller)? onEditingComplete;
+  final void Function(TextEditingController controller, FocusNode focus)?
+      onFocusChange;
   final bool multiline;
   final bool obscureText;
   const BoxTextInput({
@@ -50,26 +53,51 @@ class BoxTextInput extends StatelessWidget {
     this.multiline = false,
     this.obscureText = false,
     this.onSubmitted,
+    this.onEditingComplete,
+    this.onFocusChange,
   });
 
   @override
+  State<BoxTextInput> createState() => _BoxTextInputState();
+}
+
+class _BoxTextInputState extends State<BoxTextInput> {
+  late final TextEditingController _controller;
+  late final FocusNode _focus;
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.value);
+    _focus = FocusNode();
+    _focus.addListener(() {
+      widget.onFocusChange?.call(_controller, _focus);
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _focus.dispose();
+    _controller.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return TextFieldValueProvider(
-      value: value,
-      builder: (context, controller) => TextField(
-        decoration: AcInputBorderFactory(context, AcInputBorderType.outline)
-            .decorate(InputDecoration(
-                fillColor: AcColors.white,
-                filled: true,
-                hintText: placeholder,
-                hintStyle: AcTypography.placeholder)),
-        controller: controller,
-        obscureText: obscureText,
-        maxLines: multiline ? null : 1,
-        minLines: multiline ? 4 : null,
-        onChanged: (value) => onChanged?.call(controller, value),
-        onSubmitted: (value) => onSubmitted?.call(controller, value),
-      ),
+    return TextField(
+      decoration: AcInputBorderFactory(context, AcInputBorderType.outline)
+          .decorate(InputDecoration(
+              fillColor: AcColors.white,
+              filled: true,
+              hintText: widget.placeholder,
+              hintStyle: AcTypography.placeholder)),
+      controller: _controller,
+      focusNode: _focus,
+      obscureText: widget.obscureText,
+      maxLines: widget.multiline ? null : 1,
+      minLines: widget.multiline ? 4 : null,
+      onChanged: (value) => widget.onChanged?.call(_controller, value),
+      onSubmitted: (value) => widget.onSubmitted?.call(_controller, value),
+      onEditingComplete: () => widget.onEditingComplete?.call(_controller),
     );
   }
 }

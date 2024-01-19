@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:pambe_ac_ifa/common/constants.dart';
 import 'package:pambe_ac_ifa/common/extensions.dart';
-import 'package:pambe_ac_ifa/database/interfaces/recipe.dart';
-import 'package:pambe_ac_ifa/models/container.dart';
 import 'package:pambe_ac_ifa/pages/home/components/sections.dart';
 import 'package:pambe_ac_ifa/pages/login/login.dart';
 import 'package:pambe_ac_ifa/pages/login/register.dart';
@@ -87,8 +85,7 @@ class GuestHomeScreen extends StatelessWidget {
           IconButton(
               onPressed: () {
                 context.navigator.push(MaterialPageRoute(builder: (context) {
-                  return SearchScreen(
-                      sortBy: SortBy.descending(RecipeSortBy.ratings));
+                  return const SearchScreen();
                 }));
               },
               icon: const Icon(Icons.search)),

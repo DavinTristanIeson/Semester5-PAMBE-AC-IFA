@@ -14,6 +14,5 @@ void main() {
       ),
     ));
     expect(find.text("Abcde"), findsOneWidget);
-    expect(find.byType(TextFieldValueProvider), findsOneWidget);
   });
 }
